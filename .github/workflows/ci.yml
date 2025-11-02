@@ -1,0 +1,32 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      - name: Install PNPM
+        run: npm i -g pnpm
+      - name: Backend placeholder tests
+        working-directory: backend
+        run: |
+          echo "placeholder" > README.md
+          python - <<'PY'
+print("OK")
+PY
+      - name: Frontend placeholder tests
+        working-directory: frontend
+        run: |
+          echo "placeholder" > README.md
+          node -e "console.log('OK')"
