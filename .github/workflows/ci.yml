@@ -29,10 +29,10 @@ jobs:
           black --check .
           isort --check .
       
-      - name: Run tests
+      - name: Run tests with coverage
         working-directory: backend
         run: |
-          pytest -v --cov=. --cov-report=term-missing
+          pytest -v --cov=. --cov-report=term-missing --cov-fail-under=90
       
       - name: Check migrations
         working-directory: backend
@@ -54,13 +54,13 @@ jobs:
       
       - name: Install dependencies
         working-directory: frontend
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
       
       - name: Run linter
         working-directory: frontend
         run: pnpm lint
       
-      - name: Type check
+      - name: Type check and build
         working-directory: frontend
         run: pnpm build
       
