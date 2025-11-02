@@ -17,7 +17,11 @@ class OrderListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Filter orders by patient if provided."""
-        queryset = Order.objects.all().select_related("patient").prefetch_related("items__test")
+        queryset = (
+            Order.objects.all()
+            .select_related("patient")
+            .prefetch_related("items__test")
+        )
         patient_id = self.request.query_params.get("patient")
         if patient_id:
             queryset = queryset.filter(patient_id=patient_id)
@@ -37,6 +41,8 @@ class OrderListCreateView(generics.ListCreateAPIView):
 class OrderDetailView(generics.RetrieveAPIView):
     """Retrieve order details."""
 
-    queryset = Order.objects.all().select_related("patient").prefetch_related("items__test")
+    queryset = (
+        Order.objects.all().select_related("patient").prefetch_related("items__test")
+    )
     serializer_class = OrderSerializer
     permission_classes = [IsAdminOrReception]

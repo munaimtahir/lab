@@ -1,7 +1,5 @@
 """Patient models."""
 
-import re
-
 from django.core.validators import RegexValidator
 from django.db import models
 
@@ -65,7 +63,11 @@ class Patient(models.Model):
 
             today = timezone.now().strftime("%Y%m%d")
             # Get the last patient created today
-            last_patient = Patient.objects.filter(mrn__startswith=f"PAT-{today}").order_by("mrn").last()
+            last_patient = (
+                Patient.objects.filter(mrn__startswith=f"PAT-{today}")
+                .order_by("mrn")
+                .last()
+            )
             if last_patient:
                 last_num = int(last_patient.mrn.split("-")[-1])
                 new_num = last_num + 1

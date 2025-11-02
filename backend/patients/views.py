@@ -12,7 +12,7 @@ from .serializers import PatientSerializer
 class PatientListCreateView(generics.ListCreateAPIView):
     """
     List patients with search or create a new patient.
-    
+
     GET /api/patients?query= - Search patients by name, phone, or CNIC prefix
     POST /api/patients/ - Create a new patient
     """
@@ -48,7 +48,7 @@ class PatientListCreateView(generics.ListCreateAPIView):
 class PatientDetailView(generics.RetrieveAPIView):
     """
     Retrieve a patient by ID.
-    
+
     GET /api/patients/:id/ - Get patient details
     """
 

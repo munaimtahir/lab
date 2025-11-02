@@ -28,7 +28,9 @@ class Order(models.Model):
     """Order model."""
 
     order_no = models.CharField(max_length=20, unique=True)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="orders")
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name="orders"
+    )
     priority = models.CharField(
         max_length=20,
         choices=OrderPriority.choices,
@@ -61,7 +63,11 @@ class Order(models.Model):
             from django.utils import timezone
 
             today = timezone.now().strftime("%Y%m%d")
-            last_order = Order.objects.filter(order_no__startswith=f"ORD-{today}").order_by("order_no").last()
+            last_order = (
+                Order.objects.filter(order_no__startswith=f"ORD-{today}")
+                .order_by("order_no")
+                .last()
+            )
             if last_order:
                 last_num = int(last_order.order_no.split("-")[-1])
                 new_num = last_num + 1

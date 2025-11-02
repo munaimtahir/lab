@@ -121,9 +121,13 @@ class Command(BaseCommand):
         ]
 
         for test_data in tests_data:
-            TestCatalog.objects.get_or_create(code=test_data["code"], defaults=test_data)
+            TestCatalog.objects.get_or_create(
+                code=test_data["code"], defaults=test_data
+            )
 
-        self.stdout.write(self.style.SUCCESS(f"✓ Created {len(tests_data)} test catalog items"))
+        self.stdout.write(
+            self.style.SUCCESS(f"✓ Created {len(tests_data)} test catalog items")
+        )
 
         # Create sample patients
         patients_data = [
@@ -148,9 +152,13 @@ class Command(BaseCommand):
         ]
 
         for patient_data in patients_data:
-            Patient.objects.get_or_create(cnic=patient_data["cnic"], defaults=patient_data)
+            Patient.objects.get_or_create(
+                cnic=patient_data["cnic"], defaults=patient_data
+            )
 
-        self.stdout.write(self.style.SUCCESS(f"✓ Created {len(patients_data)} sample patients"))
+        self.stdout.write(
+            self.style.SUCCESS(f"✓ Created {len(patients_data)} sample patients")
+        )
         self.stdout.write(self.style.SUCCESS("\nDemo data seeded successfully! 🎉"))
         self.stdout.write("\nDefault users:")
         self.stdout.write("  admin / admin123 (Admin)")
