@@ -330,3 +330,37 @@ class TestPatientAPI:
         response = self.client.post("/api/patients/", data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+
+    def test_create_patient_invalid_phone_prefix(self):
+        """Test creating patient with invalid phone prefix."""
+        self.client.force_authenticate(user=self.reception_user)
+        data = {
+            "full_name": "Test Invalid Phone",
+            "father_name": "Test Father",
+            "dob": "1990-01-01",
+            "sex": "M",
+            "phone": "1234567890",  # Doesn't start with +92 or 0
+            "cnic": "12345-1234567-9",
+            "address": "Test Address",
+        }
+        response = self.client.post("/api/patients/", data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        # Check that phone error is in the response (either directly or in error envelope)
+        assert ("phone" in response.data) or ("phone" in response.data.get("error", {}).get("details", {}))
+
+    def test_create_patient_invalid_cnic_format(self):
+        """Test creating patient with invalid CNIC format."""
+        self.client.force_authenticate(user=self.reception_user)
+        data = {
+            "full_name": "Test Invalid CNIC",
+            "father_name": "Test Father",
+            "dob": "1990-01-01",
+            "sex": "M",
+            "phone": "03001234567",
+            "cnic": "12345678901234",  # Wrong format
+            "address": "Test Address",
+        }
+        response = self.client.post("/api/patients/", data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        # Check that CNIC error is in the response (either directly or in error envelope)
+        assert ("cnic" in response.data) or ("cnic" in response.data.get("error", {}).get("details", {}))
