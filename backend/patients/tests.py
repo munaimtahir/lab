@@ -314,3 +314,19 @@ class TestPatientAPI:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["full_name"] == "John Doe"
         assert response.data["mrn"] == patient.mrn
+
+    def test_create_patient_invalid_phone_format(self):
+        """Test creating a patient with invalid phone format."""
+        self.client.force_authenticate(user=self.reception_user)
+        data = {
+            "full_name": "John Doe",
+            "father_name": "James Doe",
+            "dob": "1990-01-01",
+            "sex": "M",
+            "phone": "invalid_phone",
+            "cnic": "12345-1234567-1",
+            "address": "123 Main St",
+        }
+        response = self.client.post("/api/patients/", data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+

@@ -103,3 +103,20 @@ class TestAuthenticationAPI:
             {"refresh": refresh_token},
         )
         assert response.status_code == status.HTTP_200_OK
+
+    def test_logout_invalid_token(self):
+        """Test logout with invalid token."""
+        # Login first
+        login_response = self.client.post(
+            "/api/auth/login/",
+            {"username": "testuser", "password": "testpass123"},
+        )
+        access_token = login_response.data["access"]
+
+        # Logout with invalid refresh token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access_token}")
+        response = self.client.post(
+            "/api/auth/logout/",
+            {"refresh": "invalid_token"},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

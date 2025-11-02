@@ -232,3 +232,34 @@ class TestResultAPI:
         response = self.client.get(f"/api/results/{result.id}/")
         assert response.status_code == status.HTTP_200_OK
         assert response.data["value"] == "12.5"
+
+    def test_enter_nonexistent_result(self):
+        """Test entering a non-existent result returns 404."""
+        self.client.force_authenticate(user=self.tech_user)
+        response = self.client.post("/api/results/99999/enter/")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_verify_nonexistent_result(self):
+        """Test verifying a non-existent result returns 404."""
+        self.client.force_authenticate(user=self.pathologist_user)
+        response = self.client.post("/api/results/99999/verify/")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_publish_nonexistent_result(self):
+        """Test publishing a non-existent result returns 404."""
+        self.client.force_authenticate(user=self.pathologist_user)
+        response = self.client.post("/api/results/99999/publish/")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_publish_result_as_tech_forbidden(self):
+        """Test that tech cannot publish results."""
+        self.client.force_authenticate(user=self.tech_user)
+        result = Result.objects.create(
+            order_item=self.order_item,
+            value="12.5",
+            unit="g/dL",
+            status="VERIFIED",
+        )
+
+        response = self.client.post(f"/api/results/{result.id}/publish/")
+        assert response.status_code == status.HTTP_403_FORBIDDEN

@@ -218,3 +218,15 @@ class TestSampleAPI:
         response = self.client.get(f"/api/samples/{sample.id}/")
         assert response.status_code == status.HTTP_200_OK
         assert response.data["barcode"] == sample.barcode
+
+    def test_collect_nonexistent_sample(self):
+        """Test collecting a non-existent sample returns 404."""
+        self.client.force_authenticate(user=self.phlebotomy_user)
+        response = self.client.post("/api/samples/99999/collect/")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_receive_nonexistent_sample(self):
+        """Test receiving a non-existent sample returns 404."""
+        self.client.force_authenticate(user=self.tech_user)
+        response = self.client.post("/api/samples/99999/receive/")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
