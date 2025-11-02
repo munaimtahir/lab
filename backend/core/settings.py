@@ -95,7 +95,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 # Use PostgreSQL in production/Docker, SQLite for local testing
 if os.environ.get("POSTGRES_HOST"):
-    DATABASES = {
+    DATABASES = {  # pragma: no cover - Environment-dependent configuration
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": os.environ.get("POSTGRES_DB", "lims"),

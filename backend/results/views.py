@@ -39,9 +39,7 @@ def enter_result(request, pk):
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
-        return Response(
-            {"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.user.role not in [UserRole.TECHNOLOGIST, UserRole.ADMIN]:
         return Response(
@@ -65,9 +63,7 @@ def verify_result(request, pk):
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
-        return Response(
-            {"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.user.role not in [UserRole.PATHOLOGIST, UserRole.ADMIN]:
         return Response(
@@ -97,9 +93,7 @@ def publish_result(request, pk):
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
-        return Response(
-            {"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.user.role not in [UserRole.PATHOLOGIST, UserRole.ADMIN]:
         return Response(

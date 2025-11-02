@@ -199,14 +199,13 @@ class TestReportAPI:
 
         # Use the order with published result
         pdf_buffer = generate_report_pdf(self.order)
-        
+
         assert pdf_buffer is not None
         pdf_content = pdf_buffer.read()
         assert len(pdf_content) > 0
-        assert pdf_content.startswith(b'%PDF')  # PDF header
-        
+        assert pdf_content.startswith(b"%PDF")  # PDF header
+
         # Check for deterministic content
         pdf_buffer.seek(0)
-        pdf_buffer2 = generate_report_pdf(self.order)
         # PDFs should have consistent structure (though timestamps may vary)
         assert len(pdf_content) > 1000  # Reasonable PDF size

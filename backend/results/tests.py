@@ -84,9 +84,7 @@ class TestResultAPI:
             cnic="12345-1234567-1",
             address="123 Main St",
         )
-        self.order = Order.objects.create(
-            patient=self.patient, priority="ROUTINE"
-        )
+        self.order = Order.objects.create(patient=self.patient, priority="ROUTINE")
         self.test = TestCatalog.objects.create(
             code="CBC",
             name="Complete Blood Count",
@@ -95,9 +93,7 @@ class TestResultAPI:
             price=500.00,
             turnaround_time_hours=24,
         )
-        self.order_item = OrderItem.objects.create(
-            order=self.order, test=self.test
-        )
+        self.order_item = OrderItem.objects.create(order=self.order, test=self.test)
 
     def test_create_result(self):
         """Test creating a result."""

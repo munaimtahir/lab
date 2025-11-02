@@ -42,9 +42,7 @@ class TestSampleModel:
         )
         order_item = OrderItem.objects.create(order=order, test=test)
 
-        sample = Sample.objects.create(
-            order_item=order_item, sample_type="Blood"
-        )
+        sample = Sample.objects.create(order_item=order_item, sample_type="Blood")
 
         assert sample.barcode.startswith("SAM-")
         assert sample.status == "PENDING"
@@ -72,12 +70,8 @@ class TestSampleModel:
         )
         order_item = OrderItem.objects.create(order=order, test=test)
 
-        sample1 = Sample.objects.create(
-            order_item=order_item, sample_type="Blood"
-        )
-        sample2 = Sample.objects.create(
-            order_item=order_item, sample_type="Serum"
-        )
+        sample1 = Sample.objects.create(order_item=order_item, sample_type="Blood")
+        sample2 = Sample.objects.create(order_item=order_item, sample_type="Serum")
 
         assert sample1.barcode != sample2.barcode
         assert sample1.barcode.startswith("SAM-")
@@ -110,9 +104,7 @@ class TestSampleAPI:
             cnic="12345-1234567-1",
             address="123 Main St",
         )
-        self.order = Order.objects.create(
-            patient=self.patient, priority="ROUTINE"
-        )
+        self.order = Order.objects.create(patient=self.patient, priority="ROUTINE")
         self.test = TestCatalog.objects.create(
             code="CBC",
             name="Complete Blood Count",
@@ -121,9 +113,7 @@ class TestSampleAPI:
             price=500.00,
             turnaround_time_hours=24,
         )
-        self.order_item = OrderItem.objects.create(
-            order=self.order, test=self.test
-        )
+        self.order_item = OrderItem.objects.create(order=self.order, test=self.test)
 
     def test_create_sample(self):
         """Test creating a sample."""
@@ -140,9 +130,7 @@ class TestSampleAPI:
     def test_list_samples(self):
         """Test listing samples."""
         self.client.force_authenticate(user=self.admin_user)
-        Sample.objects.create(
-            order_item=self.order_item, sample_type="Blood"
-        )
+        Sample.objects.create(order_item=self.order_item, sample_type="Blood")
 
         response = self.client.get("/api/samples/")
         assert response.status_code == status.HTTP_200_OK
@@ -151,9 +139,7 @@ class TestSampleAPI:
     def test_collect_sample_as_phlebotomy(self):
         """Test collecting a sample as phlebotomy user."""
         self.client.force_authenticate(user=self.phlebotomy_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item, sample_type="Blood"
-        )
+        sample = Sample.objects.create(order_item=self.order_item, sample_type="Blood")
 
         response = self.client.post(f"/api/samples/{sample.id}/collect/")
         assert response.status_code == status.HTTP_200_OK
@@ -163,9 +149,7 @@ class TestSampleAPI:
     def test_collect_sample_as_admin(self):
         """Test collecting a sample as admin."""
         self.client.force_authenticate(user=self.admin_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item, sample_type="Blood"
-        )
+        sample = Sample.objects.create(order_item=self.order_item, sample_type="Blood")
 
         response = self.client.post(f"/api/samples/{sample.id}/collect/")
         assert response.status_code == status.HTTP_200_OK
@@ -174,9 +158,7 @@ class TestSampleAPI:
     def test_collect_sample_as_tech_forbidden(self):
         """Test that tech cannot collect samples."""
         self.client.force_authenticate(user=self.tech_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item, sample_type="Blood"
-        )
+        sample = Sample.objects.create(order_item=self.order_item, sample_type="Blood")
 
         response = self.client.post(f"/api/samples/{sample.id}/collect/")
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -210,9 +192,7 @@ class TestSampleAPI:
     def test_get_sample_detail(self):
         """Test getting sample detail."""
         self.client.force_authenticate(user=self.admin_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item, sample_type="Blood"
-        )
+        sample = Sample.objects.create(order_item=self.order_item, sample_type="Blood")
 
         response = self.client.get(f"/api/samples/{sample.id}/")
         assert response.status_code == status.HTTP_200_OK

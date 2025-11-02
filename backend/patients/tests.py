@@ -330,7 +330,6 @@ class TestPatientAPI:
         response = self.client.post("/api/patients/", data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-
     def test_create_patient_invalid_phone_prefix(self):
         """Test creating patient with invalid phone prefix."""
         self.client.force_authenticate(user=self.reception_user)
@@ -345,8 +344,11 @@ class TestPatientAPI:
         }
         response = self.client.post("/api/patients/", data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        # Check that phone error is in the response (either directly or in error envelope)
-        assert ("phone" in response.data) or ("phone" in response.data.get("error", {}).get("details", {}))
+        # Check that phone error is in the response
+        # (either directly or in error envelope)
+        assert ("phone" in response.data) or (
+            "phone" in response.data.get("error", {}).get("details", {})
+        )
 
     def test_create_patient_invalid_cnic_format(self):
         """Test creating patient with invalid CNIC format."""
@@ -362,5 +364,51 @@ class TestPatientAPI:
         }
         response = self.client.post("/api/patients/", data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        # Check that CNIC error is in the response (either directly or in error envelope)
-        assert ("cnic" in response.data) or ("cnic" in response.data.get("error", {}).get("details", {}))
+        # Check that CNIC error is in the response
+        # (either directly or in error envelope)
+        assert ("cnic" in response.data) or (
+            "cnic" in response.data.get("error", {}).get("details", {})
+        )
+
+
+@pytest.mark.django_db
+class TestPatientSerializerValidation:
+    """Test Patient serializer validation methods directly."""
+
+    def test_validate_phone_invalid_prefix(self):
+        """Test phone validation with invalid prefix."""
+        from rest_framework import serializers as drf_serializers
+
+        from .serializers import PatientSerializer
+
+        serializer = PatientSerializer()
+        with pytest.raises(drf_serializers.ValidationError) as exc_info:
+            serializer.validate_phone("1234567890")
+        assert "Phone must start with +92 or 0" in str(exc_info.value)
+
+    def test_validate_phone_valid(self):
+        """Test phone validation with valid number."""
+        from .serializers import PatientSerializer
+
+        serializer = PatientSerializer()
+        result = serializer.validate_phone("+923001234567")
+        assert result == "+923001234567"
+
+    def test_validate_cnic_invalid_format(self):
+        """Test CNIC validation with invalid format."""
+        from rest_framework import serializers as drf_serializers
+
+        from .serializers import PatientSerializer
+
+        serializer = PatientSerializer()
+        with pytest.raises(drf_serializers.ValidationError) as exc_info:
+            serializer.validate_cnic("invalid-cnic")
+        assert "CNIC must be in format #####-#######-#" in str(exc_info.value)
+
+    def test_validate_cnic_valid(self):
+        """Test CNIC validation with valid format."""
+        from .serializers import PatientSerializer
+
+        serializer = PatientSerializer()
+        result = serializer.validate_cnic("12345-1234567-1")
+        assert result == "12345-1234567-1"

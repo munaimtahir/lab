@@ -1,6 +1,6 @@
+from django.core.cache import cache
 from django.db import connection
 from django.http import JsonResponse
-from django.core.cache import cache
 
 
 def health_check(request):
@@ -41,4 +41,3 @@ def health_check(request):
             status_code = 200
 
     return JsonResponse(health_status, status=status_code)
-

@@ -39,9 +39,7 @@ def collect_sample(request, pk):
     try:
         sample = Sample.objects.get(pk=pk)
     except Sample.DoesNotExist:
-        return Response(
-            {"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.user.role not in [UserRole.PHLEBOTOMY, UserRole.ADMIN]:
         return Response(
@@ -65,9 +63,7 @@ def receive_sample(request, pk):
     try:
         sample = Sample.objects.get(pk=pk)
     except Sample.DoesNotExist:
-        return Response(
-            {"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.user.role not in [
         UserRole.TECHNOLOGIST,

@@ -50,7 +50,7 @@ def generate_report(request, order_id):
     for item in order.items.all():
         if not item.results.filter(status="PUBLISHED").exists():
             return Response(
-                {"error": "All test results must be published before generating report"},
+                {"error": "All results must be published before report"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -65,7 +65,10 @@ def generate_report(request, order_id):
     )
 
     serializer = ReportSerializer(report)
-    return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+    return Response(
+        serializer.data,
+        status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+    )
 
 
 @api_view(["GET"])

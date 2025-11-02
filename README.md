@@ -1,8 +1,8 @@
 # Al Shifa LIMS v1.0.0 — Laboratory Information Management System
 
 ![CI](https://github.com/munaimtahir/lab/workflows/CI/badge.svg)
-[![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen.svg)](https://github.com/munaimtahir/lab)
-[![Tests](https://img.shields.io/badge/tests-80%20passing-brightgreen.svg)](https://github.com/munaimtahir/lab)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/munaimtahir/lab)
+[![Tests](https://img.shields.io/badge/tests-87%20passing-brightgreen.svg)](https://github.com/munaimtahir/lab)
 
 A production-ready Laboratory Information Management System (LIMS) for Al Shifa Laboratory with complete workflow automation, PDF reporting, and role-based access control.
 
@@ -26,7 +26,7 @@ cd infra && docker-compose up
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS
 - **Authentication**: JWT with token blacklisting and role-based access control
 - **Infrastructure**: Docker Compose with health checks, GitHub Actions CI/CD
-- **Testing**: 97% backend coverage, 80 comprehensive tests, E2E with Playwright
+- **Testing**: 100% backend coverage, 87 comprehensive tests, E2E with Playwright
 
 ## ✨ Complete LIMS Workflow
 
@@ -40,18 +40,21 @@ cd infra && docker-compose up
 8. **PDF Reports** - Al Shifa template with signatures
 9. **Report Download** - Secure delivery
 
-## 📊 Test Coverage: 97% (80 Tests)
+## 📊 Test Coverage: 100% (87 Tests) 🎉
 
 | Module | Tests | Coverage |
 |--------|-------|----------|
 | Authentication | 7 | 100% |
-| Patients | 18 | 98% |
+| Patients | 22 | 100% |
 | Catalog | 3 | 100% |
 | Orders | 4 | 100% |
 | Samples | 12 | 100% |
 | Results | 15 | 100% |
 | Reports | 12 | 100% |
-| Health | 3 | 100% |
+| Health | 6 | 100% |
+| Seed Data | 4 | 100% |
+| Core Settings | 3 | 100% |
+| **Total** | **87** | **100%** |
 
 ## 👥 Demo Users
 

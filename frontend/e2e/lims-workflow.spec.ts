@@ -5,10 +5,9 @@ import { expect, test } from '@playwright/test';
 // Frontend: pnpm dev
 
 const API_BASE = 'http://localhost:8000/api';
-const APP_BASE = 'http://localhost:5173';
 
 test.describe('LIMS Complete Workflow', () => {
-  test('full workflow: register patient → order → sample → result → report', async ({ page, request }) => {
+  test('full workflow: register patient → order → sample → result → report', async ({ request }) => {
     // 1. Login as admin
     const loginResponse = await request.post(`${API_BASE}/auth/login/`, {
       data: {
@@ -17,7 +16,7 @@ test.describe('LIMS Complete Workflow', () => {
       },
     });
     expect(loginResponse.ok()).toBeTruthy();
-    const { access, refresh } = await loginResponse.json();
+    const { access } = await loginResponse.json();
     expect(access).toBeTruthy();
 
     // Set authorization header for subsequent requests

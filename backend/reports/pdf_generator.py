@@ -45,7 +45,9 @@ def generate_report_pdf(order):
         ["Order No:", order.order_no, "Date:", datetime.now().strftime("%Y-%m-%d")],
     ]
 
-    patient_table = Table(patient_info, colWidths=[1.5 * inch, 2.5 * inch, 1 * inch, 2 * inch])
+    patient_table = Table(
+        patient_info, colWidths=[1.5 * inch, 2.5 * inch, 1 * inch, 2 * inch]
+    )
     patient_table.setStyle(
         TableStyle(
             [
@@ -77,7 +79,8 @@ def generate_report_pdf(order):
             )
 
     results_table = Table(
-        results_data, colWidths=[2.5 * inch, 1.5 * inch, 1 * inch, 1.5 * inch, 0.5 * inch]
+        results_data,
+        colWidths=[2.5 * inch, 1.5 * inch, 1 * inch, 1.5 * inch, 0.5 * inch],
     )
     results_table.setStyle(
         TableStyle(
