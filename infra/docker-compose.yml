@@ -1,0 +1,29 @@
+# Dev docker-compose (scaffold)
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: lims
+      POSTGRES_PASSWORD: lims
+      POSTGRES_DB: lims
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+  backend:
+    build: ../backend
+    env_file: ../.env
+    depends_on: [db, redis]
+    command: sh -c "python manage.py migrate && pytest -q || true && python manage.py runserver 0.0.0.0:8000"
+    ports: ["8000:8000"]
+  frontend:
+    build: ../frontend
+    env_file: ../.env
+    depends_on: [backend]
+    command: sh -c "pnpm install && pnpm dev --host"
+    ports: ["5173:5173"]
+
+volumes:
+  pgdata:

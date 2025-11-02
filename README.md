@@ -1,59 +1,14 @@
-# lab
-Laboratory Information Management System
+# LIMS — Lab Information Management System (Dev Pack v0)
+**Date:** 2025-11-02
 
-## Mono-Repo Structure
+This repository is a *code-free* starter kit: it contains documents, CI skeletons, and structure for an AI agent (or human team) to build a full-stack LIMS in stages with 100% test coverage.
+The actual application code will be generated later using the stage prompts in `docs/AGENT.md` and `docs/TASKS.md`.
 
-This project is organized as a mono-repo with the following structure:
+## Structure
+- `docs/` — specifications, prompts, checklists
+- `backend/` — (empty now) Python/Django target with pytest
+- `frontend/` — (empty now) React + TypeScript target with Vitest + Playwright
+- `infra/` — docker-compose and environment examples
+- `.github/workflows/` — CI pipeline scaffold
 
-- **backend/** - Django-based backend API with pytest, factory_boy, freezegun, ruff, mypy, black, isort
-- **frontend/** - Vite + React + TypeScript frontend with ESLint, Prettier, Vitest + RTL, Playwright
-- **infra/** - Infrastructure as Code and deployment configurations
-- **docs/** - Project documentation and guides
-
-## Quick Start
-
-### Backend
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Testing
-
-### Backend Tests
-```bash
-cd backend
-source venv/bin/activate
-pytest --cov=. --cov-report=term-missing
-```
-
-### Frontend Tests
-```bash
-cd frontend
-npm run test:coverage
-```
-
-## Pre-commit Hooks
-
-This project uses pre-commit hooks for code quality. To set up:
-
-```bash
-pip install pre-commit
-pre-commit install
-```
-
-The hooks will automatically run on git commit and check:
-- Python: black, isort, ruff, mypy
-- JavaScript/TypeScript: prettier, eslint
-
+Start by reading `docs/SETUP.md` then `docs/GOALS.md`, and finally run the prompts in `docs/AGENT.md` stage-by-stage.
