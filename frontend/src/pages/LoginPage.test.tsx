@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { LoginPage } from './LoginPage'
 
 describe('LoginPage', () => {
@@ -13,8 +13,8 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument()
   })
 
-  it('calls onLogin with username on submit', () => {
-    const mockLogin = vi.fn()
+  it('calls onLogin with username and password on submit', async () => {
+    const mockLogin = vi.fn().mockResolvedValue(undefined)
     render(<LoginPage onLogin={mockLogin} />)
 
     const usernameInput = screen.getByLabelText('Username')
@@ -25,7 +25,42 @@ describe('LoginPage', () => {
     fireEvent.change(passwordInput, { target: { value: 'testpass' } })
     fireEvent.click(loginButton)
 
-    expect(mockLogin).toHaveBeenCalledWith('testuser')
+    await waitFor(() => {
+      expect(mockLogin).toHaveBeenCalledWith('testuser', 'testpass')
+    })
+  })
+
+  it('shows error message on login failure', async () => {
+    const mockLogin = vi.fn().mockRejectedValue(new Error('Invalid credentials'))
+    render(<LoginPage onLogin={mockLogin} />)
+
+    const usernameInput = screen.getByLabelText('Username')
+    const passwordInput = screen.getByLabelText('Password')
+    const loginButton = screen.getByRole('button', { name: 'Login' })
+
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
+    fireEvent.change(passwordInput, { target: { value: 'wrongpass' } })
+    fireEvent.click(loginButton)
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid credentials')).toBeInTheDocument()
+    })
+  })
+
+  it('shows loading state during login', async () => {
+    const mockLogin = vi.fn().mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)))
+    render(<LoginPage onLogin={mockLogin} />)
+
+    const usernameInput = screen.getByLabelText('Username')
+    const passwordInput = screen.getByLabelText('Password')
+    const loginButton = screen.getByRole('button', { name: 'Login' })
+
+    fireEvent.change(usernameInput, { target: { value: 'testuser' } })
+    fireEvent.change(passwordInput, { target: { value: 'testpass' } })
+    fireEvent.click(loginButton)
+
+    expect(screen.getByText('Logging in...')).toBeInTheDocument()
+    expect(loginButton).toBeDisabled()
   })
 
   it('shows demo credentials', () => {

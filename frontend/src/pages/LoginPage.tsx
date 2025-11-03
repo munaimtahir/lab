@@ -1,16 +1,27 @@
 import { useState } from 'react'
 
 interface LoginPageProps {
-  onLogin: (username: string) => void
+  onLogin: (username: string, password: string) => Promise<void>
 }
 
 export function LoginPage({ onLogin }: LoginPageProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onLogin(username)
+    setError('')
+    setIsLoading(true)
+
+    try {
+      await onLogin(username, password)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -20,6 +31,12 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           <h1 className="text-3xl font-bold text-red-900">Al-Shifa Laboratory</h1>
           <p className="text-gray-600 mt-2">Laboratory Information Management System</p>
         </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-800">{error}</p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -34,6 +51,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent"
               placeholder="Enter your username"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -49,14 +67,16 @@ export function LoginPage({ onLogin }: LoginPageProps) {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent"
               placeholder="Enter your password"
               required
+              disabled={isLoading}
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-red-900 text-white py-3 rounded-lg hover:bg-red-800 transition-colors font-medium"
+            disabled={isLoading}
+            className="w-full bg-red-900 text-white py-3 rounded-lg hover:bg-red-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
