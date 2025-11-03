@@ -122,6 +122,7 @@ pnpm playwright test
 ## 📚 Documentation
 
 - [API Reference](docs/API.md)
+- [Frontend Guide](docs/FRONTEND.md)
 - [Data Model](docs/DATA_MODEL.md)
 - [Test Coverage](docs/TESTS_COVERAGE.md)
 
