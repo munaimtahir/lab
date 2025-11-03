@@ -12,6 +12,7 @@ include_trailing_comma = true
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+extend-exclude = ["*/migrations/*.py"]
 
 [tool.ruff.lint]
 select = [

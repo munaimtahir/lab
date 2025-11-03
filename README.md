@@ -20,6 +20,12 @@ cd infra && docker-compose up
 # Default credentials: admin / admin123
 ```
 
+> **Security Note**: The default configuration uses development credentials. For production:
+> 1. Copy `.env.example` to `.env` and update all passwords
+> 2. Set strong `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY`
+> 3. Use environment variables to override docker-compose defaults
+> 4. Never commit `.env` to version control
+
 ## 🏗️ Architecture
 
 - **Backend**: Python 3.12, Django 5.2, Django REST Framework, PostgreSQL 16, Redis 7
@@ -67,17 +73,34 @@ cd infra && docker-compose up
 
 ## 🔧 Local Development
 
+### Environment Setup
+
 ```bash
-# Backend
+# 1. Create your environment configuration
+cp .env.example .env
+# Edit .env with your local settings (passwords, secrets)
+
+# 2. Start with Docker (recommended)
+cd infra && docker-compose up
+
+# OR run services individually:
+```
+
+### Backend Development
+
+```bash
 cd backend
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py seed_data
 python manage.py runserver
+```
 
-# Frontend
+### Frontend Development
+
+```bash
 cd frontend
-pnpm install
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 

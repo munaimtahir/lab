@@ -16,6 +16,14 @@ class Command(BaseCommand):
 
     help = "Seed demo data for LIMS"
 
+    def add_arguments(self, parser):
+        """Add command arguments."""
+        parser.add_argument(
+            "--no-input",
+            action="store_true",
+            help="Run without user interaction (idempotent)",
+        )
+
     def handle(self, *args, **kwargs):
         """Handle the command."""
         self.stdout.write("Seeding demo data...")
