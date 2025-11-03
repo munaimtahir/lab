@@ -57,7 +57,10 @@ def allocate_patient_mrn(
     # Get next MRN number from terminal's range
     mrn_number = terminal.get_next_offline_mrn()
     
-    # Format as string - keeping consistent format but using numeric MRN
+    # Format as string (numeric only for offline to distinguish from online format)
+    # Online format: PAT-YYYYMMDD-NNNN (date-based with prefix)
+    # Offline format: Pure numeric (e.g., "710000") from terminal range
+    # This allows easy identification of offline vs online registrations
     mrn = str(mrn_number)
 
     return mrn, terminal, True

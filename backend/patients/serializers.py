@@ -5,6 +5,7 @@ from datetime import date
 from rest_framework import serializers
 from django.db import IntegrityError
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from .models import Patient
 from .services import allocate_patient_mrn
@@ -91,7 +92,8 @@ class PatientSerializer(serializers.ModelSerializer):
                 origin_terminal_code=origin_terminal_code,
                 offline=offline,
             )
-        except Exception as e:
+        except ValidationError as e:
+            # Handle expected validation errors from the service
             raise serializers.ValidationError({"detail": str(e)})
 
         # Set offline-related fields

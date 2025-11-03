@@ -393,6 +393,8 @@ class TestOfflinePatientRegistration:
 
     def test_duplicate_mrn_handled(self, admin_client, lab_terminal):
         """Test that duplicate MRN is handled gracefully."""
+        from django.db import IntegrityError
+        
         # Create a patient with offline MRN
         data1 = {
             "full_name": "First Patient",
@@ -411,7 +413,7 @@ class TestOfflinePatientRegistration:
 
         # Try to create another patient with same MRN (simulate race condition)
         # This should not happen in normal operation but test error handling
-        with pytest.raises(Exception):
+        with pytest.raises(IntegrityError):
             Patient.objects.create(
                 mrn=mrn,
                 full_name="Duplicate",
