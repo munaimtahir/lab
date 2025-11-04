@@ -1,0 +1,85 @@
+name: Production Hardening Task — Security, Infrastructure, and Operations
+description: Resolve the critical blockers preventing a safe commercial deployment
+title: "[Hardening]: Ship-ready security, infra, and operational safeguards"
+labels: ["security", "infra", "compliance", "high priority"]
+assignees:
+  - your-username
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🚨 Goal
+
+        Eliminate every remaining blocker identified in the production readiness review so the LIMS can be deployed commercially with confidence.
+
+        Complete the following checklists covering configuration, data handling, access control, build hygiene, and infrastructure hygiene.
+
+  - type: checkboxes
+    id: configuration
+    attributes:
+      label: 🔐 Secure Configuration & Secrets Management
+      options:
+        - label: Replace development defaults for secrets, debug flags, CORS, and host settings with production-safe values
+        - label: Ensure JWT signing requires a strong secret/key and cannot fall back to public development material
+        - label: Harden Docker Compose and runtime configs to disallow weak default credentials (e.g., lims/lims)
+
+  - type: checkboxes
+    id: data-integrity
+    attributes:
+      label: 🧬 Data Integrity & Lifecycle Controls
+      options:
+        - label: Disable automatic reseeding of demo accounts/data during production deployments
+        - label: Implement durable storage (e.g., persistent volumes or object storage) for generated reports/media
+        - label: Add retention/backups and document operational handling for generated reports
+
+  - type: checkboxes
+    id: access-controls
+    attributes:
+      label: 🛡️ Authorization & Workflow Enforcement
+      options:
+        - label: Enforce ownership/role checks when downloading reports via `/api/reports/{id}/download/`
+        - label: Prevent `enter_result` from overwriting published/verified results
+        - label: Add state guards and auditing for sample collection transitions to block regressions back to `COLLECTED`
+
+  - type: checkboxes
+    id: frontend-build
+    attributes:
+      label: 🌐 Frontend Build Safety
+      options:
+        - label: Align environment variables (`VITE_API_URL`) so production builds target the correct API endpoint
+        - label: Move access/refresh tokens out of `localStorage` into an HttpOnly or otherwise hardened storage mechanism
+        - label: Remove committed `frontend/node_modules/` and enforce clean install workflows
+
+  - type: checkboxes
+    id: ci-cd
+    attributes:
+      label: ⚙️ CI/CD & Toolchain Hygiene
+      options:
+        - label: Strip development-only tooling from production container images to minimize size and attack surface
+        - label: Make linting fail CI (drop `--exit-zero`) so `ruff` violations block merges
+        - label: Ensure frontend CI respects the lockfile for deterministic installs
+        - label: Update `verify.sh` to bootstrap environments automatically (no pre-built venv/node_modules assumptions)
+
+  - type: checkboxes
+    id: documentation
+    attributes:
+      label: 📚 Documentation & Messaging
+      options:
+        - label: Update documentation to accurately reflect coverage, production readiness, and provide a complete frontend README
+
+  - type: checkboxes
+    id: infra
+    attributes:
+      label: 🌩️ Edge & Infrastructure Hardening
+      options:
+        - label: Secure nginx with valid TLS termination, correct `server_name`, and static asset handling that does not proxy back to Django
+
+  - type: textarea
+    id: qa
+    attributes:
+      label: ✅ Verification Summary
+      description: Document the tests, security reviews, and operational runbooks you executed to prove production readiness.
+      placeholder: e.g., Rotated secrets, hardened nginx TLS, verified role-gated report downloads, added persistence for media.
+    validations:
+      required: true
