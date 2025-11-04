@@ -78,14 +78,18 @@ export type SampleStatus = 'PENDING' | 'COLLECTED' | 'RECEIVED'
 
 export interface Sample {
   id: number
-  order: number
+  order_item: number
   barcode: string
   status: SampleStatus
-  specimen_type: string
+  sample_type: string
   collected_at?: string
-  collected_by?: User
+  collected_by?: number
   received_at?: string
-  received_by?: User
+  received_by?: number
+  rejection_reason?: string
+  notes?: string
+  created_at: string
+  updated_at: string
 }
 
 // Result types
@@ -95,16 +99,18 @@ export interface Result {
   id: number
   order_item: number
   status: ResultStatus
-  value?: string
+  value: string
   unit?: string
   reference_range?: string
-  flag?: 'normal' | 'high' | 'low' | 'abnormal'
+  flags?: string
   entered_at?: string
-  entered_by?: User
+  entered_by?: number
   verified_at?: string
-  verified_by?: User
+  verified_by?: number
   published_at?: string
-  published_by?: User
+  notes?: string
+  created_at: string
+  updated_at: string
 }
 
 // Report types

@@ -1,5 +1,7 @@
 import { API_BASE_URL, STORAGE_KEYS } from '../utils/constants'
 
+export { API_BASE_URL }
+
 export class ApiError extends Error {
   status?: number
   data?: unknown
