@@ -3,6 +3,8 @@
 from django.core.validators import RegexValidator
 from django.db import models
 
+from core.models import LabTerminal
+
 
 class Patient(models.Model):
     """Patient model with demographics."""
@@ -40,6 +42,26 @@ class Patient(models.Model):
         help_text="National ID in format #####-#######-#",
     )
     address = models.TextField()
+    
+    # Offline registration support
+    origin_terminal = models.ForeignKey(
+        LabTerminal,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="patients",
+        help_text="Terminal that created this registration (if known)",
+    )
+    is_offline_entry = models.BooleanField(
+        default=False,
+        help_text="True if originally created while offline",
+    )
+    synced_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when this record was synced to central server",
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
