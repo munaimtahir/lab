@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { orderService } from '../../services/orders'
-import type { Order } from '../../types'
+import { sampleService } from '../../services/samples'
+import { resultService } from '../../services/results'
+import { reportService } from '../../services/reports'
+import type { Order, Sample, Result, Report } from '../../types'
 import { ROUTES, COLORS } from '../../utils/constants'
 import { formatDateTime, formatCurrency } from '../../utils/validators'
 import { useAuth } from '../../hooks/useAuth'
@@ -14,14 +17,37 @@ export function OrderDetailPage() {
   const { user } = useAuth()
   
   const [order, setOrder] = useState<Order | null>(null)
+  const [samples, setSamples] = useState<Sample[]>([])
+  const [results, setResults] = useState<Result[]>([])
+  const [reports, setReports] = useState<Report[]>([])
   const [loading, setLoading] = useState(true)
+  const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('summary')
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  
+  // Results entry form state
+  const [resultFormData, setResultFormData] = useState<Record<number, {
+    value: string
+    unit: string
+    flags: string
+    notes: string
+  }>>({})
 
   useEffect(() => {
     if (id) {
       fetchOrder(Number(id))
     }
   }, [id])
+
+  useEffect(() => {
+    if (order) {
+      fetchSamples()
+      fetchResults()
+      fetchReports()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order])
 
   const fetchOrder = async (orderId: number) => {
     setLoading(true)
@@ -30,8 +56,156 @@ export function OrderDetailPage() {
       setOrder(data)
     } catch (error) {
       console.error('Failed to fetch order:', error)
+      setError('Failed to load order')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchSamples = async () => {
+    try {
+      const allSamples = await sampleService.getAll()
+      const orderItemIds = order?.items.map(item => item.id) || []
+      const filteredSamples = allSamples.filter(s => orderItemIds.includes(s.order_item))
+      setSamples(filteredSamples)
+    } catch (error) {
+      console.error('Failed to fetch samples:', error)
+    }
+  }
+
+  const fetchResults = async () => {
+    try {
+      const allResults = await resultService.getAll()
+      const orderItemIds = order?.items.map(item => item.id) || []
+      const filteredResults = allResults.filter(r => orderItemIds.includes(r.order_item))
+      setResults(filteredResults)
+      
+      // Initialize form data with existing results
+      const formData: Record<number, any> = {}
+      filteredResults.forEach(result => {
+        formData[result.order_item] = {
+          value: result.value || '',
+          unit: result.unit || '',
+          flags: result.flags || '',
+          notes: result.notes || ''
+        }
+      })
+      setResultFormData(formData)
+    } catch (error) {
+      console.error('Failed to fetch results:', error)
+    }
+  }
+
+  const fetchReports = async () => {
+    try {
+      const allReports = await reportService.getAll()
+      const orderReports = allReports.filter(r => r.order.id === order?.id)
+      setReports(orderReports)
+    } catch (error) {
+      console.error('Failed to fetch reports:', error)
+    }
+  }
+
+  const handleCollectSample = async (sampleId: number) => {
+    setActionLoading(`collect-${sampleId}`)
+    setError(null)
+    setSuccess(null)
+    try {
+      await sampleService.collect(sampleId)
+      setSuccess('Sample collected successfully')
+      await fetchSamples()
+    } catch (error: any) {
+      setError(error.message || 'Failed to collect sample')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleReceiveSample = async (sampleId: number) => {
+    setActionLoading(`receive-${sampleId}`)
+    setError(null)
+    setSuccess(null)
+    try {
+      await sampleService.receive(sampleId)
+      setSuccess('Sample received successfully')
+      await fetchSamples()
+    } catch (error: any) {
+      setError(error.message || 'Failed to receive sample')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleEnterResult = async (resultId: number, orderItemId: number) => {
+    setActionLoading(`enter-${resultId}`)
+    setError(null)
+    setSuccess(null)
+    try {
+      const formData = resultFormData[orderItemId]
+      if (!formData?.value) {
+        setError('Please enter a result value')
+        setActionLoading(null)
+        return
+      }
+      
+      await resultService.enter(resultId, {
+        value: formData.value,
+        unit: formData.unit,
+        flag: formData.flags as any,
+        notes: formData.notes
+      })
+      setSuccess('Result entered successfully')
+      await fetchResults()
+    } catch (error: any) {
+      setError(error.message || 'Failed to enter result')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleVerifyResult = async (resultId: number) => {
+    setActionLoading(`verify-${resultId}`)
+    setError(null)
+    setSuccess(null)
+    try {
+      await resultService.verify(resultId)
+      setSuccess('Result verified successfully')
+      await fetchResults()
+    } catch (error: any) {
+      setError(error.message || 'Failed to verify result')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handlePublishResult = async (resultId: number) => {
+    setActionLoading(`publish-${resultId}`)
+    setError(null)
+    setSuccess(null)
+    try {
+      await resultService.publish(resultId)
+      setSuccess('Result published successfully')
+      await fetchResults()
+    } catch (error: any) {
+      setError(error.message || 'Failed to publish result')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleGenerateReport = async () => {
+    if (!order) return
+    setActionLoading('generate-report')
+    setError(null)
+    setSuccess(null)
+    try {
+      await reportService.generate(order.id)
+      setSuccess('Report generated successfully')
+      await fetchReports()
+    } catch (error: any) {
+      setError(error.message || 'Failed to generate report')
+    } finally {
+      setActionLoading(null)
     }
   }
 
@@ -39,10 +213,19 @@ export function OrderDetailPage() {
     return COLORS.status[status as keyof typeof COLORS.status] || 'bg-gray-100 text-gray-800'
   }
 
+  const getSampleForItem = (orderItemId: number) => {
+    return samples.find(s => s.order_item === orderItemId)
+  }
+
+  const getResultForItem = (orderItemId: number) => {
+    return results.find(r => r.order_item === orderItemId)
+  }
+
   const canCollectSamples = user && ['ADMIN', 'PHLEBOTOMY'].includes(user.role)
   const canReceiveSamples = user && ['ADMIN', 'TECHNOLOGIST', 'PATHOLOGIST'].includes(user.role)
   const canEnterResults = user && ['ADMIN', 'TECHNOLOGIST'].includes(user.role)
   const canVerifyResults = user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
+  const canGenerateReports = user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
 
   if (loading) {
     return (
@@ -89,6 +272,18 @@ export function OrderDetailPage() {
           Status: {order.status}
         </span>
       </div>
+
+      {/* Alert Messages */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-800">{error}</p>
+        </div>
+      )}
+      {success && (
+        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-sm text-green-800">{success}</p>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow">
@@ -253,12 +448,73 @@ export function OrderDetailPage() {
           {activeTab === 'samples' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Sample Management</h3>
-              <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  Sample collection and receiving workflow will be fully implemented here.
-                  {canCollectSamples && <span className="block mt-2 font-medium">You can collect samples.</span>}
-                  {canReceiveSamples && <span className="block mt-2 font-medium">You can receive samples.</span>}
-                </p>
+              
+              <div className="space-y-4">
+                {order.items.map(item => {
+                  const sample = getSampleForItem(item.id)
+                  return (
+                    <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{item.test.name}</h4>
+                          <p className="text-sm text-gray-600">Specimen: {item.test.specimen}</p>
+                        </div>
+                        {sample && (
+                          <span className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(sample.status)}`}>
+                            {sample.status}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {sample ? (
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="text-gray-600">Barcode: </span>
+                            <span className="font-mono font-medium">{sample.barcode}</span>
+                          </div>
+                          
+                          {sample.collected_at && (
+                            <div className="text-sm text-gray-600">
+                              Collected: {formatDateTime(sample.collected_at)}
+                            </div>
+                          )}
+                          
+                          {sample.received_at && (
+                            <div className="text-sm text-gray-600">
+                              Received: {formatDateTime(sample.received_at)}
+                            </div>
+                          )}
+                          
+                          <div className="flex gap-2 mt-3">
+                            {sample.status === 'PENDING' && canCollectSamples && (
+                              <button
+                                onClick={() => handleCollectSample(sample.id)}
+                                disabled={actionLoading === `collect-${sample.id}`}
+                                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 text-sm"
+                              >
+                                {actionLoading === `collect-${sample.id}` ? 'Collecting...' : 'Collect Sample'}
+                              </button>
+                            )}
+                            
+                            {sample.status === 'COLLECTED' && canReceiveSamples && (
+                              <button
+                                onClick={() => handleReceiveSample(sample.id)}
+                                disabled={actionLoading === `receive-${sample.id}`}
+                                className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 text-sm"
+                              >
+                                {actionLoading === `receive-${sample.id}` ? 'Receiving...' : 'Receive Sample'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500 italic">
+                          No sample created yet for this test
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -267,12 +523,177 @@ export function OrderDetailPage() {
           {activeTab === 'results' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Results Entry</h3>
-              <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  Results entry and verification workflow will be fully implemented here.
-                  {canEnterResults && <span className="block mt-2 font-medium">You can enter results.</span>}
-                  {canVerifyResults && <span className="block mt-2 font-medium">You can verify and publish results.</span>}
-                </p>
+              
+              <div className="space-y-4">
+                {order.items.map(item => {
+                  const result = getResultForItem(item.id)
+                  const formData = resultFormData[item.id] || { value: '', unit: '', flags: '', notes: '' }
+                  const isEntered = result && result.status !== 'DRAFT'
+                  
+                  return (
+                    <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{item.test.name}</h4>
+                          <p className="text-sm text-gray-600">
+                            {item.test.reference_range && `Reference: ${item.test.reference_range}`}
+                          </p>
+                        </div>
+                        {result && (
+                          <span className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(result.status)}`}>
+                            {result.status}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {result ? (
+                        <div className="space-y-3">
+                          {/* Result Entry Form */}
+                          {!isEntered && canEnterResults && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Value *</label>
+                                <input
+                                  type="text"
+                                  value={formData.value}
+                                  onChange={(e) => setResultFormData({
+                                    ...resultFormData,
+                                    [item.id]: { ...formData, value: e.target.value }
+                                  })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Enter result value"
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                                <input
+                                  type="text"
+                                  value={formData.unit}
+                                  onChange={(e) => setResultFormData({
+                                    ...resultFormData,
+                                    [item.id]: { ...formData, unit: e.target.value }
+                                  })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder={item.test.unit || 'Unit'}
+                                />
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Flag</label>
+                                <select
+                                  value={formData.flags}
+                                  onChange={(e) => setResultFormData({
+                                    ...resultFormData,
+                                    [item.id]: { ...formData, flags: e.target.value }
+                                  })}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="">Normal</option>
+                                  <option value="high">High</option>
+                                  <option value="low">Low</option>
+                                  <option value="abnormal">Abnormal</option>
+                                </select>
+                              </div>
+                              
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                                <textarea
+                                  value={formData.notes}
+                                  onChange={(e) => setResultFormData({
+                                    ...resultFormData,
+                                    [item.id]: { ...formData, notes: e.target.value }
+                                  })}
+                                  rows={2}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Optional notes"
+                                />
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Display entered result */}
+                          {isEntered && (
+                            <div className="bg-gray-50 p-3 rounded-lg space-y-2">
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <span className="text-gray-600">Value: </span>
+                                  <span className="font-medium">{result.value} {result.unit}</span>
+                                </div>
+                                {result.flags && (
+                                  <div>
+                                    <span className="text-gray-600">Flag: </span>
+                                    <span className={`font-medium ${
+                                      result.flags === 'high' || result.flags === 'low' ? 'text-red-600' : 'text-green-600'
+                                    }`}>
+                                      {result.flags}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {result.notes && (
+                                <div className="text-sm">
+                                  <span className="text-gray-600">Notes: </span>
+                                  <span>{result.notes}</span>
+                                </div>
+                              )}
+                              
+                              {result.entered_at && (
+                                <div className="text-xs text-gray-500">
+                                  Entered: {formatDateTime(result.entered_at)}
+                                </div>
+                              )}
+                              
+                              {result.verified_at && (
+                                <div className="text-xs text-gray-500">
+                                  Verified: {formatDateTime(result.verified_at)}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Action Buttons */}
+                          <div className="flex gap-2 mt-3">
+                            {result.status === 'DRAFT' && canEnterResults && (
+                              <button
+                                onClick={() => handleEnterResult(result.id, item.id)}
+                                disabled={actionLoading === `enter-${result.id}`}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
+                              >
+                                {actionLoading === `enter-${result.id}` ? 'Saving...' : 'Enter Result'}
+                              </button>
+                            )}
+                            
+                            {result.status === 'ENTERED' && canVerifyResults && (
+                              <button
+                                onClick={() => handleVerifyResult(result.id)}
+                                disabled={actionLoading === `verify-${result.id}`}
+                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
+                              >
+                                {actionLoading === `verify-${result.id}` ? 'Verifying...' : 'Verify Result'}
+                              </button>
+                            )}
+                            
+                            {result.status === 'VERIFIED' && canVerifyResults && (
+                              <button
+                                onClick={() => handlePublishResult(result.id)}
+                                disabled={actionLoading === `publish-${result.id}`}
+                                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm"
+                              >
+                                {actionLoading === `publish-${result.id}` ? 'Publishing...' : 'Publish Result'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500 italic">
+                          No result created yet for this test
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -281,14 +702,51 @@ export function OrderDetailPage() {
           {activeTab === 'report' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Report Generation</h3>
-              <div className="text-center py-8">
-                <p className="text-gray-600 mb-4">Generate and download PDF report</p>
-                <button
-                  className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                  onClick={() => console.log('Generate report for order:', order.id)}
-                >
-                  Generate PDF Report
-                </button>
+              
+              <div className="space-y-4">
+                {reports.length > 0 ? (
+                  <div className="space-y-3">
+                    {reports.map(report => (
+                      <div key={report.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="font-medium text-gray-900">Report #{report.id}</p>
+                            <p className="text-sm text-gray-600">
+                              Generated: {formatDateTime(report.generated_at)}
+                            </p>
+                          </div>
+                          <a
+                            href={reportService.getDownloadUrl(report.id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                          >
+                            Download PDF
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-4">No report generated yet</p>
+                  </div>
+                )}
+                
+                {canGenerateReports && (
+                  <div className="text-center pt-4 border-t">
+                    <button
+                      onClick={handleGenerateReport}
+                      disabled={actionLoading === 'generate-report'}
+                      className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {actionLoading === 'generate-report' ? 'Generating...' : 'Generate PDF Report'}
+                    </button>
+                    <p className="text-xs text-gray-500 mt-2">
+                      All results must be published before generating a report
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
