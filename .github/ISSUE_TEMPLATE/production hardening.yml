@@ -2,8 +2,7 @@ name: Production Hardening Task — Security, Infrastructure, and Operations
 description: Resolve the critical blockers preventing a safe commercial deployment
 title: "[Hardening]: Ship-ready security, infra, and operational safeguards"
 labels: ["security", "infra", "compliance", "high priority"]
-assignees:
-  - your-username
+assignees: []
 
 body:
   - type: markdown
@@ -75,10 +74,20 @@ body:
       options:
         - label: Secure nginx with valid TLS termination, correct `server_name`, and static asset handling that does not proxy back to Django
 
+  - type: checkboxes
+    id: testing
+    attributes:
+      label: ✅ Testing & Validation
+      options:
+        - label: Run full backend test suite and lint checks
+        - label: Run full frontend test, lint, and typecheck workflows
+        - label: Validate production deployment in staging (smoke tests, role-based access verification)
+        - label: Document incident response, backup, and restore drills executed during verification
+
   - type: textarea
     id: qa
     attributes:
-      label: ✅ Verification Summary
+      label: 🚀 Readiness Summary
       description: Document the tests, security reviews, and operational runbooks you executed to prove production readiness.
       placeholder: e.g., Rotated secrets, hardened nginx TLS, verified role-gated report downloads, added persistence for media.
     validations:
