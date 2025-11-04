@@ -6,6 +6,7 @@ vi.mock('./api', () => ({
   apiClient: {
     get: vi.fn(),
     post: vi.fn(),
+    patch: vi.fn(),
   },
 }))
 
@@ -66,11 +67,19 @@ describe('resultService', () => {
         unit: 'mg/dL',
         flag: 'normal' as const,
       }
+      vi.mocked(apiClient.patch).mockResolvedValueOnce(mockResult)
       vi.mocked(apiClient.post).mockResolvedValueOnce(mockResult)
 
       const result = await resultService.enter(1, enterData)
 
-      expect(apiClient.post).toHaveBeenCalledWith('/api/results/1/enter/', enterData)
+      expect(apiClient.patch).toHaveBeenCalledWith('/api/results/1/', {
+        value: '120',
+        unit: 'mg/dL',
+        reference_range: undefined,
+        flags: 'normal',
+        notes: undefined,
+      })
+      expect(apiClient.post).toHaveBeenCalledWith('/api/results/1/enter/')
       expect(result).toEqual(mockResult)
     })
   })

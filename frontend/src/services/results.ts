@@ -26,7 +26,16 @@ export const resultService = {
   },
 
   async enter(id: number, data: EnterResultData): Promise<Result> {
-    return apiClient.post<Result>(RESULT_ENDPOINTS.ENTER(id), data)
+    // First update the result with the data
+    await apiClient.patch<Result>(RESULT_ENDPOINTS.DETAIL(id), {
+      value: data.value,
+      unit: data.unit,
+      reference_range: data.reference_range,
+      flags: data.flag,
+      notes: data.notes,
+    })
+    // Then mark it as entered
+    return apiClient.post<Result>(RESULT_ENDPOINTS.ENTER(id))
   },
 
   async verify(id: number): Promise<Result> {

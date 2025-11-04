@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { reportService } from './reports'
-import { apiClient, API_BASE_URL } from './api'
+import { apiClient } from './api'
 
 vi.mock('./api', () => ({
   API_BASE_URL: 'http://localhost:8000',

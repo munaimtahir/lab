@@ -81,7 +81,12 @@ export function OrderDetailPage() {
       setResults(filteredResults)
       
       // Initialize form data with existing results
-      const formData: Record<number, any> = {}
+      const formData: Record<number, {
+        value: string
+        unit: string
+        flags: string
+        notes: string
+      }> = {}
       filteredResults.forEach(result => {
         formData[result.order_item] = {
           value: result.value || '',
@@ -114,8 +119,8 @@ export function OrderDetailPage() {
       await sampleService.collect(sampleId)
       setSuccess('Sample collected successfully')
       await fetchSamples()
-    } catch (error: any) {
-      setError(error.message || 'Failed to collect sample')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to collect sample')
     } finally {
       setActionLoading(null)
     }
@@ -129,8 +134,8 @@ export function OrderDetailPage() {
       await sampleService.receive(sampleId)
       setSuccess('Sample received successfully')
       await fetchSamples()
-    } catch (error: any) {
-      setError(error.message || 'Failed to receive sample')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to receive sample')
     } finally {
       setActionLoading(null)
     }
@@ -151,13 +156,13 @@ export function OrderDetailPage() {
       await resultService.enter(resultId, {
         value: formData.value,
         unit: formData.unit,
-        flag: formData.flags as any,
+        flag: formData.flags as 'normal' | 'high' | 'low' | 'abnormal' | undefined,
         notes: formData.notes
       })
       setSuccess('Result entered successfully')
       await fetchResults()
-    } catch (error: any) {
-      setError(error.message || 'Failed to enter result')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to enter result')
     } finally {
       setActionLoading(null)
     }
@@ -171,8 +176,8 @@ export function OrderDetailPage() {
       await resultService.verify(resultId)
       setSuccess('Result verified successfully')
       await fetchResults()
-    } catch (error: any) {
-      setError(error.message || 'Failed to verify result')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to verify result')
     } finally {
       setActionLoading(null)
     }
@@ -186,8 +191,8 @@ export function OrderDetailPage() {
       await resultService.publish(resultId)
       setSuccess('Result published successfully')
       await fetchResults()
-    } catch (error: any) {
-      setError(error.message || 'Failed to publish result')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to publish result')
     } finally {
       setActionLoading(null)
     }
@@ -202,8 +207,8 @@ export function OrderDetailPage() {
       await reportService.generate(order.id)
       setSuccess('Report generated successfully')
       await fetchReports()
-    } catch (error: any) {
-      setError(error.message || 'Failed to generate report')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate report')
     } finally {
       setActionLoading(null)
     }
