@@ -25,5 +25,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 
 # Run migrations, seed data, and start gunicorn bound to 0.0.0.0
 CMD python manage.py migrate && \
-    python manage.py seed_data --no-input && \
+    python manage.py seed_data && \
     gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120 --access-logfile - --error-logfile -
