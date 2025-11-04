@@ -203,6 +203,3 @@ CORS_ALLOWED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
-CORS_ALLOWED_ORIGINS = [
-    origin.strip() for origin in _cors_origins.split(",") if origin.strip()
-]
