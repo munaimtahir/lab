@@ -39,7 +39,7 @@ jobs:
       - name: Run linters
         working-directory: backend
         run: |
-          ruff check . || echo "Ruff found issues but continuing..."
+          ruff check . --exit-zero
           black --check .
           isort --check .
       

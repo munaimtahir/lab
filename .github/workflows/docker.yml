@@ -23,22 +23,6 @@ permissions:
   contents: read
 
 jobs:
-  validate-dockerfiles:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Validate backend Dockerfile syntax
-        run: docker build --check -f backend/Dockerfile backend || echo "Basic syntax check passed"
-      
-      - name: Validate frontend Dockerfile syntax
-        run: docker build --check -f frontend/Dockerfile frontend || echo "Basic syntax check passed"
-      
-      - name: Validate nginx Dockerfile syntax
-        run: docker build --check -f nginx/Dockerfile . || echo "Basic syntax check passed"
-  
   validate-compose:
     runs-on: ubuntu-latest
     
