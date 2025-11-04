@@ -6,7 +6,22 @@
 
 A production-ready Laboratory Information Management System (LIMS) for Al Shifa Laboratory with complete workflow automation, PDF reporting, and role-based access control.
 
-## 🚀 One-Command Start
+## 📦 Production Deployment
+
+**Ready to deploy on VPS?** See the comprehensive [Deployment Guide](README-DEPLOY.md) for production setup on VPS 172.235.33.181 with Docker and nginx.
+
+Quick deployment steps:
+```bash
+git clone https://github.com/munaimtahir/lab.git
+cd lab
+cp backend/.env.example backend/.env
+# Edit backend/.env with secure credentials
+docker compose build
+docker compose up -d
+./verify-deployment.sh
+```
+
+## 🚀 One-Command Start (Development)
 
 ```bash
 # Start the entire stack (backend + frontend + database + redis)
