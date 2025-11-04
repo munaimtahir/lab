@@ -31,14 +31,15 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 # Parse ALLOWED_HOSTS from environment variable or use defaults
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1,172.235.33.181"
-).split(",") if os.environ.get("ALLOWED_HOSTS") else [
-    "localhost",
-    "127.0.0.1",
-    "172.235.33.181",
-]
+ALLOWED_HOSTS = (
+    os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,172.235.33.181").split(",")
+    if os.environ.get("ALLOWED_HOSTS")
+    else [
+        "localhost",
+        "127.0.0.1",
+        "172.235.33.181",
+    ]
+)
 
 
 # Application definition
@@ -205,6 +206,8 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG
 # Parse CORS_ALLOWED_ORIGINS from environment variable or use defaults
 _cors_origins = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:3000,http://172.235.33.181,http://172.235.33.181:80"
+    "http://localhost:5173,http://localhost:3000,http://172.235.33.181,http://172.235.33.181:80",
 )
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in _cors_origins.split(",") if origin.strip()]
+CORS_ALLOWED_ORIGINS = [
+    origin.strip() for origin in _cors_origins.split(",") if origin.strip()
+]
