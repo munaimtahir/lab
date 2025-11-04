@@ -1,0 +1,31 @@
+name: 🧱 Priority 2 — Post-Go-Live Operational Need
+description: Task that improves daily use, safety, or usability but is not a blocker
+title: "[P2-Operational]: <task description here>"
+labels: ["priority:2", "enhancement", "usability"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🧱 Description
+
+        This task improves core usability, workflow safety, or lab operation but is **not required to launch**. It should be completed shortly after go-live.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Task Areas
+      options:
+        - label: Implement "Reject Sample" with reason
+        - label: Add order edit/cancellation UI or enforce non-editable policy
+        - label: Add responsive mobile nav (hamburger menu)
+        - label: Ensure all forms/table views work well on tablet screens
+        - label: Improve Result Entry → Verification UX flow
+        - label: Show toasts or modals for publish/verify actions
+
+  - type: textarea
+    id: uxnotes
+    attributes:
+      label: 💡 Notes or Design Considerations
+      placeholder: e.g., Show confirmation before publishing result. Use status chips or transitions in OrderDetail.
