@@ -6,14 +6,17 @@ WORKDIR /app
 # Install pnpm
 RUN npm install -g pnpm
 
-# Copy package files
-COPY package.json pnpm-lock.yaml* ./
+# Copy frontend package files
+COPY frontend/package.json frontend/pnpm-lock.yaml* ./
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy application code
-COPY . .
+# Copy frontend application code and .env
+COPY frontend/ ./
+
+# Create .env for build with relative API path (nginx will proxy /api/ to backend)
+RUN echo "VITE_API_URL=" > .env
 
 # Build the application (creates dist directory)
 RUN pnpm build
@@ -21,14 +24,14 @@ RUN pnpm build
 # Stage 2: Serve with nginx
 FROM nginx:alpine
 
-# Copy built files from builder stage
+# Copy built frontend files from builder stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration if needed
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy nginx configuration
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
 
-# Expose port
-EXPOSE 80
+# Expose ports
+EXPOSE 80 443
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
