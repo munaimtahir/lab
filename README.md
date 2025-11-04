@@ -1,27 +1,12 @@
-# Al Shifa LIMS v1.0.0 — Laboratory Information Management System
+# Al Shifa LIMS — Laboratory Information Management System
 
-![CI](https://github.com/munaimtahir/lab/workflows/CI/badge.svg)
-[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg)](https://github.com/munaimtahir/lab)
-[![Tests](https://img.shields.io/badge/tests-87%20passing-brightgreen.svg)](https://github.com/munaimtahir/lab)
+![Backend CI](https://github.com/munaimtahir/lab/workflows/Backend%20CI/badge.svg)
+![Frontend CI](https://github.com/munaimtahir/lab/workflows/Frontend%20CI/badge.svg)
+![Docker CI](https://github.com/munaimtahir/lab/workflows/Docker%20CI/badge.svg)
 
 A production-ready Laboratory Information Management System (LIMS) for Al Shifa Laboratory with complete workflow automation, PDF reporting, and role-based access control.
 
-## 📦 Production Deployment
-
-**Ready to deploy on VPS?** See the comprehensive [Deployment Guide](README-DEPLOY.md) for production setup on VPS 172.235.33.181 with Docker and nginx.
-
-Quick deployment steps:
-```bash
-git clone https://github.com/munaimtahir/lab.git
-cd lab
-cp backend/.env.example backend/.env
-# Edit backend/.env with secure credentials
-docker compose build
-docker compose up -d
-./verify-deployment.sh
-```
-
-## 🚀 One-Command Start (Development)
+## 🚀 Quick Start (Development)
 
 ```bash
 # Start the entire stack (backend + frontend + database + redis)
@@ -41,13 +26,24 @@ cd infra && docker-compose up
 > 3. Use environment variables to override docker-compose defaults
 > 4. Never commit `.env` to version control
 
+## 📦 Production Deployment
+
+```bash
+git clone https://github.com/munaimtahir/lab.git
+cd lab
+cp backend/.env.example backend/.env
+# Edit backend/.env with secure credentials
+docker compose build
+docker compose up -d
+```
+
 ## 🏗️ Architecture
 
 - **Backend**: Python 3.12, Django 5.2, Django REST Framework, PostgreSQL 16, Redis 7
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS
 - **Authentication**: JWT with token blacklisting and role-based access control
 - **Infrastructure**: Docker Compose with health checks, GitHub Actions CI/CD
-- **Testing**: 100% backend coverage, 87 comprehensive tests, E2E with Playwright
+- **Testing**: 99% backend coverage, 166 comprehensive tests
 
 ## ✨ Complete LIMS Workflow
 
@@ -61,7 +57,11 @@ cd infra && docker-compose up
 8. **PDF Reports** - Al Shifa template with signatures
 9. **Report Download** - Secure delivery
 
-## 📊 Test Coverage: 100% (87 Tests) 🎉
+## 📊 Test Coverage
+
+- **Backend**: 99.1% coverage (106 tests passing)
+- **Frontend**: 60 tests passing (Vitest + React Testing Library)
+- **CI/CD**: Automated testing on all PRs and commits
 
 | Module | Tests | Coverage |
 |--------|-------|----------|
