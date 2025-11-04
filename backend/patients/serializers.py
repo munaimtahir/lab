@@ -2,10 +2,10 @@
 
 from datetime import date
 
-from rest_framework import serializers
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.utils import timezone
-from django.core.exceptions import ValidationError
+from rest_framework import serializers
 
 from .models import Patient
 from .services import allocate_patient_mrn
@@ -95,28 +95,47 @@ class PatientSerializer(serializers.ModelSerializer):
         except ValidationError as e:
             # Handle expected validation errors from the service
             # Use safe, user-facing error messages without exposing system details
-            error_messages = e.messages if hasattr(e, 'messages') else [str(e)]
-            
+            error_messages = e.messages if hasattr(e, "messages") else [str(e)]
+
             # Provide appropriate user-facing messages based on the error content
             for msg in error_messages:
                 msg_lower = msg.lower()
                 if "required" in msg_lower and "terminal" in msg_lower:
-                    raise serializers.ValidationError({
-                        "detail": "Terminal code is required for offline registration."
-                    })
+                    raise serializers.ValidationError(
+                        {
+                            "detail": (
+                                "Terminal code is required for " "offline registration."
+                            )
+                        }
+                    ) from e
                 elif "not found" in msg_lower or "not active" in msg_lower:
-                    raise serializers.ValidationError({
-                        "detail": "Invalid or inactive terminal. Please verify the terminal configuration."
-                    })
+                    raise serializers.ValidationError(
+                        {
+                            "detail": (
+                                "Invalid or inactive terminal. "
+                                "Please verify the terminal configuration."
+                            )
+                        }
+                    ) from e
                 elif "exhausted" in msg_lower:
-                    raise serializers.ValidationError({
-                        "detail": "Terminal has exhausted its offline registration range. Please contact administrator."
-                    })
-            
+                    raise serializers.ValidationError(
+                        {
+                            "detail": (
+                                "Terminal has exhausted its offline registration "
+                                "range. Please contact administrator."
+                            )
+                        }
+                    ) from e
+
             # Generic error for any other validation issues
-            raise serializers.ValidationError({
-                "detail": "Invalid registration parameters. Please check your input and try again."
-            })
+            raise serializers.ValidationError(
+                {
+                    "detail": (
+                        "Invalid registration parameters. "
+                        "Please check your input and try again."
+                    )
+                }
+            ) from e
 
         # Set offline-related fields
         if mrn is not None:
@@ -139,7 +158,7 @@ class PatientSerializer(serializers.ModelSerializer):
                         "detail": "Registration number already exists. "
                         "Please check offline ranges or contact admin."
                     }
-                )
+                ) from e
             raise
 
         return patient

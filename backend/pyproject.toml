@@ -25,6 +25,10 @@ select = [
 ]
 ignore = []
 
+[tool.ruff.lint.isort]
+known-first-party = ["core", "patients", "catalog", "orders", "samples", "results", "reports", "users", "health"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
 [tool.mypy]
 python_version = "3.12"
 warn_return_any = true

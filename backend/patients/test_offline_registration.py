@@ -117,9 +117,7 @@ class TestAllocationService:
     def test_allocate_offline_mode_invalid_terminal(self):
         """Test offline mode with invalid terminal code raises error."""
         with pytest.raises(ValidationError) as exc_info:
-            allocate_patient_mrn(
-                origin_terminal_code="INVALID-PC", offline=True
-            )
+            allocate_patient_mrn(origin_terminal_code="INVALID-PC", offline=True)
         assert "not found" in str(exc_info.value).lower()
 
     def test_allocate_offline_mode_inactive_terminal(self):
@@ -132,9 +130,7 @@ class TestAllocationService:
             is_active=False,
         )
         with pytest.raises(ValidationError) as exc_info:
-            allocate_patient_mrn(
-                origin_terminal_code="INACTIVE-PC", offline=True
-            )
+            allocate_patient_mrn(origin_terminal_code="INACTIVE-PC", offline=True)
         assert "not found" in str(exc_info.value).lower()
 
 
@@ -295,12 +291,15 @@ class TestOfflinePatientRegistration:
         }
         response = admin_client.post("/api/patients/", data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "invalid" in str(response.data).lower() or "terminal" in str(response.data).lower()
+        assert (
+            "invalid" in str(response.data).lower()
+            or "terminal" in str(response.data).lower()
+        )
 
     def test_offline_range_exhaustion(self, admin_client):
         """Test that exhausted range returns proper error."""
         # Create terminal with small range
-        terminal = LabTerminal.objects.create(
+        _ = LabTerminal.objects.create(
             code="SMALL-PC",
             name="Small Range Terminal",
             offline_range_start=800000,
@@ -336,7 +335,10 @@ class TestOfflinePatientRegistration:
         }
         response = admin_client.post("/api/patients/", data)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "exhausted" in str(response.data).lower() or "range" in str(response.data).lower()
+        assert (
+            "exhausted" in str(response.data).lower()
+            or "range" in str(response.data).lower()
+        )
 
     def test_multiple_terminals_no_collision(self, admin_client):
         """Test that multiple terminals don't collide in MRN ranges."""
@@ -394,7 +396,7 @@ class TestOfflinePatientRegistration:
     def test_duplicate_mrn_handled(self, admin_client, lab_terminal):
         """Test that duplicate MRN is handled gracefully."""
         from django.db import IntegrityError
-        
+
         # Create a patient with offline MRN
         data1 = {
             "full_name": "First Patient",
