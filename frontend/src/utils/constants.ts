@@ -8,6 +8,12 @@ export const AUTH_ENDPOINTS = {
   LOGOUT: '/api/auth/logout/',
 } as const
 
+// User management endpoints
+export const USER_ENDPOINTS = {
+  LIST: '/api/auth/users/',
+  DETAIL: (id: number) => `/api/auth/users/${id}/`,
+} as const
+
 // Patient endpoints
 export const PATIENT_ENDPOINTS = {
   LIST: '/api/patients/',
@@ -18,6 +24,12 @@ export const PATIENT_ENDPOINTS = {
 export const CATALOG_ENDPOINTS = {
   LIST: '/api/catalog/',
   DETAIL: (id: number) => `/api/catalog/${id}/`,
+} as const
+
+// Terminal endpoints
+export const TERMINAL_ENDPOINTS = {
+  LIST: '/api/terminals/',
+  DETAIL: (id: number) => `/api/terminals/${id}/`,
 } as const
 
 // Order endpoints
@@ -64,6 +76,9 @@ export const ROUTES = {
   LAB_ORDER: '/lab/orders/:id',
   LAB_ORDER_DETAIL: (id: number | string) => `/lab/orders/${id}`,
   SETTINGS: '/settings',
+  ADMIN_USERS: '/settings/users',
+  ADMIN_CATALOG: '/settings/catalog',
+  ADMIN_TERMINALS: '/settings/terminals',
 } as const
 
 // Role-based permissions

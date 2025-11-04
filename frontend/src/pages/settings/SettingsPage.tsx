@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ROUTES } from '../../utils/constants'
 
 interface SettingsTileProps {
   title: string
@@ -45,7 +46,22 @@ export function SettingsPage() {
         <SettingsTile
           title="User Management"
           description="Manage users, roles, and permissions"
-          isImplemented={false}
+          to={ROUTES.ADMIN_USERS}
+          isImplemented={true}
+        />
+        
+        <SettingsTile
+          title="Test Catalog"
+          description="Manage test catalog and pricing"
+          to={ROUTES.ADMIN_CATALOG}
+          isImplemented={true}
+        />
+        
+        <SettingsTile
+          title="Lab Terminals"
+          description="Configure offline MRN ranges for terminals"
+          to={ROUTES.ADMIN_TERMINALS}
+          isImplemented={true}
         />
         
         <SettingsTile
@@ -77,13 +93,6 @@ export function SettingsPage() {
           description="Customize report headers and branding"
           isImplemented={false}
         />
-      </div>
-      
-      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-800">
-          <strong>Note:</strong> Settings pages are currently stubs. Backend endpoints exist for user management,
-          branches, and departments. Full CRUD interfaces can be implemented as needed.
-        </p>
       </div>
     </div>
   )
