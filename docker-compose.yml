@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - frontend
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      - ALLOWED_HOSTS=172.235.33.181
+      - CORS_ORIGINS=http://172.235.33.181
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
