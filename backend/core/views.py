@@ -1,16 +1,11 @@
 """Views for core models."""
 
-from rest_framework import generics, permissions
+from rest_framework import generics
+
+from core.permissions import IsAdminUser
 
 from .models import LabTerminal
 from .serializers import LabTerminalSerializer
-
-
-class IsAdminUser(permissions.BasePermission):
-    """Permission class that only allows admin users."""
-
-    def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == "ADMIN"
 
 
 class LabTerminalListCreateView(generics.ListCreateAPIView):

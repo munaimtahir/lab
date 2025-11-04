@@ -2,6 +2,8 @@
 
 from rest_framework import serializers
 
+from core.validators import validate_alphanumeric_code
+
 from .models import TestCatalog
 
 
@@ -27,11 +29,7 @@ class TestCatalogSerializer(serializers.ModelSerializer):
 
     def validate_code(self, value):
         """Validate test code is alphanumeric."""
-        if not value.replace("-", "").replace("_", "").isalnum():
-            raise serializers.ValidationError(
-                "Test code must be alphanumeric (dashes and underscores allowed)."
-            )
-        return value.upper()
+        return validate_alphanumeric_code(value, "test code")
 
     def validate_price(self, value):
         """Validate price is positive."""

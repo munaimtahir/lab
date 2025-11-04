@@ -1,10 +1,13 @@
 """Views for user authentication and management."""
 
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
+
+from core.permissions import IsAdminUser
 
 from .models import User
 from .serializers import (
@@ -14,13 +17,6 @@ from .serializers import (
 )
 
 
-class IsAdminUser(permissions.BasePermission):
-    """Permission class that only allows admin users."""
-
-    def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == "ADMIN"
-
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     """Custom login view with role information."""
 
@@ -28,7 +24,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 
 @api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def logout_view(request):
     """Logout view that blacklists the refresh token."""
     try:

@@ -2,6 +2,8 @@
 
 from rest_framework import serializers
 
+from core.validators import validate_alphanumeric_code
+
 from .models import LabTerminal
 
 
@@ -25,11 +27,7 @@ class LabTerminalSerializer(serializers.ModelSerializer):
 
     def validate_code(self, value):
         """Validate terminal code format."""
-        if not value.replace("-", "").replace("_", "").isalnum():
-            raise serializers.ValidationError(
-                "Terminal code must be alphanumeric (dashes and underscores allowed)."
-            )
-        return value.upper()
+        return validate_alphanumeric_code(value, "terminal code")
 
     def validate(self, data):
         """Validate range and check for overlaps."""
@@ -59,9 +57,10 @@ class LabTerminalSerializer(serializers.ModelSerializer):
                 overlapping = overlapping.exclude(pk=instance.pk)
 
             if overlapping.exists():
+                # Safe to call first() since exists() confirms at least one record
+                overlap_code = overlapping.first().code
                 raise serializers.ValidationError(
-                    "MRN range overlaps with existing terminal: "
-                    f"{overlapping.first().code}"
+                    f"MRN range overlaps with existing terminal: {overlap_code}"
                 )
 
         return data

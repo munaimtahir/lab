@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { terminalService } from '../../services/terminals'
 import { Modal } from '../../components/Modal'
+import { calculateTerminalUtilization, calculateRangeCapacity } from '../../utils/terminal'
 import type { LabTerminal, LabTerminalFormData } from '../../types'
 
 interface TerminalFormProps {
@@ -147,9 +148,8 @@ function TerminalForm({ terminal, onSave, onCancel }: TerminalFormProps) {
         <p className="text-sm text-blue-800">
           <strong>Note:</strong> Ensure MRN ranges do not overlap with existing
           terminals. Range: {formData.offline_range_start} -{' '}
-          {formData.offline_range_end} ({formData.offline_range_end -
-            formData.offline_range_start +
-            1}{' '}
+          {formData.offline_range_end} (
+          {calculateRangeCapacity(formData.offline_range_start, formData.offline_range_end)}{' '}
           MRNs)
         </p>
       </div>
@@ -242,10 +242,7 @@ export function LabTerminalsPage() {
   }
 
   const getRangeUtilization = (terminal: LabTerminal) => {
-    if (terminal.offline_current === 0) return 0
-    const total = terminal.offline_range_end - terminal.offline_range_start + 1
-    const used = terminal.offline_current - terminal.offline_range_start + 1
-    return Math.round((used / total) * 100)
+    return calculateTerminalUtilization(terminal)
   }
 
   return (
