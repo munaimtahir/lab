@@ -81,14 +81,14 @@ if [ -f "backend/.env" ]; then
     success "backend/.env exists"
     
     # Check critical environment variables
-    if grep -q "DJANGO_SECRET_KEY=change-me-in-production" backend/.env; then
-        error "DJANGO_SECRET_KEY is still set to default value!"
+    if grep -q "DJANGO_SECRET_KEY=REPLACE-WITH-SECURE-SECRET-KEY-BEFORE-DEPLOYMENT" backend/.env; then
+        error "DJANGO_SECRET_KEY is still set to default placeholder value!"
     else
         success "DJANGO_SECRET_KEY has been changed"
     fi
     
-    if grep -q "POSTGRES_PASSWORD=change-me-in-production" backend/.env; then
-        error "POSTGRES_PASSWORD is still set to default value!"
+    if grep -q "POSTGRES_PASSWORD=REPLACE-WITH-SECURE-DATABASE-PASSWORD" backend/.env; then
+        error "POSTGRES_PASSWORD is still set to default placeholder value!"
     else
         success "POSTGRES_PASSWORD has been changed"
     fi
@@ -235,8 +235,9 @@ if docker compose ps >/dev/null 2>&1; then
         success "No CORS errors in backend logs"
     fi
     
-    # Check nginx logs for errors
-    if docker compose logs nginx 2>/dev/null | grep -q "error" | grep -v "404"; then
+    # Check nginx logs for errors (excluding 404s)
+    NGINX_ERRORS=$(docker compose logs nginx 2>/dev/null | grep -i "error" | grep -iv "404" | wc -l)
+    if [ "$NGINX_ERRORS" -gt 0 ]; then
         warning "Errors found in nginx logs (check with: docker compose logs nginx)"
     else
         success "No critical errors in nginx logs"

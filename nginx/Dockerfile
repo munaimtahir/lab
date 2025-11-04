@@ -16,7 +16,7 @@ RUN pnpm install --frozen-lockfile
 COPY frontend/ ./
 
 # Create .env for build with relative API path (nginx will proxy /api/ to backend)
-RUN echo "VITE_API_URL=" > .env
+RUN echo "VITE_API_URL=/api" > .env
 
 # Build the application (creates dist directory)
 RUN pnpm build
