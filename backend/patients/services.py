@@ -1,8 +1,7 @@
 """Services for patient registration number allocation."""
 
-from django.db import transaction
-from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
 from core.models import LabTerminal
 
@@ -40,9 +39,7 @@ def allocate_patient_mrn(
 
     # Offline mode: allocate from terminal range
     if not origin_terminal_code:
-        raise ValidationError(
-            "origin_terminal_code is required when offline=True"
-        )
+        raise ValidationError("origin_terminal_code is required when offline=True")
 
     try:
         # Use select_for_update to prevent race conditions
@@ -56,7 +53,7 @@ def allocate_patient_mrn(
 
     # Get next MRN number from terminal's range
     mrn_number = terminal.get_next_offline_mrn()
-    
+
     # Format as string (numeric only for offline to distinguish from online format)
     # Online format: PAT-YYYYMMDD-NNNN (date-based with prefix)
     # Offline format: Pure numeric (e.g., "710000") from terminal range

@@ -42,7 +42,7 @@ class Patient(models.Model):
         help_text="National ID in format #####-#######-#",
     )
     address = models.TextField()
-    
+
     # Offline registration support
     origin_terminal = models.ForeignKey(
         LabTerminal,
@@ -61,7 +61,7 @@ class Patient(models.Model):
         blank=True,
         help_text="Timestamp when this record was synced to central server",
     )
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
