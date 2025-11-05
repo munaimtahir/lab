@@ -3,18 +3,24 @@
 // - Local dev: VITE_API_URL=http://localhost:8000 (see frontend/.env.development)
 // - VPS/Production: VITE_API_URL=/api (nginx proxies to backend, see frontend/.env.production)
 // No hardcoded default to ensure proper environment configuration
-const DEFAULT_API_BASE_URL = import.meta.env.VITE_API_URL?.trim()
+const API_URL = import.meta.env.VITE_API_URL?.trim()
 
-if (!DEFAULT_API_BASE_URL) {
-  console.error(
+if (!API_URL) {
+  const errorMessage = 
     'VITE_API_URL environment variable is not set. ' +
     'Please configure it in your .env file. ' +
     'For local dev: VITE_API_URL=http://localhost:8000, ' +
     'For production: VITE_API_URL=/api'
-  )
+  
+  console.error(errorMessage)
+  
+  // Throw error in development to fail fast and make the issue obvious
+  if (import.meta.env.DEV) {
+    throw new Error(errorMessage)
+  }
 }
 
-export const API_BASE_URL = DEFAULT_API_BASE_URL || ''
+export const API_BASE_URL = API_URL || ''
 
 // Auth endpoints
 export const AUTH_ENDPOINTS = {
