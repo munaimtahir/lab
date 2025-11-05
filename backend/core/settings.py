@@ -209,3 +209,13 @@ CORS_ALLOWED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
+
+# CSRF Trusted Origins (required for POST requests from frontend on VPS)
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS",
+        "http://172.235.33.181,http://172.235.33.181:80,http://localhost:5173",
+    ).split(",")
+    if origin.strip()
+]
