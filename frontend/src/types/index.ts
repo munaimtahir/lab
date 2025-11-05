@@ -120,6 +120,7 @@ export type OrderStatus =
   | 'IN_PROCESS'
   | 'VERIFIED'
   | 'PUBLISHED'
+  | 'CANCELLED'
 
 export interface OrderItem {
   id: number

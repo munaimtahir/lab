@@ -14,6 +14,7 @@ class OrderStatus(models.TextChoices):
     IN_PROCESS = "IN_PROCESS", "In Process"
     VERIFIED = "VERIFIED", "Verified"
     PUBLISHED = "PUBLISHED", "Published"
+    CANCELLED = "CANCELLED", "Cancelled"
 
 
 class OrderPriority(models.TextChoices):

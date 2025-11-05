@@ -38,6 +38,7 @@ export const TERMINAL_ENDPOINTS = {
 export const ORDER_ENDPOINTS = {
   LIST: '/api/orders/',
   DETAIL: (id: number) => `/api/orders/${id}/`,
+  CANCEL: (id: number) => `/api/orders/${id}/cancel/`,
 } as const
 
 // Sample endpoints
@@ -119,6 +120,7 @@ export const COLORS = {
     IN_PROCESS: 'bg-purple-100 text-purple-800',
     VERIFIED: 'bg-green-100 text-green-800',
     PUBLISHED: 'bg-green-200 text-green-900',
+    CANCELLED: 'bg-gray-300 text-gray-700',
     PENDING: 'bg-gray-100 text-gray-800',
     RECEIVED: 'bg-teal-100 text-teal-800',
     REJECTED: 'bg-red-100 text-red-800',

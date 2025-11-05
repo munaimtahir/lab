@@ -272,6 +272,32 @@ export function OrderDetailPage() {
     }
   }
 
+  const handleCancelOrder = async () => {
+    if (!order) return
+
+    // Confirm cancellation
+    if (
+      !window.confirm(
+        'Are you sure you want to cancel this order? This action cannot be undone.'
+      )
+    ) {
+      return
+    }
+
+    setActionLoading('cancel-order')
+    setError(null)
+    setSuccess(null)
+    try {
+      await orderService.cancel(order.id)
+      setSuccess('Order cancelled successfully')
+      await fetchOrder(order.id)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to cancel order')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   const getStatusColor = (status: string) => {
     return (
       COLORS.status[status as keyof typeof COLORS.status] ||
@@ -294,6 +320,13 @@ export function OrderDetailPage() {
   const canVerifyResults = user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
   const canGenerateReports =
     user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
+  const canCancelOrder = user && ['ADMIN', 'RECEPTION'].includes(user.role)
+
+  // Can only cancel if order is NEW and no samples collected
+  const canActuallyCancelOrder =
+    canCancelOrder &&
+    order?.status === 'NEW' &&
+    samples.every(s => s.status === 'PENDING')
 
   if (loading) {
     return (
@@ -326,12 +359,23 @@ export function OrderDetailPage() {
           <h1 className="text-3xl font-bold text-gray-800">Order Detail</h1>
           <p className="text-gray-600">{order.order_number}</p>
         </div>
-        <button
-          onClick={() => navigate(ROUTES.LAB_WORKLIST)}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-        >
-          Back to Worklist
-        </button>
+        <div className="flex gap-2">
+          {canActuallyCancelOrder && (
+            <button
+              onClick={handleCancelOrder}
+              disabled={actionLoading === 'cancel-order'}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+            >
+              {actionLoading === 'cancel-order' ? 'Cancelling...' : 'Cancel Order'}
+            </button>
+          )}
+          <button
+            onClick={() => navigate(ROUTES.LAB_WORKLIST)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+          >
+            Back to Worklist
+          </button>
+        </div>
       </div>
 
       {/* Status Badge */}

@@ -30,4 +30,8 @@ export const orderService = {
   async create(data: CreateOrderData): Promise<Order> {
     return apiClient.post<Order>(ORDER_ENDPOINTS.LIST, data)
   },
+
+  async cancel(id: number): Promise<Order> {
+    return apiClient.post<Order>(ORDER_ENDPOINTS.CANCEL(id))
+  },
 }

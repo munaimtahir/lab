@@ -1,6 +1,7 @@
 """Order views."""
 
 from rest_framework import generics, status
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
 from patients.permissions import IsAdminOrReception
@@ -46,3 +47,42 @@ class OrderDetailView(generics.RetrieveAPIView):
     )
     serializer_class = OrderSerializer
     permission_classes = [IsAdminOrReception]
+
+
+@api_view(["POST"])
+@permission_classes([IsAdminOrReception])
+def cancel_order(request, pk):
+    """Cancel an order if no samples have been collected."""
+    try:
+        order = Order.objects.prefetch_related("items__samples").get(pk=pk)
+    except Order.DoesNotExist:
+        return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if order is already cancelled
+    if order.status == "CANCELLED":
+        return Response(
+            {"error": "Order is already cancelled"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Check if any samples have been collected
+    has_collected_samples = False
+    for item in order.items.all():
+        if item.samples.filter(status__in=["COLLECTED", "RECEIVED"]).exists():
+            has_collected_samples = True
+            break
+
+    if has_collected_samples:
+        return Response(
+            {"error": "Cannot cancel order after samples have been collected"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Cancel the order
+    order.status = "CANCELLED"
+    order.save()
+
+    # Cancel all order items
+    order.items.update(status="CANCELLED")
+
+    serializer = OrderSerializer(order)
+    return Response(serializer.data)

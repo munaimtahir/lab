@@ -109,3 +109,49 @@ class TestOrderAPI:
         response = self.client.get(f"/api/orders/?patient={self.patient.id}")
         assert response.status_code == status.HTTP_200_OK
         assert response.data["count"] == 1
+
+    def test_cancel_order_success(self):
+        """Test cancelling an order with no collected samples."""
+        self.client.force_authenticate(user=self.user)
+        order = Order.objects.create(patient=self.patient, priority="ROUTINE")
+
+        response = self.client.post(f"/api/orders/{order.id}/cancel/")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["status"] == "CANCELLED"
+
+        # Verify order is cancelled in database
+        order.refresh_from_db()
+        assert order.status == "CANCELLED"
+
+    def test_cancel_order_with_collected_samples(self):
+        """Test that order cannot be cancelled after samples are collected."""
+        from samples.models import Sample
+        from orders.models import OrderItem
+
+        self.client.force_authenticate(user=self.user)
+        order = Order.objects.create(patient=self.patient, priority="ROUTINE")
+        order_item = OrderItem.objects.create(order=order, test=self.test1)
+        Sample.objects.create(
+            order_item=order_item, sample_type="Blood", status="COLLECTED"
+        )
+
+        response = self.client.post(f"/api/orders/{order.id}/cancel/")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "collected" in response.data["error"].lower()
+
+    def test_cancel_already_cancelled_order(self):
+        """Test that already cancelled order cannot be cancelled again."""
+        self.client.force_authenticate(user=self.user)
+        order = Order.objects.create(
+            patient=self.patient, priority="ROUTINE", status="CANCELLED"
+        )
+
+        response = self.client.post(f"/api/orders/{order.id}/cancel/")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "already cancelled" in response.data["error"].lower()
+
+    def test_cancel_nonexistent_order(self):
+        """Test cancelling a non-existent order returns 404."""
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post("/api/orders/99999/cancel/")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
