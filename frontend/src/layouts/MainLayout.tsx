@@ -141,12 +141,12 @@ export function MainLayout({ user, onLogout }: MainLayoutProps) {
 
                 {/* Mobile Menu Button */}
                 <button
-                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="md:hidden p-2 rounded hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-300"
                   aria-label="Toggle mobile menu"
-                  aria-expanded={mobileMenuOpen}
+                  aria-expanded={isMobileMenuOpen}
                 >
-                  {mobileMenuOpen ? (
+                  {isMobileMenuOpen ? (
                     // Close icon (X)
                     <svg
                       className="w-6 h-6"

@@ -2,12 +2,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { reportService } from './reports'
 import { apiClient } from './api'
 
-// Test default API URL - used when VITE_API_URL is not set
-const TEST_DEFAULT_API_URL = 'http://localhost:8000'
-
 // Mock API_BASE_URL from environment or use test default
 vi.mock('./api', () => ({
-  API_BASE_URL: import.meta.env.VITE_API_URL || TEST_DEFAULT_API_URL,
+  API_BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
   apiClient: {
     get: vi.fn(),
     post: vi.fn(),
@@ -15,7 +12,7 @@ vi.mock('./api', () => ({
 }))
 
 // Store the mocked API_BASE_URL for test assertions
-const TEST_API_BASE_URL = import.meta.env.VITE_API_URL || TEST_DEFAULT_API_URL
+const TEST_API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 describe('reportService', () => {
   beforeEach(() => {
