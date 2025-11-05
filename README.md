@@ -6,7 +6,9 @@
 
 A production-ready Laboratory Information Management System (LIMS) for Al Shifa Laboratory with complete workflow automation, PDF reporting, and role-based access control.
 
-## 🚀 Quick Start (Development)
+## 🚀 Quick Start
+
+### Local Development
 
 ```bash
 # Start the entire stack (backend + frontend + database + redis)
@@ -20,20 +22,99 @@ cd infra && docker-compose up
 # Default credentials: admin / admin123
 ```
 
-> **Security Note**: The default configuration uses development credentials. For production:
-> 1. Copy `.env.example` to `.env` and update all passwords
-> 2. Set strong `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY`
-> 3. Use environment variables to override docker-compose defaults
-> 4. Never commit `.env` to version control
-
-## 📦 Production Deployment
+### VPS/Production Deployment
 
 ```bash
+# 1. Clone the repository
 git clone https://github.com/munaimtahir/lab.git
 cd lab
-cp backend/.env.example backend/.env
-# Edit backend/.env with secure credentials
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your VPS IP and secure credentials
+
+# 3. Build and start services
 docker compose build
+docker compose up -d
+
+# 4. Access the application
+# Frontend: http://YOUR_VPS_IP (served via nginx on port 80)
+# Backend API: http://YOUR_VPS_IP/api/ (proxied through nginx)
+# Health Check: http://YOUR_VPS_IP/api/health/
+```
+
+> **Security Note**: The default configuration uses development credentials. For production:
+> 1. Generate strong passwords: `POSTGRES_PASSWORD=$(openssl rand -base64 32)`
+> 2. Generate secret key: `DJANGO_SECRET_KEY=$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')`
+> 3. Set `DEBUG=False` in production
+> 4. Never commit `.env` to version control
+
+## 🌐 Deployment Configuration
+
+This application is designed to work seamlessly in both local development and VPS/production environments with **no code changes required**. All configuration is handled via environment variables.
+
+### Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `.env` | Active configuration (not in git) |
+| `.env.example` | Production/VPS template with documentation |
+| `infra/.env.example` | Local development template |
+| `frontend/.env.development` | Frontend local dev defaults |
+| `frontend/.env.production` | Frontend production defaults |
+
+### Key Environment Variables
+
+**Frontend Configuration:**
+```bash
+# Use /api for production (nginx proxies to backend)
+VITE_API_URL=/api
+
+# Or direct backend access for development
+VITE_API_URL=http://localhost:8000
+```
+
+**Backend Configuration:**
+```bash
+# Allowed hosts (comma-separated)
+ALLOWED_HOSTS=172.235.33.181,localhost,127.0.0.1
+
+# CORS origins (comma-separated)
+CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://localhost:5173
+
+# CSRF trusted origins (comma-separated)
+CSRF_TRUSTED_ORIGINS=http://172.235.33.181,http://localhost:5173
+```
+
+### Deployment Scenarios
+
+#### Scenario 1: Local Development
+```bash
+cd infra
+docker-compose up
+
+# Frontend: http://localhost:5173
+# Backend: http://localhost:8000
+# Configuration: infra/.env.example → .env
+```
+
+#### Scenario 2: VPS Production (e.g., http://172.235.33.181)
+```bash
+# Root directory
+docker compose up -d
+
+# Frontend: http://172.235.33.181 (nginx on port 80)
+# Backend: http://172.235.33.181/api/ (proxied)
+# Configuration: .env.example → .env (update IP address)
+```
+
+#### Scenario 3: Domain-based Production (e.g., https://lims.example.com)
+```bash
+# Update .env:
+# ALLOWED_HOSTS=lims.example.com
+# CORS_ALLOWED_ORIGINS=https://lims.example.com
+# CSRF_TRUSTED_ORIGINS=https://lims.example.com
+
 docker compose up -d
 ```
 
@@ -42,7 +123,7 @@ docker compose up -d
 - **Backend**: Python 3.12, Django 5.2, Django REST Framework, PostgreSQL 16, Redis 7
 - **Frontend**: React 19, TypeScript, Vite, TailwindCSS
 - **Authentication**: JWT with token blacklisting and role-based access control
-- **Infrastructure**: Docker Compose with health checks, GitHub Actions CI/CD
+- **Infrastructure**: Docker Compose with health checks, GitHub Actions CI/CD, Nginx reverse proxy
 - **Testing**: 99% backend coverage, 166 comprehensive tests
 
 ## ✨ Complete LIMS Workflow
