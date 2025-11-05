@@ -726,9 +726,23 @@ export function OrderDetailPage() {
           {/* Results Tab */}
           {activeTab === 'results' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Results Entry
-              </h3>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Results Entry & Verification
+                </h3>
+                {user && (
+                  <div className="text-sm">
+                    <span className="text-gray-600">Your Role: </span>
+                    <span className="font-medium text-blue-600">
+                      {user.role === 'TECHNOLOGIST'
+                        ? 'Result Entry'
+                        : user.role === 'PATHOLOGIST'
+                          ? 'Verification & Publishing'
+                          : user.role}
+                    </span>
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-4">
                 {order.items.map(item => {
@@ -747,7 +761,7 @@ export function OrderDetailPage() {
                       className="border border-gray-200 rounded-lg p-4"
                     >
                       <div className="flex justify-between items-start mb-3">
-                        <div>
+                        <div className="flex-1">
                           <h4 className="font-medium text-gray-900">
                             {item.test.name}
                           </h4>
@@ -756,18 +770,44 @@ export function OrderDetailPage() {
                               `Reference: ${item.test.reference_range}`}
                           </p>
                         </div>
-                        {result && (
-                          <span
-                            className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(result.status)}`}
-                          >
-                            {result.status}
-                          </span>
-                        )}
+                        <div className="flex flex-col items-end gap-1">
+                          {result && (
+                            <>
+                              <span
+                                className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(result.status)}`}
+                              >
+                                {result.status}
+                              </span>
+                              {result.status === 'DRAFT' && canEnterResults && (
+                                <span className="text-xs text-blue-600 font-medium">
+                                  → Action: Enter Result
+                                </span>
+                              )}
+                              {result.status === 'ENTERED' &&
+                                canVerifyResults && (
+                                  <span className="text-xs text-green-600 font-medium">
+                                    → Action: Verify
+                                  </span>
+                                )}
+                              {result.status === 'VERIFIED' &&
+                                canVerifyResults && (
+                                  <span className="text-xs text-purple-600 font-medium">
+                                    → Action: Publish
+                                  </span>
+                                )}
+                              {result.status === 'PUBLISHED' && (
+                                <span className="text-xs text-gray-600">
+                                  ✓ Complete
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
 
                       {result ? (
                         <div className="space-y-3">
-                          {/* Result Entry Form */}
+                          {/* Result Entry Form - Only for Technologists */}
                           {!isEntered && canEnterResults && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div>
@@ -859,6 +899,18 @@ export function OrderDetailPage() {
                             </div>
                           )}
 
+                          {/* Message for Pathologist when result is in DRAFT */}
+                          {result.status === 'DRAFT' &&
+                            !canEnterResults &&
+                            canVerifyResults && (
+                              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <p className="text-sm text-yellow-800">
+                                  ⏳ Waiting for technologist to enter result
+                                  values
+                                </p>
+                              </div>
+                            )}
+
                           {/* Display entered result */}
                           {isEntered && (
                             <div className="bg-gray-50 p-3 rounded-lg space-y-2">
@@ -926,6 +978,17 @@ export function OrderDetailPage() {
                                   : 'Enter Result'}
                               </button>
                             )}
+
+                            {result.status === 'ENTERED' &&
+                              canEnterResults &&
+                              !canVerifyResults && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 w-full">
+                                  <p className="text-sm text-blue-800">
+                                    ✓ Result entered. Waiting for pathologist
+                                    to verify.
+                                  </p>
+                                </div>
+                              )}
 
                             {result.status === 'ENTERED' &&
                               canVerifyResults && (
