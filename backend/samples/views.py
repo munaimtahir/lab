@@ -93,7 +93,6 @@ def reject_sample(request, pk):
     except Sample.DoesNotExist:
         return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Only lab staff can reject samples
     if request.user.role not in [
         UserRole.TECHNOLOGIST,
         UserRole.PATHOLOGIST,

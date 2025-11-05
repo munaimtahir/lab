@@ -121,13 +121,15 @@ export function MainLayout({ user, onLogout }: MainLayoutProps) {
               )}
             </div>
 
-            {/* User Info & Logout */}
+            {/* Right side: User Info & Mobile Menu Button */}
             {user && (
               <div className="flex items-center space-x-2 md:space-x-4">
                 <div className="text-right hidden sm:block">
                   <div className="text-sm font-medium">{user.username}</div>
                   <div className="text-xs text-red-200">{user.role}</div>
                 </div>
+
+                {/* Logout Button - Desktop */}
                 {onLogout && (
                   <button
                     onClick={onLogout}
@@ -136,6 +138,46 @@ export function MainLayout({ user, onLogout }: MainLayoutProps) {
                     Logout
                   </button>
                 )}
+
+                {/* Mobile Menu Button */}
+                <button
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="md:hidden p-2 rounded hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-300"
+                  aria-label="Toggle mobile menu"
+                  aria-expanded={mobileMenuOpen}
+                >
+                  {mobileMenuOpen ? (
+                    // Close icon (X)
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  ) : (
+                    // Hamburger icon
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
+                    </svg>
+                  )}
+                </button>
               </div>
             )}
           </div>
