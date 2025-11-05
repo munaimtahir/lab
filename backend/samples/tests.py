@@ -286,6 +286,22 @@ class TestSampleAPI:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "rejection reason" in response.data["error"].lower()
 
+    def test_reject_sample_with_invalid_status(self):
+        """Test that rejecting a sample with invalid status fails."""
+        self.client.force_authenticate(user=self.tech_user)
+        sample = Sample.objects.create(
+            order_item=self.order_item,
+            sample_type="Blood",
+            status="REJECTED",  # Already rejected
+        )
+
+        response = self.client.post(
+            f"/api/samples/{sample.id}/reject/",
+            {"rejection_reason": "Test rejection"},
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Cannot reject sample with status" in response.data["error"]
+
     def test_reject_sample_as_phlebotomy_forbidden(self):
         """Test that phlebotomy cannot reject samples."""
         self.client.force_authenticate(user=self.phlebotomy_user)
