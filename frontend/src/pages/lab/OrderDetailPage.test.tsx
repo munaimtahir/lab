@@ -59,7 +59,9 @@ describe('OrderDetailPage', () => {
   })
 
   it('shows loading state', () => {
-    vi.mocked(orderService.getById).mockImplementation(() => new Promise(() => {}))
+    vi.mocked(orderService.getById).mockImplementation(
+      () => new Promise(() => {})
+    )
 
     render(
       <MemoryRouter initialEntries={['/lab/orders/1']}>
@@ -87,8 +89,13 @@ describe('OrderDetailPage', () => {
       </MemoryRouter>
     )
 
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Summary' })).toBeInTheDocument()
-    }, { timeout: 5000 })
+    await waitFor(
+      () => {
+        expect(
+          screen.getByRole('button', { name: 'Summary' })
+        ).toBeInTheDocument()
+      },
+      { timeout: 5000 }
+    )
   })
 })

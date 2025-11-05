@@ -63,11 +63,13 @@ function TestForm({ test, onSave, onCancel }: TestFormProps) {
   }
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]:
         type === 'checkbox'
@@ -335,10 +337,12 @@ export function TestCatalogPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tests.map((test) => (
+              {tests.map(test => (
                 <tr key={test.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{test.code}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {test.code}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900">{test.name}</div>

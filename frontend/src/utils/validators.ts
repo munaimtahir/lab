@@ -7,7 +7,7 @@ export function validateCNIC(cnic: string): boolean {
 export function formatCNIC(value: string): string {
   // Remove all non-digit characters
   const digits = value.replace(/\D/g, '')
-  
+
   // Format as #####-#######-#
   if (digits.length <= 5) {
     return digits
@@ -27,7 +27,7 @@ export function validatePhone(phone: string): boolean {
 export function formatPhone(value: string): string {
   // Remove all non-digit and non-plus characters
   const cleaned = value.replace(/[^\d+]/g, '')
-  
+
   // Basic formatting
   if (cleaned.startsWith('+92')) {
     return cleaned.slice(0, 13)
@@ -45,14 +45,17 @@ export function validateDOB(dob: string): boolean {
 }
 
 // Age calculation
-export function calculateAge(dob: string): { age: number; unit: 'years' | 'months' | 'days' } {
+export function calculateAge(dob: string): {
+  age: number
+  unit: 'years' | 'months' | 'days'
+} {
   const birthDate = new Date(dob)
   const today = new Date()
-  
+
   const years = today.getFullYear() - birthDate.getFullYear()
   const months = today.getMonth() - birthDate.getMonth()
   const days = today.getDate() - birthDate.getDate()
-  
+
   if (years > 0) {
     return { age: years, unit: 'years' }
   } else if (months > 0) {

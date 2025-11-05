@@ -1,5 +1,6 @@
 // API Configuration
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 // Auth endpoints
 export const AUTH_ENDPOINTS = {
@@ -87,7 +88,12 @@ export const ROLE_PERMISSIONS = {
   RECEPTION: ['patients', 'orders', 'reports.view'],
   PHLEBOTOMY: ['samples.collect', 'worklist.view'],
   TECHNOLOGIST: ['samples.receive', 'results.enter', 'worklist.view'],
-  PATHOLOGIST: ['results.verify', 'results.publish', 'reports.generate', 'worklist.view'],
+  PATHOLOGIST: [
+    'results.verify',
+    'results.publish',
+    'reports.generate',
+    'worklist.view',
+  ],
 } as const
 
 // Color scheme matching existing xMed EMR

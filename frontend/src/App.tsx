@@ -50,7 +50,12 @@ function AppRoutes() {
             path={ROUTES.LAB_WORKLIST}
             element={
               <ProtectedRoute
-                allowedRoles={['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST', 'PATHOLOGIST']}
+                allowedRoles={[
+                  'ADMIN',
+                  'PHLEBOTOMY',
+                  'TECHNOLOGIST',
+                  'PATHOLOGIST',
+                ]}
               >
                 <LabWorklistPage />
               </ProtectedRoute>

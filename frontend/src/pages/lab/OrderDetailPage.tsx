@@ -15,7 +15,7 @@ export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
-  
+
   const [order, setOrder] = useState<Order | null>(null)
   const [samples, setSamples] = useState<Sample[]>([])
   const [results, setResults] = useState<Result[]>([])
@@ -25,14 +25,19 @@ export function OrderDetailPage() {
   const [activeTab, setActiveTab] = useState<TabType>('summary')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  
+
   // Results entry form state
-  const [resultFormData, setResultFormData] = useState<Record<number, {
-    value: string
-    unit: string
-    flags: string
-    notes: string
-  }>>({})
+  const [resultFormData, setResultFormData] = useState<
+    Record<
+      number,
+      {
+        value: string
+        unit: string
+        flags: string
+        notes: string
+      }
+    >
+  >({})
 
   useEffect(() => {
     if (id) {
@@ -66,7 +71,9 @@ export function OrderDetailPage() {
     try {
       const allSamples = await sampleService.getAll()
       const orderItemIds = order?.items.map(item => item.id) || []
-      const filteredSamples = allSamples.filter(s => orderItemIds.includes(s.order_item))
+      const filteredSamples = allSamples.filter(s =>
+        orderItemIds.includes(s.order_item)
+      )
       setSamples(filteredSamples)
     } catch (error) {
       console.error('Failed to fetch samples:', error)
@@ -77,22 +84,27 @@ export function OrderDetailPage() {
     try {
       const allResults = await resultService.getAll()
       const orderItemIds = order?.items.map(item => item.id) || []
-      const filteredResults = allResults.filter(r => orderItemIds.includes(r.order_item))
+      const filteredResults = allResults.filter(r =>
+        orderItemIds.includes(r.order_item)
+      )
       setResults(filteredResults)
-      
+
       // Initialize form data with existing results
-      const formData: Record<number, {
-        value: string
-        unit: string
-        flags: string
-        notes: string
-      }> = {}
+      const formData: Record<
+        number,
+        {
+          value: string
+          unit: string
+          flags: string
+          notes: string
+        }
+      > = {}
       filteredResults.forEach(result => {
         formData[result.order_item] = {
           value: result.value || '',
           unit: result.unit || '',
           flags: result.flags || '',
-          notes: result.notes || ''
+          notes: result.notes || '',
         }
       })
       setResultFormData(formData)
@@ -152,12 +164,17 @@ export function OrderDetailPage() {
         setActionLoading(null)
         return
       }
-      
+
       await resultService.enter(resultId, {
         value: formData.value,
         unit: formData.unit,
-        flag: formData.flags as 'normal' | 'high' | 'low' | 'abnormal' | undefined,
-        notes: formData.notes
+        flag: formData.flags as
+          | 'normal'
+          | 'high'
+          | 'low'
+          | 'abnormal'
+          | undefined,
+        notes: formData.notes,
       })
       setSuccess('Result entered successfully')
       await fetchResults()
@@ -215,7 +232,10 @@ export function OrderDetailPage() {
   }
 
   const getStatusColor = (status: string) => {
-    return COLORS.status[status as keyof typeof COLORS.status] || 'bg-gray-100 text-gray-800'
+    return (
+      COLORS.status[status as keyof typeof COLORS.status] ||
+      'bg-gray-100 text-gray-800'
+    )
   }
 
   const getSampleForItem = (orderItemId: number) => {
@@ -227,10 +247,12 @@ export function OrderDetailPage() {
   }
 
   const canCollectSamples = user && ['ADMIN', 'PHLEBOTOMY'].includes(user.role)
-  const canReceiveSamples = user && ['ADMIN', 'TECHNOLOGIST', 'PATHOLOGIST'].includes(user.role)
+  const canReceiveSamples =
+    user && ['ADMIN', 'TECHNOLOGIST', 'PATHOLOGIST'].includes(user.role)
   const canEnterResults = user && ['ADMIN', 'TECHNOLOGIST'].includes(user.role)
   const canVerifyResults = user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
-  const canGenerateReports = user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
+  const canGenerateReports =
+    user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
 
   if (loading) {
     return (
@@ -273,7 +295,9 @@ export function OrderDetailPage() {
 
       {/* Status Badge */}
       <div className="mb-6">
-        <span className={`inline-block px-4 py-2 rounded-lg text-sm font-medium ${getStatusColor(order.status)}`}>
+        <span
+          className={`inline-block px-4 py-2 rounded-lg text-sm font-medium ${getStatusColor(order.status)}`}
+        >
           Status: {order.status}
         </span>
       </div>
@@ -343,7 +367,9 @@ export function OrderDetailPage() {
             <div className="space-y-6">
               {/* Patient Info */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Patient Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Patient Information
+                </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Name:</span>
@@ -355,11 +381,19 @@ export function OrderDetailPage() {
                   </div>
                   <div>
                     <span className="text-gray-600">Gender:</span>
-                    <p className="font-medium">{order.patient.gender === 'M' ? 'Male' : order.patient.gender === 'F' ? 'Female' : 'Other'}</p>
+                    <p className="font-medium">
+                      {order.patient.gender === 'M'
+                        ? 'Male'
+                        : order.patient.gender === 'F'
+                          ? 'Female'
+                          : 'Other'}
+                    </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Age:</span>
-                    <p className="font-medium">{order.patient.age} {order.patient.age_unit}</p>
+                    <p className="font-medium">
+                      {order.patient.age} {order.patient.age_unit}
+                    </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Phone:</span>
@@ -374,7 +408,9 @@ export function OrderDetailPage() {
 
               {/* Order Info */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Order Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Order Information
+                </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Order Number:</span>
@@ -382,7 +418,9 @@ export function OrderDetailPage() {
                   </div>
                   <div>
                     <span className="text-gray-600">Created:</span>
-                    <p className="font-medium">{formatDateTime(order.created_at)}</p>
+                    <p className="font-medium">
+                      {formatDateTime(order.created_at)}
+                    </p>
                   </div>
                   <div>
                     <span className="text-gray-600">Created By:</span>
@@ -397,27 +435,47 @@ export function OrderDetailPage() {
 
               {/* Test Items */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Ordered Tests</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Ordered Tests
+                </h3>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">Test Name</th>
-                        <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">Code</th>
-                        <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">Specimen</th>
-                        <th className="text-right py-2 px-3 text-sm font-medium text-gray-700">Price</th>
-                        <th className="text-center py-2 px-3 text-sm font-medium text-gray-700">Status</th>
+                        <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">
+                          Test Name
+                        </th>
+                        <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">
+                          Code
+                        </th>
+                        <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">
+                          Specimen
+                        </th>
+                        <th className="text-right py-2 px-3 text-sm font-medium text-gray-700">
+                          Price
+                        </th>
+                        <th className="text-center py-2 px-3 text-sm font-medium text-gray-700">
+                          Status
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {order.items.map(item => (
                         <tr key={item.id} className="border-b border-gray-100">
                           <td className="py-2 px-3">{item.test.name}</td>
-                          <td className="py-2 px-3 text-sm text-gray-600">{item.test.code}</td>
-                          <td className="py-2 px-3 text-sm text-gray-600">{item.test.specimen}</td>
-                          <td className="py-2 px-3 text-right font-medium">{formatCurrency(item.test.price)}</td>
+                          <td className="py-2 px-3 text-sm text-gray-600">
+                            {item.test.code}
+                          </td>
+                          <td className="py-2 px-3 text-sm text-gray-600">
+                            {item.test.specimen}
+                          </td>
+                          <td className="py-2 px-3 text-right font-medium">
+                            {formatCurrency(item.test.price)}
+                          </td>
                           <td className="py-2 px-3 text-center">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(item.status)}`}>
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(item.status)}`}
+                            >
                               {item.status}
                             </span>
                           </td>
@@ -430,19 +488,27 @@ export function OrderDetailPage() {
 
               {/* Billing */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Billing</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  Billing
+                </h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between mb-2">
                     <span>Bill Amount:</span>
-                    <span className="font-medium">{formatCurrency(order.bill_amount)}</span>
+                    <span className="font-medium">
+                      {formatCurrency(order.bill_amount)}
+                    </span>
                   </div>
                   <div className="flex justify-between mb-2">
                     <span>Discount:</span>
-                    <span className="font-medium">{formatCurrency(order.discount)}</span>
+                    <span className="font-medium">
+                      {formatCurrency(order.discount)}
+                    </span>
                   </div>
                   <div className="flex justify-between border-t pt-2">
                     <span className="font-semibold">Amount Paid:</span>
-                    <span className="font-semibold text-blue-600">{formatCurrency(order.amount_paid)}</span>
+                    <span className="font-semibold text-blue-600">
+                      {formatCurrency(order.amount_paid)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -452,64 +518,87 @@ export function OrderDetailPage() {
           {/* Samples Tab */}
           {activeTab === 'samples' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Sample Management</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Sample Management
+              </h3>
+
               <div className="space-y-4">
                 {order.items.map(item => {
                   const sample = getSampleForItem(item.id)
                   return (
-                    <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                    <div
+                      key={item.id}
+                      className="border border-gray-200 rounded-lg p-4"
+                    >
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <h4 className="font-medium text-gray-900">{item.test.name}</h4>
-                          <p className="text-sm text-gray-600">Specimen: {item.test.specimen}</p>
+                          <h4 className="font-medium text-gray-900">
+                            {item.test.name}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            Specimen: {item.test.specimen}
+                          </p>
                         </div>
                         {sample && (
-                          <span className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(sample.status)}`}>
+                          <span
+                            className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(sample.status)}`}
+                          >
                             {sample.status}
                           </span>
                         )}
                       </div>
-                      
+
                       {sample ? (
                         <div className="space-y-2">
                           <div className="text-sm">
                             <span className="text-gray-600">Barcode: </span>
-                            <span className="font-mono font-medium">{sample.barcode}</span>
+                            <span className="font-mono font-medium">
+                              {sample.barcode}
+                            </span>
                           </div>
-                          
+
                           {sample.collected_at && (
                             <div className="text-sm text-gray-600">
                               Collected: {formatDateTime(sample.collected_at)}
                             </div>
                           )}
-                          
+
                           {sample.received_at && (
                             <div className="text-sm text-gray-600">
                               Received: {formatDateTime(sample.received_at)}
                             </div>
                           )}
-                          
+
                           <div className="flex gap-2 mt-3">
-                            {sample.status === 'PENDING' && canCollectSamples && (
-                              <button
-                                onClick={() => handleCollectSample(sample.id)}
-                                disabled={actionLoading === `collect-${sample.id}`}
-                                className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 text-sm"
-                              >
-                                {actionLoading === `collect-${sample.id}` ? 'Collecting...' : 'Collect Sample'}
-                              </button>
-                            )}
-                            
-                            {sample.status === 'COLLECTED' && canReceiveSamples && (
-                              <button
-                                onClick={() => handleReceiveSample(sample.id)}
-                                disabled={actionLoading === `receive-${sample.id}`}
-                                className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 text-sm"
-                              >
-                                {actionLoading === `receive-${sample.id}` ? 'Receiving...' : 'Receive Sample'}
-                              </button>
-                            )}
+                            {sample.status === 'PENDING' &&
+                              canCollectSamples && (
+                                <button
+                                  onClick={() => handleCollectSample(sample.id)}
+                                  disabled={
+                                    actionLoading === `collect-${sample.id}`
+                                  }
+                                  className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 text-sm"
+                                >
+                                  {actionLoading === `collect-${sample.id}`
+                                    ? 'Collecting...'
+                                    : 'Collect Sample'}
+                                </button>
+                              )}
+
+                            {sample.status === 'COLLECTED' &&
+                              canReceiveSamples && (
+                                <button
+                                  onClick={() => handleReceiveSample(sample.id)}
+                                  disabled={
+                                    actionLoading === `receive-${sample.id}`
+                                  }
+                                  className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 text-sm"
+                                >
+                                  {actionLoading === `receive-${sample.id}`
+                                    ? 'Receiving...'
+                                    : 'Receive Sample'}
+                                </button>
+                              )}
                           </div>
                         </div>
                       ) : (
@@ -527,71 +616,107 @@ export function OrderDetailPage() {
           {/* Results Tab */}
           {activeTab === 'results' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Results Entry</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Results Entry
+              </h3>
+
               <div className="space-y-4">
                 {order.items.map(item => {
                   const result = getResultForItem(item.id)
-                  const formData = resultFormData[item.id] || { value: '', unit: '', flags: '', notes: '' }
+                  const formData = resultFormData[item.id] || {
+                    value: '',
+                    unit: '',
+                    flags: '',
+                    notes: '',
+                  }
                   const isEntered = result && result.status !== 'DRAFT'
-                  
+
                   return (
-                    <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                    <div
+                      key={item.id}
+                      className="border border-gray-200 rounded-lg p-4"
+                    >
                       <div className="flex justify-between items-start mb-3">
                         <div>
-                          <h4 className="font-medium text-gray-900">{item.test.name}</h4>
+                          <h4 className="font-medium text-gray-900">
+                            {item.test.name}
+                          </h4>
                           <p className="text-sm text-gray-600">
-                            {item.test.reference_range && `Reference: ${item.test.reference_range}`}
+                            {item.test.reference_range &&
+                              `Reference: ${item.test.reference_range}`}
                           </p>
                         </div>
                         {result && (
-                          <span className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(result.status)}`}>
+                          <span
+                            className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(result.status)}`}
+                          >
                             {result.status}
                           </span>
                         )}
                       </div>
-                      
+
                       {result ? (
                         <div className="space-y-3">
                           {/* Result Entry Form */}
                           {!isEntered && canEnterResults && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Value *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Value *
+                                </label>
                                 <input
                                   type="text"
                                   value={formData.value}
-                                  onChange={(e) => setResultFormData({
-                                    ...resultFormData,
-                                    [item.id]: { ...formData, value: e.target.value }
-                                  })}
+                                  onChange={e =>
+                                    setResultFormData({
+                                      ...resultFormData,
+                                      [item.id]: {
+                                        ...formData,
+                                        value: e.target.value,
+                                      },
+                                    })
+                                  }
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   placeholder="Enter result value"
                                 />
                               </div>
-                              
+
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Unit
+                                </label>
                                 <input
                                   type="text"
                                   value={formData.unit}
-                                  onChange={(e) => setResultFormData({
-                                    ...resultFormData,
-                                    [item.id]: { ...formData, unit: e.target.value }
-                                  })}
+                                  onChange={e =>
+                                    setResultFormData({
+                                      ...resultFormData,
+                                      [item.id]: {
+                                        ...formData,
+                                        unit: e.target.value,
+                                      },
+                                    })
+                                  }
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   placeholder={item.test.unit || 'Unit'}
                                 />
                               </div>
-                              
+
                               <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Flag</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Flag
+                                </label>
                                 <select
                                   value={formData.flags}
-                                  onChange={(e) => setResultFormData({
-                                    ...resultFormData,
-                                    [item.id]: { ...formData, flags: e.target.value }
-                                  })}
+                                  onChange={e =>
+                                    setResultFormData({
+                                      ...resultFormData,
+                                      [item.id]: {
+                                        ...formData,
+                                        flags: e.target.value,
+                                      },
+                                    })
+                                  }
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                   <option value="">Normal</option>
@@ -600,15 +725,22 @@ export function OrderDetailPage() {
                                   <option value="abnormal">Abnormal</option>
                                 </select>
                               </div>
-                              
+
                               <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Notes
+                                </label>
                                 <textarea
                                   value={formData.notes}
-                                  onChange={(e) => setResultFormData({
-                                    ...resultFormData,
-                                    [item.id]: { ...formData, notes: e.target.value }
-                                  })}
+                                  onChange={e =>
+                                    setResultFormData({
+                                      ...resultFormData,
+                                      [item.id]: {
+                                        ...formData,
+                                        notes: e.target.value,
+                                      },
+                                    })
+                                  }
                                   rows={2}
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   placeholder="Optional notes"
@@ -616,40 +748,49 @@ export function OrderDetailPage() {
                               </div>
                             </div>
                           )}
-                          
+
                           {/* Display entered result */}
                           {isEntered && (
                             <div className="bg-gray-50 p-3 rounded-lg space-y-2">
                               <div className="grid grid-cols-2 gap-2 text-sm">
                                 <div>
                                   <span className="text-gray-600">Value: </span>
-                                  <span className="font-medium">{result.value} {result.unit}</span>
+                                  <span className="font-medium">
+                                    {result.value} {result.unit}
+                                  </span>
                                 </div>
                                 {result.flags && (
                                   <div>
-                                    <span className="text-gray-600">Flag: </span>
-                                    <span className={`font-medium ${
-                                      result.flags === 'high' || result.flags === 'low' ? 'text-red-600' : 'text-green-600'
-                                    }`}>
+                                    <span className="text-gray-600">
+                                      Flag:{' '}
+                                    </span>
+                                    <span
+                                      className={`font-medium ${
+                                        result.flags === 'high' ||
+                                        result.flags === 'low'
+                                          ? 'text-red-600'
+                                          : 'text-green-600'
+                                      }`}
+                                    >
                                       {result.flags}
                                     </span>
                                   </div>
                                 )}
                               </div>
-                              
+
                               {result.notes && (
                                 <div className="text-sm">
                                   <span className="text-gray-600">Notes: </span>
                                   <span>{result.notes}</span>
                                 </div>
                               )}
-                              
+
                               {result.entered_at && (
                                 <div className="text-xs text-gray-500">
                                   Entered: {formatDateTime(result.entered_at)}
                                 </div>
                               )}
-                              
+
                               {result.verified_at && (
                                 <div className="text-xs text-gray-500">
                                   Verified: {formatDateTime(result.verified_at)}
@@ -657,38 +798,54 @@ export function OrderDetailPage() {
                               )}
                             </div>
                           )}
-                          
+
                           {/* Action Buttons */}
                           <div className="flex gap-2 mt-3">
                             {result.status === 'DRAFT' && canEnterResults && (
                               <button
-                                onClick={() => handleEnterResult(result.id, item.id)}
-                                disabled={actionLoading === `enter-${result.id}`}
+                                onClick={() =>
+                                  handleEnterResult(result.id, item.id)
+                                }
+                                disabled={
+                                  actionLoading === `enter-${result.id}`
+                                }
                                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
                               >
-                                {actionLoading === `enter-${result.id}` ? 'Saving...' : 'Enter Result'}
+                                {actionLoading === `enter-${result.id}`
+                                  ? 'Saving...'
+                                  : 'Enter Result'}
                               </button>
                             )}
-                            
-                            {result.status === 'ENTERED' && canVerifyResults && (
-                              <button
-                                onClick={() => handleVerifyResult(result.id)}
-                                disabled={actionLoading === `verify-${result.id}`}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
-                              >
-                                {actionLoading === `verify-${result.id}` ? 'Verifying...' : 'Verify Result'}
-                              </button>
-                            )}
-                            
-                            {result.status === 'VERIFIED' && canVerifyResults && (
-                              <button
-                                onClick={() => handlePublishResult(result.id)}
-                                disabled={actionLoading === `publish-${result.id}`}
-                                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm"
-                              >
-                                {actionLoading === `publish-${result.id}` ? 'Publishing...' : 'Publish Result'}
-                              </button>
-                            )}
+
+                            {result.status === 'ENTERED' &&
+                              canVerifyResults && (
+                                <button
+                                  onClick={() => handleVerifyResult(result.id)}
+                                  disabled={
+                                    actionLoading === `verify-${result.id}`
+                                  }
+                                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
+                                >
+                                  {actionLoading === `verify-${result.id}`
+                                    ? 'Verifying...'
+                                    : 'Verify Result'}
+                                </button>
+                              )}
+
+                            {result.status === 'VERIFIED' &&
+                              canVerifyResults && (
+                                <button
+                                  onClick={() => handlePublishResult(result.id)}
+                                  disabled={
+                                    actionLoading === `publish-${result.id}`
+                                  }
+                                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm"
+                                >
+                                  {actionLoading === `publish-${result.id}`
+                                    ? 'Publishing...'
+                                    : 'Publish Result'}
+                                </button>
+                              )}
                           </div>
                         </div>
                       ) : (
@@ -706,16 +863,23 @@ export function OrderDetailPage() {
           {/* Report Tab */}
           {activeTab === 'report' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Report Generation</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Report Generation
+              </h3>
+
               <div className="space-y-4">
                 {reports.length > 0 ? (
                   <div className="space-y-3">
                     {reports.map(report => (
-                      <div key={report.id} className="border border-gray-200 rounded-lg p-4">
+                      <div
+                        key={report.id}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-center">
                           <div>
-                            <p className="font-medium text-gray-900">Report #{report.id}</p>
+                            <p className="font-medium text-gray-900">
+                              Report #{report.id}
+                            </p>
                             <p className="text-sm text-gray-600">
                               Generated: {formatDateTime(report.generated_at)}
                             </p>
@@ -734,10 +898,12 @@ export function OrderDetailPage() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-gray-600 mb-4">No report generated yet</p>
+                    <p className="text-gray-600 mb-4">
+                      No report generated yet
+                    </p>
                   </div>
                 )}
-                
+
                 {canGenerateReports && (
                   <div className="text-center pt-4 border-t">
                     <button
@@ -745,7 +911,9 @@ export function OrderDetailPage() {
                       disabled={actionLoading === 'generate-report'}
                       className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
                     >
-                      {actionLoading === 'generate-report' ? 'Generating...' : 'Generate PDF Report'}
+                      {actionLoading === 'generate-report'
+                        ? 'Generating...'
+                        : 'Generate PDF Report'}
                     </button>
                     <p className="text-xs text-gray-500 mt-2">
                       All results must be published before generating a report
@@ -760,4 +928,3 @@ export function OrderDetailPage() {
     </div>
   )
 }
-
