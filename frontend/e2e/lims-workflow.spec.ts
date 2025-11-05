@@ -4,12 +4,14 @@ import { expect, test } from '@playwright/test';
 // Backend: python manage.py runserver
 // Frontend: pnpm dev
 
-const API_BASE = 'http://localhost:8000/api';
+// Use environment variable or default to localhost for E2E tests
+const API_BASE = process.env.VITE_API_URL || process.env.API_BASE_URL || 'http://localhost:8000';
+const API_URL = `${API_BASE}/api`;
 
 test.describe('LIMS Complete Workflow', () => {
   test('full workflow: register patient → order → sample → result → report', async ({ request }) => {
     // 1. Login as admin
-    const loginResponse = await request.post(`${API_BASE}/auth/login/`, {
+    const loginResponse = await request.post(`${API_URL}/auth/login/`, {
       data: {
         username: 'admin',
         password: 'admin123',
@@ -23,7 +25,7 @@ test.describe('LIMS Complete Workflow', () => {
     const headers = { Authorization: `Bearer ${access}` };
 
     // 2. Create a patient
-    const patientResponse = await request.post(`${API_BASE}/patients/`, {
+    const patientResponse = await request.post(`${API_URL}/patients/`, {
       headers,
       data: {
         full_name: 'Test Patient E2E',
@@ -41,7 +43,7 @@ test.describe('LIMS Complete Workflow', () => {
     console.log('Created patient:', patient.mrn);
 
     // 3. Get test catalog
-    const catalogResponse = await request.get(`${API_BASE}/catalog/`, { headers });
+    const catalogResponse = await request.get(`${API_URL}/catalog/`, { headers });
     expect(catalogResponse.ok()).toBeTruthy();
     const catalog = await catalogResponse.json();
     expect(catalog.length).toBeGreaterThan(0);
