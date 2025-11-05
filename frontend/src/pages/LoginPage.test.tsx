@@ -31,7 +31,9 @@ describe('LoginPage', () => {
   })
 
   it('shows error message on login failure', async () => {
-    const mockLogin = vi.fn().mockRejectedValue(new Error('Invalid credentials'))
+    const mockLogin = vi
+      .fn()
+      .mockRejectedValue(new Error('Invalid credentials'))
     render(<LoginPage onLogin={mockLogin} />)
 
     const usernameInput = screen.getByLabelText('Username')
@@ -48,7 +50,11 @@ describe('LoginPage', () => {
   })
 
   it('shows loading state during login', async () => {
-    const mockLogin = vi.fn().mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)))
+    const mockLogin = vi
+      .fn()
+      .mockImplementation(
+        () => new Promise(resolve => setTimeout(resolve, 100))
+      )
     render(<LoginPage onLogin={mockLogin} />)
 
     const usernameInput = screen.getByLabelText('Username')

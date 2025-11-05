@@ -6,9 +6,27 @@ export interface User {
   role: UserRole
   first_name: string
   last_name: string
+  is_active?: boolean
+  phone?: string
 }
 
-export type UserRole = 'ADMIN' | 'RECEPTION' | 'PHLEBOTOMY' | 'TECHNOLOGIST' | 'PATHOLOGIST'
+export interface UserFormData {
+  username: string
+  email: string
+  password?: string
+  role: UserRole
+  first_name: string
+  last_name: string
+  is_active: boolean
+  phone?: string
+}
+
+export type UserRole =
+  | 'ADMIN'
+  | 'RECEPTION'
+  | 'PHLEBOTOMY'
+  | 'TECHNOLOGIST'
+  | 'PATHOLOGIST'
 
 export interface AuthTokens {
   access: string
@@ -49,8 +67,59 @@ export interface Test {
   is_active: boolean
 }
 
+export interface TestCatalog {
+  id: number
+  code: string
+  name: string
+  description?: string
+  category: string
+  sample_type: string
+  price: number
+  turnaround_time_hours: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface TestCatalogFormData {
+  code: string
+  name: string
+  description?: string
+  category: string
+  sample_type: string
+  price: number
+  turnaround_time_hours: number
+  is_active: boolean
+}
+
+// Terminal types
+export interface LabTerminal {
+  id: number
+  code: string
+  name: string
+  offline_range_start: number
+  offline_range_end: number
+  offline_current: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface LabTerminalFormData {
+  code: string
+  name: string
+  offline_range_start: number
+  offline_range_end: number
+  is_active: boolean
+}
+
 // Order types
-export type OrderStatus = 'NEW' | 'COLLECTED' | 'IN_PROCESS' | 'VERIFIED' | 'PUBLISHED'
+export type OrderStatus =
+  | 'NEW'
+  | 'COLLECTED'
+  | 'IN_PROCESS'
+  | 'VERIFIED'
+  | 'PUBLISHED'
 
 export interface OrderItem {
   id: number

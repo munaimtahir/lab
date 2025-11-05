@@ -46,10 +46,10 @@ def allocate_patient_mrn(
         terminal = LabTerminal.objects.select_for_update().get(
             code=origin_terminal_code, is_active=True
         )
-    except LabTerminal.DoesNotExist:
+    except LabTerminal.DoesNotExist as err:
         raise ValidationError(
             f"Terminal '{origin_terminal_code}' not found or not active"
-        )
+        ) from err
 
     # Get next MRN number from terminal's range
     mrn_number = terminal.get_next_offline_mrn()

@@ -1,0 +1,32 @@
+
+name: [Blocker] Auto-Create Result Records After Sample Receipt
+description: Technologists cannot enter results unless result records exist
+title: "[Blocker]: Auto-create result entries after sample is received"
+labels: ["blocker", "results", "technologist"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🧪 Result Initialization Task
+
+        Once a sample is marked as "RECEIVED", a placeholder result entry should be created automatically.
+
+  - type: checkboxes
+    id: task
+    attributes:
+      label: 🔧 Tasks
+      options:
+        - label: On sample status = RECEIVED, create Result record if none exists
+        - label: Set initial status to DRAFT
+        - label: Display result input fields for Technologist
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: ✅ Final Checks
+      options:
+        - label: UI correctly shows result input
+        - label: Result creation is tested
+        - label: CI passing

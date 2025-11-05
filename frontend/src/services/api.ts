@@ -109,7 +109,11 @@ class ApiClient {
     })
 
     // If 401, try to refresh token and retry once
-    if (response.status === 401 && this.refreshToken && !path.includes('/auth/')) {
+    if (
+      response.status === 401 &&
+      this.refreshToken &&
+      !path.includes('/auth/')
+    ) {
       try {
         await this.refreshAccessToken()
         headers['Authorization'] = `Bearer ${this.accessToken}`

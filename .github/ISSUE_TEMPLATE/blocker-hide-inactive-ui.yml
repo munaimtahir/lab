@@ -1,0 +1,32 @@
+
+name: [Blocker] Disable Inactive UI Features
+description: Prevent confusion by removing unfinished dashboard buttons
+title: "[Blocker]: Hide or disable inactive dashboard tiles"
+labels: ["blocker", "frontend", "usability"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🧼 UI Cleanup Task
+
+        Several dashboard features are shown but not implemented (e.g., Modify Slip, Refund Slip, Results Upload). These must be hidden or disabled before launch.
+
+  - type: checkboxes
+    id: task
+    attributes:
+      label: 🔧 Tasks
+      options:
+        - label: Hide inactive tiles from Lab Home dashboard
+        - label: Remove links to stub routes
+        - label: Add tooltips or "Coming Soon" tag (optional)
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: ✅ Final Checks
+      options:
+        - label: No broken routes or buttons
+        - label: Admin UI only shows working actions
+        - label: CI lint + typecheck pass

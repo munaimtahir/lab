@@ -10,6 +10,9 @@ import { NewLabSlipPage } from './pages/lab/NewLabSlipPage'
 import { LabWorklistPage } from './pages/lab/LabWorklistPage'
 import { OrderDetailPage } from './pages/lab/OrderDetailPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
+import { UserManagementPage } from './pages/admin/UserManagementPage'
+import { TestCatalogPage } from './pages/admin/TestCatalogPage'
+import { LabTerminalsPage } from './pages/admin/LabTerminalsPage'
 import { ROUTES } from './utils/constants'
 
 const queryClient = new QueryClient({
@@ -47,7 +50,12 @@ function AppRoutes() {
             path={ROUTES.LAB_WORKLIST}
             element={
               <ProtectedRoute
-                allowedRoles={['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST', 'PATHOLOGIST']}
+                allowedRoles={[
+                  'ADMIN',
+                  'PHLEBOTOMY',
+                  'TECHNOLOGIST',
+                  'PATHOLOGIST',
+                ]}
               >
                 <LabWorklistPage />
               </ProtectedRoute>
@@ -59,6 +67,30 @@ function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.ADMIN_USERS}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <UserManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.ADMIN_CATALOG}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <TestCatalogPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.ADMIN_TERMINALS}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <LabTerminalsPage />
               </ProtectedRoute>
             }
           />

@@ -4,10 +4,10 @@ import type { LoginResponse, User } from '../types'
 
 export const authService = {
   async login(username: string, password: string): Promise<LoginResponse> {
-    const response = await apiClient.post<LoginResponse>(
-      AUTH_ENDPOINTS.LOGIN,
-      { username, password }
-    )
+    const response = await apiClient.post<LoginResponse>(AUTH_ENDPOINTS.LOGIN, {
+      username,
+      password,
+    })
 
     // Store tokens and user data
     apiClient.setTokens(response.access, response.refresh)
@@ -18,7 +18,7 @@ export const authService = {
 
   async logout(): Promise<void> {
     const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
-    
+
     try {
       if (refreshToken) {
         await apiClient.post(AUTH_ENDPOINTS.LOGOUT, { refresh: refreshToken })

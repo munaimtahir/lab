@@ -47,7 +47,9 @@ describe('sampleService', () => {
 
       const result = await sampleService.getAll({ status: 'COLLECTED' })
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/samples/?status=COLLECTED')
+      expect(apiClient.get).toHaveBeenCalledWith(
+        '/api/samples/?status=COLLECTED'
+      )
       expect(result).toEqual(mockSamples)
     })
   })

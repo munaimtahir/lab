@@ -103,26 +103,37 @@ class PatientSerializer(serializers.ModelSerializer):
                 if "required" in msg_lower and "terminal" in msg_lower:
                     raise serializers.ValidationError(
                         {
-                            "detail": "Terminal code is required for offline registration."
+                            "detail": (
+                                "Terminal code is required for offline registration."
+                            )
                         }
                     ) from e
                 elif "not found" in msg_lower or "not active" in msg_lower:
                     raise serializers.ValidationError(
                         {
-                            "detail": "Invalid or inactive terminal. Please verify the terminal configuration."
+                            "detail": (
+                                "Invalid or inactive terminal. "
+                                "Please verify the terminal configuration."
+                            )
                         }
                     ) from e
                 elif "exhausted" in msg_lower:
                     raise serializers.ValidationError(
                         {
-                            "detail": "Terminal has exhausted its offline registration range. Please contact administrator."
+                            "detail": (
+                                "Terminal has exhausted its offline registration "
+                                "range. Please contact administrator."
+                            )
                         }
                     ) from e
 
             # Generic error for any other validation issues
             raise serializers.ValidationError(
                 {
-                    "detail": "Invalid registration parameters. Please check your input and try again."
+                    "detail": (
+                        "Invalid registration parameters. "
+                        "Please check your input and try again."
+                    )
                 }
             ) from e
 

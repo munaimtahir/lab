@@ -16,7 +16,7 @@ describe('MainLayout', () => {
 
   it('shows navigation when user is logged in', () => {
     const mockUser = { username: 'testuser', role: 'ADMIN' }
-    
+
     render(
       <BrowserRouter>
         <MainLayout user={mockUser} />
@@ -30,7 +30,7 @@ describe('MainLayout', () => {
 
   it('displays user info when logged in', () => {
     const mockUser = { username: 'testuser', role: 'ADMIN' }
-    
+
     render(
       <BrowserRouter>
         <MainLayout user={mockUser} />
@@ -55,7 +55,7 @@ describe('MainLayout', () => {
   it('shows logout button when user is logged in', () => {
     const mockUser = { username: 'testuser', role: 'ADMIN' }
     const mockLogout = () => {}
-    
+
     render(
       <BrowserRouter>
         <MainLayout user={mockUser} onLogout={mockLogout} />
@@ -67,7 +67,7 @@ describe('MainLayout', () => {
 
   it('filters navigation based on user role', () => {
     const mockUser = { username: 'testuser', role: 'RECEPTION' }
-    
+
     render(
       <BrowserRouter>
         <MainLayout user={mockUser} />

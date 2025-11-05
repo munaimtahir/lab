@@ -40,7 +40,9 @@ describe('LabWorklistPage', () => {
   })
 
   it('shows loading state', () => {
-    vi.mocked(orderService.getAll).mockImplementation(() => new Promise(() => {}))
+    vi.mocked(orderService.getAll).mockImplementation(
+      () => new Promise(() => {})
+    )
 
     render(
       <BrowserRouter>
@@ -86,7 +88,11 @@ describe('LabWorklistPage', () => {
         ],
         status: 'NEW' as const,
         created_at: '2024-01-01T00:00:00Z',
-        created_by: { id: 1, username: 'admin', role: 'ADMIN' } as unknown as User,
+        created_by: {
+          id: 1,
+          username: 'admin',
+          role: 'ADMIN',
+        } as unknown as User,
         bill_amount: 500,
         discount: 0,
         amount_paid: 500,
