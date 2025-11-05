@@ -125,8 +125,8 @@ class TestOrderAPI:
 
     def test_cancel_order_with_collected_samples(self):
         """Test that order cannot be cancelled after samples are collected."""
-        from samples.models import Sample
         from orders.models import OrderItem
+        from samples.models import Sample
 
         self.client.force_authenticate(user=self.user)
         order = Order.objects.create(patient=self.patient, priority="ROUTINE")
