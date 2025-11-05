@@ -377,35 +377,42 @@ export function OrderDetailPage() {
       </Modal>
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Order Detail</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Order Detail
+          </h1>
           <p className="text-gray-600">{order.order_number}</p>
         </div>
         <button
           onClick={() => navigate(ROUTES.LAB_WORKLIST)}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
         >
           Back to Worklist
         </button>
       </div>
 
-      {/* Status Badge */}
-      <div className="mb-6">
+      {/* Status Badge and Policy Info */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
         <span
           className={`inline-block px-4 py-2 rounded-lg text-sm font-medium ${getStatusColor(order.status)}`}
         >
           Status: {order.status}
         </span>
+        {order.status !== 'NEW' && (
+          <div className="text-sm text-gray-600 bg-blue-50 px-3 py-2 rounded border border-blue-200">
+            ℹ️ Orders cannot be edited once sample collection has started
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow">
         <div className="border-b border-gray-200">
-          <nav className="flex -mb-px">
+          <nav className="flex -mb-px overflow-x-auto">
             <button
               onClick={() => setActiveTab('summary')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'summary'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -415,7 +422,7 @@ export function OrderDetailPage() {
             </button>
             <button
               onClick={() => setActiveTab('samples')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'samples'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -425,7 +432,7 @@ export function OrderDetailPage() {
             </button>
             <button
               onClick={() => setActiveTab('results')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'results'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -435,7 +442,7 @@ export function OrderDetailPage() {
             </button>
             <button
               onClick={() => setActiveTab('report')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'report'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -446,7 +453,7 @@ export function OrderDetailPage() {
           </nav>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Summary Tab */}
           {activeTab === 'summary' && (
             <div className="space-y-6">
@@ -729,9 +736,34 @@ export function OrderDetailPage() {
           {/* Results Tab */}
           {activeTab === 'results' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Results Entry
-              </h3>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Results Entry
+                </h3>
+                
+                {/* Workflow Progress Indicator */}
+                <div className="flex items-center gap-2 text-xs">
+                  <div className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded-full bg-gray-400"></span>
+                    <span className="text-gray-600">Draft</span>
+                  </div>
+                  <span className="text-gray-400">→</span>
+                  <div className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded-full bg-blue-400"></span>
+                    <span className="text-gray-600">Entered</span>
+                  </div>
+                  <span className="text-gray-400">→</span>
+                  <div className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded-full bg-green-400"></span>
+                    <span className="text-gray-600">Verified</span>
+                  </div>
+                  <span className="text-gray-400">→</span>
+                  <div className="flex items-center gap-1">
+                    <span className="w-3 h-3 rounded-full bg-purple-400"></span>
+                    <span className="text-gray-600">Published</span>
+                  </div>
+                </div>
+              </div>
 
               <div className="space-y-4">
                 {order.items.map(item => {
@@ -770,6 +802,61 @@ export function OrderDetailPage() {
 
                       {result ? (
                         <div className="space-y-3">
+                          {/* Workflow Position Indicator */}
+                          <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-gray-600 font-medium">
+                                Workflow Status:
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`px-2 py-1 rounded ${
+                                    result.status === 'DRAFT'
+                                      ? 'bg-gray-200 text-gray-800'
+                                      : 'bg-gray-100 text-gray-500'
+                                  }`}
+                                >
+                                  Draft
+                                </span>
+                                <span className="text-gray-400">→</span>
+                                <span
+                                  className={`px-2 py-1 rounded ${
+                                    result.status === 'ENTERED'
+                                      ? 'bg-blue-200 text-blue-800'
+                                      : result.status === 'VERIFIED' ||
+                                          result.status === 'PUBLISHED'
+                                        ? 'bg-blue-100 text-blue-600'
+                                        : 'bg-gray-100 text-gray-500'
+                                  }`}
+                                >
+                                  Entered
+                                </span>
+                                <span className="text-gray-400">→</span>
+                                <span
+                                  className={`px-2 py-1 rounded ${
+                                    result.status === 'VERIFIED'
+                                      ? 'bg-green-200 text-green-800'
+                                      : result.status === 'PUBLISHED'
+                                        ? 'bg-green-100 text-green-600'
+                                        : 'bg-gray-100 text-gray-500'
+                                  }`}
+                                >
+                                  Verified
+                                </span>
+                                <span className="text-gray-400">→</span>
+                                <span
+                                  className={`px-2 py-1 rounded ${
+                                    result.status === 'PUBLISHED'
+                                      ? 'bg-purple-200 text-purple-800'
+                                      : 'bg-gray-100 text-gray-500'
+                                  }`}
+                                >
+                                  Published
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
                           {/* Result Entry Form */}
                           {!isEntered && canEnterResults && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -913,7 +1000,7 @@ export function OrderDetailPage() {
                           )}
 
                           {/* Action Buttons */}
-                          <div className="flex gap-2 mt-3">
+                          <div className="flex flex-wrap gap-2 mt-3 bg-gray-50 p-3 rounded-lg border border-gray-200">
                             {result.status === 'DRAFT' && canEnterResults && (
                               <button
                                 onClick={() =>
@@ -922,11 +1009,11 @@ export function OrderDetailPage() {
                                 disabled={
                                   actionLoading === `enter-${result.id}`
                                 }
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
+                                className="flex-1 sm:flex-none px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium shadow-sm"
                               >
                                 {actionLoading === `enter-${result.id}`
-                                  ? 'Saving...'
-                                  : 'Enter Result'}
+                                  ? '⏳ Saving...'
+                                  : '✓ Enter Result'}
                               </button>
                             )}
 
@@ -937,11 +1024,11 @@ export function OrderDetailPage() {
                                   disabled={
                                     actionLoading === `verify-${result.id}`
                                   }
-                                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm"
+                                  className="flex-1 sm:flex-none px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium shadow-sm"
                                 >
                                   {actionLoading === `verify-${result.id}`
-                                    ? 'Verifying...'
-                                    : 'Verify Result'}
+                                    ? '⏳ Verifying...'
+                                    : '✓ Verify Result'}
                                 </button>
                               )}
 
@@ -952,13 +1039,19 @@ export function OrderDetailPage() {
                                   disabled={
                                     actionLoading === `publish-${result.id}`
                                   }
-                                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm"
+                                  className="flex-1 sm:flex-none px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm font-medium shadow-sm"
                                 >
                                   {actionLoading === `publish-${result.id}`
-                                    ? 'Publishing...'
-                                    : 'Publish Result'}
+                                    ? '⏳ Publishing...'
+                                    : '📤 Publish Result'}
                                 </button>
                               )}
+                            
+                            {result.status === 'PUBLISHED' && (
+                              <div className="flex-1 px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm border border-green-200">
+                                ✓ Result has been published
+                              </div>
+                            )}
                           </div>
                         </div>
                       ) : (
