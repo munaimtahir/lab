@@ -1,0 +1,33 @@
+
+name: [Blocker] Harden Production Environment Configuration
+description: Production settings must not use unsafe defaults
+title: "[Blocker]: Secure .env and production flags"
+labels: ["blocker", "deployment", "infra"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚙️ Production Config Task
+
+        Deployment settings must disable debug modes and apply secure API controls.
+
+  - type: checkboxes
+    id: task
+    attributes:
+      label: 🔧 Tasks
+      options:
+        - label: Set `DEBUG=False` in `.env.production`
+        - label: Define `ALLOWED_HOSTS` for deployment domain
+        - label: Set `DJANGO_SECRET_KEY` using a strong, random value
+        - label: Validate `CORS` headers and HTTPS redirect settings
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: ✅ Final Checks
+      options:
+        - label: Debug routes disabled
+        - label: API responds only to approved domains
+        - label: CI and staging smoke tests pass
