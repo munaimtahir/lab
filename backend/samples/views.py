@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from users.models import UserRole
 
-from .models import Sample
+from .models import Sample, SampleStatus
 from .serializers import SampleSerializer
 
 
@@ -47,7 +47,7 @@ def collect_sample(request, pk):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    sample.status = "COLLECTED"
+    sample.status = SampleStatus.COLLECTED
     sample.collected_at = timezone.now()
     sample.collected_by = request.user
     sample.save()
@@ -75,7 +75,7 @@ def receive_sample(request, pk):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    sample.status = "RECEIVED"
+    sample.status = SampleStatus.RECEIVED
     sample.received_at = timezone.now()
     sample.received_by = request.user
     sample.save()
@@ -87,7 +87,7 @@ def receive_sample(request, pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def reject_sample(request, pk):
-    """Mark sample as rejected with reason."""
+    """Reject a sample with a reason."""
     try:
         sample = Sample.objects.get(pk=pk)
     except Sample.DoesNotExist:
@@ -103,6 +103,18 @@ def reject_sample(request, pk):
             status=status.HTTP_403_FORBIDDEN,
         )
 
+    # Can only reject samples that are not already processed
+    if sample.status not in [
+        SampleStatus.PENDING,
+        SampleStatus.COLLECTED,
+        SampleStatus.RECEIVED,
+    ]:
+        return Response(
+            {"error": f"Cannot reject sample with status {sample.status}"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Rejection reason is required
     rejection_reason = request.data.get("rejection_reason", "").strip()
     if not rejection_reason:
         return Response(
@@ -110,10 +122,8 @@ def reject_sample(request, pk):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    sample.status = "REJECTED"
+    sample.status = SampleStatus.REJECTED
     sample.rejection_reason = rejection_reason
-    sample.received_at = timezone.now()
-    sample.received_by = request.user
     sample.save()
 
     serializer = SampleSerializer(sample)

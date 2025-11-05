@@ -4,6 +4,7 @@ import { orderService } from '../../services/orders'
 import { sampleService } from '../../services/samples'
 import { resultService } from '../../services/results'
 import { reportService } from '../../services/reports'
+import { catalogService } from '../../services/catalog'
 import type { Order, Sample, Result, Report } from '../../types'
 import { ROUTES, COLORS } from '../../utils/constants'
 import { formatDateTime, formatCurrency } from '../../utils/validators'
@@ -38,6 +39,14 @@ export function OrderDetailPage() {
     sampleId: number | null
   }>({ isOpen: false, sampleId: null })
   const [rejectionReason, setRejectionReason] = useState('')
+
+  // Edit tests modal state
+  const [editTestsModal, setEditTestsModal] = useState(false)
+  const [availableTests, setAvailableTests] = useState<
+    Array<{ id: number; name: string; code: string; price: number }>
+  >([])
+  const [selectedTestsToAdd, setSelectedTestsToAdd] = useState<number[]>([])
+  const [testsToRemove, setTestsToRemove] = useState<number[]>([])
 
   // Results entry form state
   const [resultFormData, setResultFormData] = useState<
@@ -74,7 +83,7 @@ export function OrderDetailPage() {
       setOrder(data)
     } catch (error) {
       console.error('Failed to fetch order:', error)
-      setError('Failed to load order')
+      setToast({ message: 'Failed to load order', type: 'error' })
     } finally {
       setLoading(false)
     }
@@ -280,6 +289,91 @@ export function OrderDetailPage() {
     }
   }
 
+  const handleCancelOrder = async () => {
+    if (!order) return
+
+    // Confirm cancellation
+    if (
+      !window.confirm(
+        'Are you sure you want to cancel this order? This action cannot be undone.'
+      )
+    ) {
+      return
+    }
+
+    setActionLoading('cancel-order')
+    try {
+      await orderService.cancel(order.id)
+      setToast({ message: 'Order cancelled successfully', type: 'success' })
+      await fetchOrder(order.id)
+    } catch (err) {
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to cancel order',
+        type: 'error',
+      })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleOpenEditTestsModal = async () => {
+    try {
+      const tests = await catalogService.getAll()
+      setAvailableTests(tests)
+      setEditTestsModal(true)
+      setSelectedTestsToAdd([])
+      setTestsToRemove([])
+    } catch {
+      setToast({
+        message: 'Failed to load test catalog',
+        type: 'error',
+      })
+    }
+  }
+
+  const handleEditTests = async () => {
+    if (!order) return
+
+    // Validate at least one change
+    if (selectedTestsToAdd.length === 0 && testsToRemove.length === 0) {
+      setToast({
+        message: 'Please select tests to add or remove',
+        type: 'error',
+      })
+      return
+    }
+
+    setActionLoading('edit-tests')
+    try {
+      await orderService.editTests(order.id, {
+        tests_to_add: selectedTestsToAdd.length > 0 ? selectedTestsToAdd : undefined,
+        tests_to_remove: testsToRemove.length > 0 ? testsToRemove : undefined,
+      })
+      setToast({ message: 'Order tests updated successfully', type: 'success' })
+      setEditTestsModal(false)
+      await fetchOrder(order.id)
+    } catch (err) {
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to edit order tests',
+        type: 'error',
+      })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleToggleTestToRemove = (testId: number) => {
+    setTestsToRemove(prev =>
+      prev.includes(testId) ? prev.filter(id => id !== testId) : [...prev, testId]
+    )
+  }
+
+  const handleToggleTestToAdd = (testId: number) => {
+    setSelectedTestsToAdd(prev =>
+      prev.includes(testId) ? prev.filter(id => id !== testId) : [...prev, testId]
+    )
+  }
+
   const getStatusColor = (status: string) => {
     return (
       COLORS.status[status as keyof typeof COLORS.status] ||
@@ -302,6 +396,20 @@ export function OrderDetailPage() {
   const canVerifyResults = user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
   const canGenerateReports =
     user && ['ADMIN', 'PATHOLOGIST'].includes(user.role)
+  const canCancelOrder = user && ['ADMIN', 'RECEPTION'].includes(user.role)
+
+  // Can only cancel if order is NEW and no samples collected
+  const canActuallyCancelOrder =
+    canCancelOrder &&
+    order?.status === 'NEW' &&
+    samples.every(s => s.status === 'PENDING')
+
+  // Can only edit tests if order is not cancelled, no samples exist, and no results exist
+  const canEditTests =
+    canCancelOrder &&
+    order?.status !== 'CANCELLED' &&
+    samples.length === 0 &&
+    results.length === 0
 
   if (loading) {
     return (
@@ -383,6 +491,111 @@ export function OrderDetailPage() {
         </div>
       </Modal>
 
+      {/* Edit Tests Modal */}
+      <Modal
+        isOpen={editTestsModal}
+        onClose={() => setEditTestsModal(false)}
+        title="Edit Order Tests"
+      >
+        <div className="space-y-4">
+          {/* Current Tests */}
+          <div>
+            <h3 className="font-semibold mb-2">Current Tests</h3>
+            <div className="space-y-2">
+              {order?.items.map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-2 border rounded"
+                >
+                  <div>
+                    <p className="font-medium">{item.test_detail?.name}</p>
+                    <p className="text-sm text-gray-600">
+                      {item.test_detail?.code} - {formatCurrency(item.test_detail?.price || 0)}
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={testsToRemove.includes(item.test)}
+                      onChange={() => handleToggleTestToRemove(item.test)}
+                      className="rounded"
+                    />
+                    <span className="text-sm text-red-600">Remove</span>
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Available Tests to Add */}
+          <div>
+            <h3 className="font-semibold mb-2">Available Tests to Add</h3>
+            <div className="max-h-60 overflow-y-auto space-y-2">
+              {availableTests
+                .filter(
+                  test => !order?.items.some(item => item.test === test.id)
+                )
+                .map(test => (
+                  <div
+                    key={test.id}
+                    className="flex items-center justify-between p-2 border rounded hover:bg-gray-50"
+                  >
+                    <div>
+                      <p className="font-medium">{test.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {test.code} - {formatCurrency(test.price)}
+                      </p>
+                    </div>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedTestsToAdd.includes(test.id)}
+                        onChange={() => handleToggleTestToAdd(test.id)}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-green-600">Add</span>
+                    </label>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Summary */}
+          {(selectedTestsToAdd.length > 0 || testsToRemove.length > 0) && (
+            <div className="p-3 bg-blue-50 rounded border border-blue-200">
+              <p className="text-sm font-medium text-blue-800">Summary:</p>
+              {selectedTestsToAdd.length > 0 && (
+                <p className="text-sm text-blue-700">
+                  ➕ Adding {selectedTestsToAdd.length} test(s)
+                </p>
+              )}
+              {testsToRemove.length > 0 && (
+                <p className="text-sm text-blue-700">
+                  ➖ Removing {testsToRemove.length} test(s)
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col-reverse sm:flex-row gap-2 pt-4">
+            <button
+              onClick={() => setEditTestsModal(false)}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleEditTests}
+              disabled={actionLoading === 'edit-tests'}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 w-full sm:w-auto"
+            >
+              {actionLoading === 'edit-tests' ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -391,12 +604,32 @@ export function OrderDetailPage() {
           </h1>
           <p className="text-gray-600">{order.order_number}</p>
         </div>
-        <button
-          onClick={() => navigate(ROUTES.LAB_WORKLIST)}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
-        >
-          Back to Worklist
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          {canEditTests && (
+            <button
+              onClick={handleOpenEditTestsModal}
+              disabled={actionLoading === 'edit-tests'}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+            >
+              {actionLoading === 'edit-tests' ? 'Editing...' : 'Edit Tests'}
+            </button>
+          )}
+          {canActuallyCancelOrder && (
+            <button
+              onClick={handleCancelOrder}
+              disabled={actionLoading === 'cancel-order'}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm sm:text-base"
+            >
+              {actionLoading === 'cancel-order' ? 'Cancelling...' : 'Cancel Order'}
+            </button>
+          )}
+          <button
+            onClick={() => navigate(ROUTES.LAB_WORKLIST)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
+          >
+            Back to Worklist
+          </button>
+        </div>
       </div>
 
       {/* Status Badge and Policy Info */}
@@ -743,33 +976,22 @@ export function OrderDetailPage() {
           {/* Results Tab */}
           {activeTab === 'results' && (
             <div>
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                 <h3 className="text-lg font-semibold text-gray-800">
-                  Results Entry
+                  Results Entry & Verification
                 </h3>
-                
-                {/* Workflow Progress Indicator */}
-                <div className="flex items-center gap-2 text-xs">
-                  <div className="flex items-center gap-1">
-                    <span className="w-3 h-3 rounded-full bg-gray-400"></span>
-                    <span className="text-gray-600">Draft</span>
+                {user && (
+                  <div className="text-sm">
+                    <span className="text-gray-600">Your Role: </span>
+                    <span className="font-medium text-blue-600">
+                      {user.role === 'TECHNOLOGIST'
+                        ? 'Result Entry'
+                        : user.role === 'PATHOLOGIST'
+                          ? 'Verification & Publishing'
+                          : user.role}
+                    </span>
                   </div>
-                  <span className="text-gray-400">→</span>
-                  <div className="flex items-center gap-1">
-                    <span className="w-3 h-3 rounded-full bg-blue-400"></span>
-                    <span className="text-gray-600">Entered</span>
-                  </div>
-                  <span className="text-gray-400">→</span>
-                  <div className="flex items-center gap-1">
-                    <span className="w-3 h-3 rounded-full bg-green-400"></span>
-                    <span className="text-gray-600">Verified</span>
-                  </div>
-                  <span className="text-gray-400">→</span>
-                  <div className="flex items-center gap-1">
-                    <span className="w-3 h-3 rounded-full bg-purple-400"></span>
-                    <span className="text-gray-600">Published</span>
-                  </div>
-                </div>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -798,13 +1020,39 @@ export function OrderDetailPage() {
                               `Reference: ${item.test.reference_range}`}
                           </p>
                         </div>
-                        {result && (
-                          <span
-                            className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(result.status)}`}
-                          >
-                            {result.status}
-                          </span>
-                        )}
+                        <div className="flex flex-col items-end gap-1">
+                          {result && (
+                            <>
+                              <span
+                                className={`px-3 py-1 rounded-lg text-sm font-medium ${getStatusColor(result.status)}`}
+                              >
+                                {result.status}
+                              </span>
+                              {result.status === 'DRAFT' && canEnterResults && (
+                                <span className="text-xs text-blue-600 font-medium">
+                                  → Action: Enter Result
+                                </span>
+                              )}
+                              {result.status === 'ENTERED' &&
+                                canVerifyResults && (
+                                  <span className="text-xs text-green-600 font-medium">
+                                    → Action: Verify
+                                  </span>
+                                )}
+                              {result.status === 'VERIFIED' &&
+                                canVerifyResults && (
+                                  <span className="text-xs text-purple-600 font-medium">
+                                    → Action: Publish
+                                  </span>
+                                )}
+                              {result.status === 'PUBLISHED' && (
+                                <span className="text-xs text-gray-600">
+                                  ✓ Complete
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
 
                       {result ? (
@@ -956,6 +1204,18 @@ export function OrderDetailPage() {
                             </div>
                           )}
 
+                          {/* Message for Pathologist when result is in DRAFT */}
+                          {result.status === 'DRAFT' &&
+                            !canEnterResults &&
+                            canVerifyResults && (
+                              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <p className="text-sm text-yellow-800">
+                                  ⏳ Waiting for technologist to enter result
+                                  values
+                                </p>
+                              </div>
+                            )}
+
                           {/* Display entered result */}
                           {isEntered && (
                             <div className="bg-gray-50 p-3 rounded-lg space-y-2">
@@ -1024,6 +1284,17 @@ export function OrderDetailPage() {
                                   : 'Enter Result'}
                               </button>
                             )}
+
+                            {result.status === 'ENTERED' &&
+                              canEnterResults &&
+                              !canVerifyResults && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 w-full">
+                                  <p className="text-sm text-blue-800">
+                                    ✓ Result entered. Waiting for pathologist
+                                    to verify.
+                                  </p>
+                                </div>
+                              )}
 
                             {result.status === 'ENTERED' &&
                               canVerifyResults && (

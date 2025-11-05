@@ -12,6 +12,11 @@ interface CreateOrderData {
   report_time?: string
 }
 
+interface EditOrderTestsData {
+  tests_to_add?: number[]
+  tests_to_remove?: number[]
+}
+
 export const orderService = {
   async getAll(filters?: Record<string, string>): Promise<Order[]> {
     const queryParams = filters
@@ -29,5 +34,13 @@ export const orderService = {
 
   async create(data: CreateOrderData): Promise<Order> {
     return apiClient.post<Order>(ORDER_ENDPOINTS.LIST, data)
+  },
+
+  async cancel(id: number): Promise<Order> {
+    return apiClient.post<Order>(ORDER_ENDPOINTS.CANCEL(id))
+  },
+
+  async editTests(id: number, data: EditOrderTestsData): Promise<Order> {
+    return apiClient.patch<Order>(ORDER_ENDPOINTS.EDIT_TESTS(id), data)
   },
 }
