@@ -28,6 +28,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cancellation updates order and all related items to CANCELLED status
 - Database migration: Added CANCELLED status to Order and OrderItem models
 
+#### Order Test Editing Feature
+- Added ability to edit tests in orders before samples/results exist
+- New `PATCH /api/orders/{id}/edit-tests/` endpoint
+- Request body: `{tests_to_add?: number[], tests_to_remove?: number[]}`
+- Only Admin and Reception roles can edit tests
+- "Edit Tests" button in Order Detail page with modal interface
+- Modal shows current tests with remove checkboxes
+- Modal shows available tests with add checkboxes
+- Summary preview of changes before saving
+- Cannot edit after samples or results created
+- Cannot edit cancelled orders
+- Cannot remove all tests without adding new ones
+- 10 comprehensive backend tests added
+- 100% test coverage for new functionality
+
 #### Mobile Navigation
 - Responsive hamburger menu for screens < 768px (tablet/mobile)
 - Auto-closes menu on route change for better UX

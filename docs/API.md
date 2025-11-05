@@ -34,6 +34,7 @@ All endpoints return JSON. Consistent error envelope: `{error: {code, message, d
 - `POST /api/orders/` - Create order with `test_ids` array
 - `GET /api/orders/:id/` - Get order with items
 - `POST /api/orders/:id/cancel/` - Cancel order (Admin/Reception only)
+- `PATCH /api/orders/:id/edit-tests/` - Edit order tests (Admin/Reception only)
 
 **Order States:** NEW → COLLECTED → IN_PROCESS → VERIFIED → PUBLISHED | CANCELLED
 
@@ -42,6 +43,16 @@ All endpoints return JSON. Consistent error envelope: `{error: {code, message, d
 - Cannot cancel if any samples have been collected or received
 - Cancellation also updates all related order items to CANCELLED status
 - Shows confirmation dialog before cancellation
+
+**Order Test Editing:**
+- Can edit tests (add/remove) before any samples or results exist
+- Request body: `{"tests_to_add": [4,5], "tests_to_remove": [3]}`
+- Cannot edit cancelled orders
+- Cannot edit if samples exist
+- Cannot edit if results exist
+- Cannot remove all tests without adding new ones
+- Requires Admin or Reception role
+- Returns updated order with modified items
 
 ## Samples
 

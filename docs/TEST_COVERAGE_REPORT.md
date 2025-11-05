@@ -5,8 +5,8 @@
 | Component | Tests | Coverage | Status |
 |-----------|-------|----------|--------|
 | Frontend | 98 | N/A | ✅ Pass |
-| Backend | 140 | 99.02% | ✅ Pass |
-| **Total** | **238** | **99.02%** | **✅ Pass** |
+| Backend | 150 | 99.07% | ✅ Pass |
+| **Total** | **248** | **99.07%** | **✅ Pass** |
 
 ## Frontend Tests (98 tests)
 
@@ -55,7 +55,7 @@
 
 ### Test Distribution by Module
 - **Samples**: 17 tests (100% coverage)
-- **Orders**: 8 tests (100% coverage)
+- **Orders**: 18 tests (100% coverage) ⬆️ +10 new tests
 - **Results**: 30 tests (100% coverage)
 - **Patients**: 20 tests (91.38% coverage - existing code)
 - **Catalog**: 15 tests (94.74% coverage - existing code)
@@ -76,12 +76,24 @@
    - ✅ `test_cancel_order_after_collection_forbidden` - Cannot cancel after sample collection
    - ✅ `test_cancel_already_cancelled_order` - Cannot re-cancel cancelled order
 
+3. **Order Test Editing Tests** (10 new tests) ⬆️ NEW
+   - ✅ `test_edit_order_tests_add_tests` - Add tests to order
+   - ✅ `test_edit_order_tests_remove_tests` - Remove tests from order
+   - ✅ `test_edit_order_tests_add_and_remove` - Add and remove in same request
+   - ✅ `test_edit_order_tests_with_samples_forbidden` - Cannot edit with samples
+   - ✅ `test_edit_order_tests_with_results_forbidden` - Cannot edit with results
+   - ✅ `test_edit_cancelled_order_forbidden` - Cannot edit cancelled orders
+   - ✅ `test_edit_order_tests_no_changes_specified` - Validation for empty request
+   - ✅ `test_edit_order_tests_cannot_remove_all_tests` - Must keep at least one test
+   - ✅ `test_edit_order_tests_duplicate_test_not_added` - Idempotent additions
+   - ✅ `test_edit_nonexistent_order` - 404 for missing orders
+
 ### Coverage Breakdown
 
 #### Full Coverage (100%)
 ```
 samples/views.py         65 lines    100.00%  ✅
-orders/views.py          46 lines    100.00%  ✅
+orders/views.py          88 lines    100.00%  ✅ (updated with edit-tests endpoint)
 results/views.py         64 lines    100.00%  ✅
 reports/views.py         47 lines    100.00%  ✅
 samples/serializers.py    7 lines    100.00%  ✅
@@ -96,8 +108,8 @@ patients/serializers.py  58 lines    91.38%   (5 lines uncovered - existing)
 ```
 
 ### Test Quality Metrics
-- **Total Coverage**: 99.02% (exceeds 99% requirement)
-- **Lines Covered**: 706 of 713
+- **Total Coverage**: 99.07% (exceeds 99% requirement) ⬆️
+- **Lines Covered**: 748 of 755 ⬆️
 - **Lines Missing**: 7 (all in pre-existing code, not related to this PR)
 - **Warnings**: 8 deprecation warnings (reportlab library)
 
@@ -129,7 +141,27 @@ patients/serializers.py  58 lines    91.38%   (5 lines uncovered - existing)
 
 **Coverage**: 100%
 
-### 3. Mobile Navigation
+### 3. Order Test Editing Feature ⬆️ NEW
+**Backend Tests**: 10/10 ✅
+- Add tests to orders
+- Remove tests from orders
+- Add and remove simultaneously
+- Permission validation (Admin/Reception only)
+- Cannot edit with samples
+- Cannot edit with results
+- Cannot edit cancelled orders
+- Cannot remove all tests
+- Duplicate test handling (idempotent)
+- Non-existent order handling
+
+**Frontend Tests**: Covered by OrderDetail integration
+- Edit Tests button visibility logic
+- Modal rendering and interaction
+- API service calls
+
+**Coverage**: 100%
+
+### 4. Mobile Navigation
 **Frontend Tests**: 3/3 ✅
 - Menu toggle functionality
 - Auto-close on route change (via useEffect)
@@ -137,7 +169,7 @@ patients/serializers.py  58 lines    91.38%   (5 lines uncovered - existing)
 
 **Coverage**: 100% of new code
 
-### 4. Responsive Layout
+### 5. Responsive Layout
 **Testing**: Visual/Manual
 - Validated on 768px iPad viewport
 - Tested with Tailwind responsive utilities
@@ -145,7 +177,7 @@ patients/serializers.py  58 lines    91.38%   (5 lines uncovered - existing)
 
 **Automated Tests**: Covered by existing component tests
 
-### 5. Result Workflow UX
+### 6. Result Workflow UX
 **Testing**: Integration
 - Covered by existing OrderDetail tests
 - Role-based UI filtering tested via component rendering
