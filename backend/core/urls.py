@@ -18,6 +18,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from core.views import LabTerminalDetailView, LabTerminalListCreateView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/health/", include("health.urls")),
@@ -28,4 +30,10 @@ urlpatterns = [
     path("api/samples/", include("samples.urls")),
     path("api/results/", include("results.urls")),
     path("api/reports/", include("reports.urls")),
+    path("api/terminals/", LabTerminalListCreateView.as_view(), name="terminal-list"),
+    path(
+        "api/terminals/<int:pk>/",
+        LabTerminalDetailView.as_view(),
+        name="terminal-detail",
+    ),
 ]

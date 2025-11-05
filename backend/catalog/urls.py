@@ -2,9 +2,9 @@
 
 from django.urls import path
 
-from .views import TestCatalogDetailView, TestCatalogListView
+from .views import TestCatalogDetailView, TestCatalogListCreateView
 
 urlpatterns = [
-    path("", TestCatalogListView.as_view(), name="test-catalog-list"),
+    path("", TestCatalogListCreateView.as_view(), name="test-catalog-list"),
     path("<int:pk>/", TestCatalogDetailView.as_view(), name="test-catalog-detail"),
 ]
