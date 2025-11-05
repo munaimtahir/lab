@@ -1151,7 +1151,7 @@ export function OrderDetailPage() {
               }
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 order-1 sm:order-2"
             >
-              {actionLoading && sampleToReject
+              {actionLoading === `reject-${sampleToReject?.id}`
                 ? 'Rejecting...'
                 : 'Reject Sample'}
             </button>

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from patients.permissions import IsAdminOrReception
 
-from .models import Order
+from .models import Order, OrderStatus
 from .serializers import OrderSerializer
 
 
@@ -59,7 +59,7 @@ def cancel_order(request, pk):
         return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
 
     # Check if order is already cancelled
-    if order.status == "CANCELLED":
+    if order.status == OrderStatus.CANCELLED:
         return Response(
             {"error": "Order is already cancelled"}, status=status.HTTP_400_BAD_REQUEST
         )
@@ -67,7 +67,9 @@ def cancel_order(request, pk):
     # Check if any samples have been collected
     has_collected_samples = False
     for item in order.items.all():
-        if item.samples.filter(status__in=["COLLECTED", "RECEIVED"]).exists():
+        if item.samples.filter(
+            status__in=["COLLECTED", "RECEIVED"]
+        ).exists():  # Sample status strings are fine here
             has_collected_samples = True
             break
 
@@ -78,11 +80,11 @@ def cancel_order(request, pk):
         )
 
     # Cancel the order
-    order.status = "CANCELLED"
+    order.status = OrderStatus.CANCELLED
     order.save()
 
     # Cancel all order items
-    order.items.update(status="CANCELLED")
+    order.items.update(status=OrderStatus.CANCELLED)
 
     serializer = OrderSerializer(order)
     return Response(serializer.data)
