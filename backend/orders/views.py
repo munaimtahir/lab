@@ -88,3 +88,87 @@ def cancel_order(request, pk):
 
     serializer = OrderSerializer(order)
     return Response(serializer.data)
+
+
+@api_view(["PATCH"])
+@permission_classes([IsAdminOrReception])
+def edit_order_tests(request, pk):
+    """Edit tests in an order (add/remove) if no samples or results exist."""
+    try:
+        order = Order.objects.prefetch_related(
+            "items__samples", "items__results"
+        ).get(pk=pk)
+    except Order.DoesNotExist:
+        return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Check if order is cancelled
+    if order.status == OrderStatus.CANCELLED:
+        return Response(
+            {"error": "Cannot edit a cancelled order"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Check if any samples exist
+    has_samples = False
+    for item in order.items.all():
+        if item.samples.exists():
+            has_samples = True
+            break
+
+    if has_samples:
+        return Response(
+            {"error": "Cannot edit tests after samples have been created"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Check if any results exist
+    has_results = False
+    for item in order.items.all():
+        if item.results.exists():
+            has_results = True
+            break
+
+    if has_results:
+        return Response(
+            {"error": "Cannot edit tests after results have been created"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Get test modifications from request
+    tests_to_add = request.data.get("tests_to_add", [])
+    tests_to_remove = request.data.get("tests_to_remove", [])
+
+    if not tests_to_add and not tests_to_remove:
+        return Response(
+            {"error": "No tests specified for addition or removal"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Validate that we're not removing all tests
+    current_test_ids = set(order.items.values_list("test_id", flat=True))
+    remaining_tests = current_test_ids - set(tests_to_remove)
+    if not remaining_tests and not tests_to_add:
+        return Response(
+            {"error": "Cannot remove all tests from order"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Remove tests
+    if tests_to_remove:
+        from .models import OrderItem
+
+        OrderItem.objects.filter(order=order, test_id__in=tests_to_remove).delete()
+
+    # Add tests
+    if tests_to_add:
+        from .models import OrderItem
+
+        for test_id in tests_to_add:
+            # Check if test already exists in order
+            if not OrderItem.objects.filter(order=order, test_id=test_id).exists():
+                OrderItem.objects.create(order=order, test_id=test_id)
+
+    # Refresh order and return
+    order.refresh_from_db()
+    serializer = OrderSerializer(order)
+    return Response(serializer.data)

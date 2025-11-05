@@ -4,6 +4,7 @@ import { orderService } from '../../services/orders'
 import { sampleService } from '../../services/samples'
 import { resultService } from '../../services/results'
 import { reportService } from '../../services/reports'
+import { catalogService } from '../../services/catalog'
 import type { Order, Sample, Result, Report } from '../../types'
 import { ROUTES, COLORS } from '../../utils/constants'
 import { formatDateTime, formatCurrency } from '../../utils/validators'
@@ -38,6 +39,14 @@ export function OrderDetailPage() {
     sampleId: number | null
   }>({ isOpen: false, sampleId: null })
   const [rejectionReason, setRejectionReason] = useState('')
+
+  // Edit tests modal state
+  const [editTestsModal, setEditTestsModal] = useState(false)
+  const [availableTests, setAvailableTests] = useState<
+    Array<{ id: number; name: string; code: string; price: number }>
+  >([])
+  const [selectedTestsToAdd, setSelectedTestsToAdd] = useState<number[]>([])
+  const [testsToRemove, setTestsToRemove] = useState<number[]>([])
 
   // Results entry form state
   const [resultFormData, setResultFormData] = useState<
@@ -307,6 +316,64 @@ export function OrderDetailPage() {
     }
   }
 
+  const handleOpenEditTestsModal = async () => {
+    try {
+      const tests = await catalogService.getAll()
+      setAvailableTests(tests)
+      setEditTestsModal(true)
+      setSelectedTestsToAdd([])
+      setTestsToRemove([])
+    } catch {
+      setToast({
+        message: 'Failed to load test catalog',
+        type: 'error',
+      })
+    }
+  }
+
+  const handleEditTests = async () => {
+    if (!order) return
+
+    // Validate at least one change
+    if (selectedTestsToAdd.length === 0 && testsToRemove.length === 0) {
+      setToast({
+        message: 'Please select tests to add or remove',
+        type: 'error',
+      })
+      return
+    }
+
+    setActionLoading('edit-tests')
+    try {
+      await orderService.editTests(order.id, {
+        tests_to_add: selectedTestsToAdd.length > 0 ? selectedTestsToAdd : undefined,
+        tests_to_remove: testsToRemove.length > 0 ? testsToRemove : undefined,
+      })
+      setToast({ message: 'Order tests updated successfully', type: 'success' })
+      setEditTestsModal(false)
+      await fetchOrder(order.id)
+    } catch (err) {
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to edit order tests',
+        type: 'error',
+      })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleToggleTestToRemove = (testId: number) => {
+    setTestsToRemove(prev =>
+      prev.includes(testId) ? prev.filter(id => id !== testId) : [...prev, testId]
+    )
+  }
+
+  const handleToggleTestToAdd = (testId: number) => {
+    setSelectedTestsToAdd(prev =>
+      prev.includes(testId) ? prev.filter(id => id !== testId) : [...prev, testId]
+    )
+  }
+
   const getStatusColor = (status: string) => {
     return (
       COLORS.status[status as keyof typeof COLORS.status] ||
@@ -336,6 +403,13 @@ export function OrderDetailPage() {
     canCancelOrder &&
     order?.status === 'NEW' &&
     samples.every(s => s.status === 'PENDING')
+
+  // Can only edit tests if order is not cancelled, no samples exist, and no results exist
+  const canEditTests =
+    canCancelOrder &&
+    order?.status !== 'CANCELLED' &&
+    samples.length === 0 &&
+    results.length === 0
 
   if (loading) {
     return (
@@ -417,6 +491,111 @@ export function OrderDetailPage() {
         </div>
       </Modal>
 
+      {/* Edit Tests Modal */}
+      <Modal
+        isOpen={editTestsModal}
+        onClose={() => setEditTestsModal(false)}
+        title="Edit Order Tests"
+      >
+        <div className="space-y-4">
+          {/* Current Tests */}
+          <div>
+            <h3 className="font-semibold mb-2">Current Tests</h3>
+            <div className="space-y-2">
+              {order?.items.map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-2 border rounded"
+                >
+                  <div>
+                    <p className="font-medium">{item.test_detail?.name}</p>
+                    <p className="text-sm text-gray-600">
+                      {item.test_detail?.code} - {formatCurrency(item.test_detail?.price || 0)}
+                    </p>
+                  </div>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={testsToRemove.includes(item.test)}
+                      onChange={() => handleToggleTestToRemove(item.test)}
+                      className="rounded"
+                    />
+                    <span className="text-sm text-red-600">Remove</span>
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Available Tests to Add */}
+          <div>
+            <h3 className="font-semibold mb-2">Available Tests to Add</h3>
+            <div className="max-h-60 overflow-y-auto space-y-2">
+              {availableTests
+                .filter(
+                  test => !order?.items.some(item => item.test === test.id)
+                )
+                .map(test => (
+                  <div
+                    key={test.id}
+                    className="flex items-center justify-between p-2 border rounded hover:bg-gray-50"
+                  >
+                    <div>
+                      <p className="font-medium">{test.name}</p>
+                      <p className="text-sm text-gray-600">
+                        {test.code} - {formatCurrency(test.price)}
+                      </p>
+                    </div>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedTestsToAdd.includes(test.id)}
+                        onChange={() => handleToggleTestToAdd(test.id)}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-green-600">Add</span>
+                    </label>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Summary */}
+          {(selectedTestsToAdd.length > 0 || testsToRemove.length > 0) && (
+            <div className="p-3 bg-blue-50 rounded border border-blue-200">
+              <p className="text-sm font-medium text-blue-800">Summary:</p>
+              {selectedTestsToAdd.length > 0 && (
+                <p className="text-sm text-blue-700">
+                  ➕ Adding {selectedTestsToAdd.length} test(s)
+                </p>
+              )}
+              {testsToRemove.length > 0 && (
+                <p className="text-sm text-blue-700">
+                  ➖ Removing {testsToRemove.length} test(s)
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex flex-col-reverse sm:flex-row gap-2 pt-4">
+            <button
+              onClick={() => setEditTestsModal(false)}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 w-full sm:w-auto"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleEditTests}
+              disabled={actionLoading === 'edit-tests'}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 w-full sm:w-auto"
+            >
+              {actionLoading === 'edit-tests' ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
@@ -426,6 +605,15 @@ export function OrderDetailPage() {
           <p className="text-gray-600">{order.order_number}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          {canEditTests && (
+            <button
+              onClick={handleOpenEditTestsModal}
+              disabled={actionLoading === 'edit-tests'}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm sm:text-base"
+            >
+              {actionLoading === 'edit-tests' ? 'Editing...' : 'Edit Tests'}
+            </button>
+          )}
           {canActuallyCancelOrder && (
             <button
               onClick={handleCancelOrder}

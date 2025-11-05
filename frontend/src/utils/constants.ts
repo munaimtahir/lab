@@ -40,6 +40,7 @@ export const ORDER_ENDPOINTS = {
   LIST: '/api/orders/',
   DETAIL: (id: number) => `/api/orders/${id}/`,
   CANCEL: (id: number) => `/api/orders/${id}/cancel/`,
+  EDIT_TESTS: (id: number) => `/api/orders/${id}/edit-tests/`,
 } as const
 
 // Sample endpoints
