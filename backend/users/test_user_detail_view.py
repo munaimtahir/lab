@@ -6,11 +6,16 @@ from users.views import UserDetailView
 
 User = get_user_model()
 
+
 @pytest.mark.django_db
 def test_user_detail_view_get_uses_user_serializer():
     # create an admin and a normal user
-    admin = User.objects.create_user(username="admin", password="adminpass", role="ADMIN")
-    target = User.objects.create_user(username="target", password="targetpass", role="RECEPTION")
+    admin = User.objects.create_user(
+        username="admin", password="adminpass", role="ADMIN"
+    )
+    target = User.objects.create_user(
+        username="target", password="targetpass", role="RECEPTION"
+    )
 
     factory = APIRequestFactory()
     request = factory.get(f"/api/users/{target.id}/")
