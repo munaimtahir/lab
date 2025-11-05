@@ -8,6 +8,7 @@ import type { Order, Sample, Result, Report } from '../../types'
 import { ROUTES, COLORS } from '../../utils/constants'
 import { formatDateTime, formatCurrency } from '../../utils/validators'
 import { useAuth } from '../../hooks/useAuth'
+import { Modal } from '../../components/Modal'
 
 type TabType = 'summary' | 'samples' | 'results' | 'report'
 
@@ -25,6 +26,11 @@ export function OrderDetailPage() {
   const [activeTab, setActiveTab] = useState<TabType>('summary')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+
+  // Reject sample modal state
+  const [rejectModalOpen, setRejectModalOpen] = useState(false)
+  const [sampleToReject, setSampleToReject] = useState<Sample | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
 
   // Results entry form state
   const [resultFormData, setResultFormData] = useState<
@@ -148,6 +154,41 @@ export function OrderDetailPage() {
       await fetchSamples()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to receive sample')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleOpenRejectModal = (sample: Sample) => {
+    setSampleToReject(sample)
+    setRejectionReason('')
+    setRejectModalOpen(true)
+  }
+
+  const handleCloseRejectModal = () => {
+    setRejectModalOpen(false)
+    setSampleToReject(null)
+    setRejectionReason('')
+  }
+
+  const handleRejectSample = async () => {
+    if (!sampleToReject) return
+
+    if (!rejectionReason.trim()) {
+      setError('Rejection reason is required')
+      return
+    }
+
+    setActionLoading(`reject-${sampleToReject.id}`)
+    setError(null)
+    setSuccess(null)
+    try {
+      await sampleService.reject(sampleToReject.id, rejectionReason)
+      setSuccess('Sample rejected successfully')
+      handleCloseRejectModal()
+      await fetchSamples()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to reject sample')
     } finally {
       setActionLoading(null)
     }
@@ -569,6 +610,18 @@ export function OrderDetailPage() {
                             </div>
                           )}
 
+                          {sample.status === 'REJECTED' &&
+                            sample.rejection_reason && (
+                              <div className="text-sm bg-red-50 p-2 rounded border border-red-200">
+                                <span className="text-red-700 font-medium">
+                                  Rejection Reason:{' '}
+                                </span>
+                                <span className="text-red-900">
+                                  {sample.rejection_reason}
+                                </span>
+                              </div>
+                            )}
+
                           <div className="flex gap-2 mt-3">
                             {sample.status === 'PENDING' &&
                               canCollectSamples && (
@@ -597,6 +650,19 @@ export function OrderDetailPage() {
                                   {actionLoading === `receive-${sample.id}`
                                     ? 'Receiving...'
                                     : 'Receive Sample'}
+                                </button>
+                              )}
+
+                            {['PENDING', 'COLLECTED', 'RECEIVED'].includes(
+                              sample.status
+                            ) &&
+                              canReceiveSamples && (
+                                <button
+                                  onClick={() => handleOpenRejectModal(sample)}
+                                  disabled={actionLoading !== null}
+                                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm"
+                                >
+                                  Reject Sample
                                 </button>
                               )}
                           </div>
@@ -925,6 +991,66 @@ export function OrderDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Reject Sample Modal */}
+      <Modal
+        isOpen={rejectModalOpen}
+        onClose={handleCloseRejectModal}
+        title="Reject Sample"
+      >
+        <div className="space-y-4">
+          {sampleToReject && (
+            <div className="bg-gray-50 p-3 rounded">
+              <p className="text-sm text-gray-600">Sample</p>
+              <p className="font-medium font-mono">{sampleToReject.barcode}</p>
+              <p className="text-sm text-gray-600 mt-1">
+                Type: {sampleToReject.sample_type}
+              </p>
+            </div>
+          )}
+
+          <div>
+            <label
+              htmlFor="rejection-reason"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Rejection Reason <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              id="rejection-reason"
+              value={rejectionReason}
+              onChange={e => setRejectionReason(e.target.value)}
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Enter the reason for rejecting this sample (e.g., hemolyzed, insufficient quantity, clotted, etc.)"
+              autoFocus
+            />
+          </div>
+
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={handleCloseRejectModal}
+              disabled={actionLoading !== null}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleRejectSample}
+              disabled={
+                actionLoading !== null ||
+                !rejectionReason.trim() ||
+                !sampleToReject
+              }
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+            >
+              {actionLoading && sampleToReject
+                ? 'Rejecting...'
+                : 'Reject Sample'}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

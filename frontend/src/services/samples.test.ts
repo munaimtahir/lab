@@ -107,4 +107,25 @@ describe('sampleService', () => {
       expect(result).toEqual(mockSample)
     })
   })
+
+  describe('reject', () => {
+    it('should reject sample with reason', async () => {
+      const mockSample = {
+        id: 1,
+        order_item: 1,
+        barcode: 'SAM-20240101-0001',
+        status: 'REJECTED',
+        sample_type: 'Blood',
+        rejection_reason: 'Hemolyzed sample',
+      }
+      vi.mocked(apiClient.post).mockResolvedValueOnce(mockSample)
+
+      const result = await sampleService.reject(1, 'Hemolyzed sample')
+
+      expect(apiClient.post).toHaveBeenCalledWith('/api/samples/1/reject/', {
+        rejection_reason: 'Hemolyzed sample',
+      })
+      expect(result).toEqual(mockSample)
+    })
+  })
 })

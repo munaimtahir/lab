@@ -143,7 +143,7 @@ export interface Order {
 }
 
 // Sample types
-export type SampleStatus = 'PENDING' | 'COLLECTED' | 'RECEIVED'
+export type SampleStatus = 'PENDING' | 'COLLECTED' | 'RECEIVED' | 'REJECTED'
 
 export interface Sample {
   id: number
