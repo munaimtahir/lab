@@ -45,7 +45,8 @@ describe('Modal', () => {
       </Modal>
     )
 
-    const backdrop = screen.getByText('Test Modal').closest('div')?.parentElement?.parentElement
+    const backdrop = screen.getByText('Test Modal').closest('div')
+      ?.parentElement?.parentElement
     if (backdrop) {
       fireEvent.click(backdrop)
       expect(onClose).toHaveBeenCalled()

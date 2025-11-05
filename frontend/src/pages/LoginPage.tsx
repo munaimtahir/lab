@@ -28,8 +28,12 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-red-900">Al-Shifa Laboratory</h1>
-          <p className="text-gray-600 mt-2">Laboratory Information Management System</p>
+          <h1 className="text-3xl font-bold text-red-900">
+            Al-Shifa Laboratory
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Laboratory Information Management System
+          </p>
         </div>
 
         {error && (
@@ -40,14 +44,17 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Username
             </label>
             <input
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={e => setUsername(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent"
               placeholder="Enter your username"
               required
@@ -56,14 +63,17 @@ export function LoginPage({ onLogin }: LoginPageProps) {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Password
             </label>
             <input
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent"
               placeholder="Enter your password"
               required

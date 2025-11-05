@@ -10,7 +10,11 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: ROUTES.HOME, label: 'Home' },
   { path: ROUTES.LAB, label: 'Lab' },
-  { path: ROUTES.LAB_WORKLIST, label: 'Worklist', roles: ['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST', 'PATHOLOGIST'] },
+  {
+    path: ROUTES.LAB_WORKLIST,
+    label: 'Worklist',
+    roles: ['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST', 'PATHOLOGIST'],
+  },
   { path: ROUTES.SETTINGS, label: 'Settings', roles: ['ADMIN'] },
 ]
 
@@ -36,14 +40,16 @@ export function MainLayout({ user, onLogout }: MainLayoutProps) {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
               <h1 className="text-2xl font-bold">Al-Shifa Laboratory</h1>
-              
+
               {/* Main Navigation */}
               {user && (
                 <nav className="hidden md:flex space-x-1">
-                  {navItems.filter(isNavItemVisible).map((item) => {
-                    const isActive = location.pathname === item.path || 
-                      (item.path !== ROUTES.HOME && location.pathname.startsWith(item.path))
-                    
+                  {navItems.filter(isNavItemVisible).map(item => {
+                    const isActive =
+                      location.pathname === item.path ||
+                      (item.path !== ROUTES.HOME &&
+                        location.pathname.startsWith(item.path))
+
                     return (
                       <Link
                         key={item.path}

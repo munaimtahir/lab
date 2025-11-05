@@ -54,7 +54,9 @@ export function LabHomePage() {
 
       {/* Main Lab Actions */}
       <section className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Lab Actions</h2>
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          Lab Actions
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Tile
             title="New Lab Slip"

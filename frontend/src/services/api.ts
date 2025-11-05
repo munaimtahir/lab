@@ -72,10 +72,7 @@ class ApiClient {
     return data.access
   }
 
-  public async request<T>(
-    path: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  public async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${path}`
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -92,7 +89,11 @@ class ApiClient {
     })
 
     // If 401, try to refresh token and retry once
-    if (response.status === 401 && this.refreshToken && !path.includes('/auth/')) {
+    if (
+      response.status === 401 &&
+      this.refreshToken &&
+      !path.includes('/auth/')
+    ) {
       try {
         await this.refreshAccessToken()
         headers['Authorization'] = `Bearer ${this.accessToken}`

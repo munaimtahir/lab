@@ -8,7 +8,7 @@ import { formatDateTime, formatCurrency } from '../../utils/validators'
 export function LabWorklistPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  
+
   // Filter state
   const [filters, setFilters] = useState({
     fromDate: '',
@@ -49,7 +49,10 @@ export function LabWorklistPage() {
   }
 
   const getStatusColor = (status: string) => {
-    return COLORS.status[status as keyof typeof COLORS.status] || 'bg-gray-100 text-gray-800'
+    return (
+      COLORS.status[status as keyof typeof COLORS.status] ||
+      'bg-gray-100 text-gray-800'
+    )
   }
 
   return (
@@ -60,30 +63,36 @@ export function LabWorklistPage() {
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              From Date
+            </label>
             <input
               type="date"
               value={filters.fromDate}
-              onChange={(e) => handleFilterChange('fromDate', e.target.value)}
+              onChange={e => handleFilterChange('fromDate', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              To Date
+            </label>
             <input
               type="date"
               value={filters.toDate}
-              onChange={(e) => handleFilterChange('toDate', e.target.value)}
+              onChange={e => handleFilterChange('toDate', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
             <select
               value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
+              onChange={e => handleFilterChange('status', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Statuses</option>
@@ -96,11 +105,15 @@ export function LabWorklistPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Patient Search</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Patient Search
+            </label>
             <input
               type="text"
               value={filters.patientSearch}
-              onChange={(e) => handleFilterChange('patientSearch', e.target.value)}
+              onChange={e =>
+                handleFilterChange('patientSearch', e.target.value)
+              }
               placeholder="Name, phone, order #"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -125,26 +138,48 @@ export function LabWorklistPage() {
         </div>
       ) : orders.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-gray-600">No orders found. Try adjusting your filters.</p>
+          <p className="text-gray-600">
+            No orders found. Try adjusting your filters.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {orders.map(order => (
-            <div key={order.id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+            <div
+              key={order.id}
+              className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
+            >
               {/* Card Header */}
               <div className="bg-blue-700 text-white p-4 rounded-t-lg">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold text-lg">{order.order_number}</h3>
-                    <p className="text-sm text-blue-100">{order.patient.full_name}</p>
+                    <h3 className="font-semibold text-lg">
+                      {order.order_number}
+                    </h3>
+                    <p className="text-sm text-blue-100">
+                      {order.patient.full_name}
+                    </p>
                   </div>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(order.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(order.status)}`}
+                  >
                     {order.status}
                   </span>
                 </div>
                 <div className="mt-2 text-sm text-blue-100">
-                  <span>{order.patient.gender === 'M' ? 'Male' : order.patient.gender === 'F' ? 'Female' : 'Other'}</span>
-                  {order.patient.age && <span> • {order.patient.age} {order.patient.age_unit}</span>}
+                  <span>
+                    {order.patient.gender === 'M'
+                      ? 'Male'
+                      : order.patient.gender === 'F'
+                        ? 'Female'
+                        : 'Other'}
+                  </span>
+                  {order.patient.age && (
+                    <span>
+                      {' '}
+                      • {order.patient.age} {order.patient.age_unit}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -158,9 +193,14 @@ export function LabWorklistPage() {
                 {/* Test Items */}
                 <div className="space-y-2 mb-4">
                   {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-sm">
+                    <div
+                      key={idx}
+                      className="flex justify-between items-center text-sm"
+                    >
                       <span className="text-gray-700">{item.test.name}</span>
-                      <span className={`px-2 py-0.5 rounded text-xs ${getStatusColor(item.status)}`}>
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs ${getStatusColor(item.status)}`}
+                      >
                         {item.status}
                       </span>
                     </div>
@@ -197,4 +237,3 @@ export function LabWorklistPage() {
     </div>
   )
 }
-

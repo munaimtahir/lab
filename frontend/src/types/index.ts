@@ -21,7 +21,12 @@ export interface UserFormData {
   phone?: string
 }
 
-export type UserRole = 'ADMIN' | 'RECEPTION' | 'PHLEBOTOMY' | 'TECHNOLOGIST' | 'PATHOLOGIST'
+export type UserRole =
+  | 'ADMIN'
+  | 'RECEPTION'
+  | 'PHLEBOTOMY'
+  | 'TECHNOLOGIST'
+  | 'PATHOLOGIST'
 
 export interface AuthTokens {
   access: string
@@ -109,7 +114,12 @@ export interface LabTerminalFormData {
 }
 
 // Order types
-export type OrderStatus = 'NEW' | 'COLLECTED' | 'IN_PROCESS' | 'VERIFIED' | 'PUBLISHED'
+export type OrderStatus =
+  | 'NEW'
+  | 'COLLECTED'
+  | 'IN_PROCESS'
+  | 'VERIFIED'
+  | 'PUBLISHED'
 
 export interface OrderItem {
   id: number

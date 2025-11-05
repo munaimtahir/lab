@@ -69,7 +69,9 @@ describe('TestCatalogPage', () => {
   })
 
   it('displays error message on fetch failure', async () => {
-    vi.mocked(catalogService.getAll).mockRejectedValue(new Error('Network error'))
+    vi.mocked(catalogService.getAll).mockRejectedValue(
+      new Error('Network error')
+    )
 
     render(
       <BrowserRouter>

@@ -66,7 +66,9 @@ describe('NewLabSlipPage', () => {
     await waitFor(() => {
       expect(screen.getByText(/Full name is required/i)).toBeInTheDocument()
       expect(screen.getByText(/Valid CNIC is required/i)).toBeInTheDocument()
-      expect(screen.getByText(/Valid phone number is required/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/Valid phone number is required/i)
+      ).toBeInTheDocument()
     })
   })
 
@@ -122,7 +124,9 @@ describe('NewLabSlipPage', () => {
       </BrowserRouter>
     )
 
-    const testSearch = screen.getByPlaceholderText(/Search by test name or code/i)
+    const testSearch = screen.getByPlaceholderText(
+      /Search by test name or code/i
+    )
     fireEvent.change(testSearch, { target: { value: 'CBC' } })
 
     await waitFor(() => {
@@ -163,7 +167,9 @@ describe('NewLabSlipPage', () => {
     )
 
     // Add first test
-    const testSearch = screen.getByPlaceholderText(/Search by test name or code/i)
+    const testSearch = screen.getByPlaceholderText(
+      /Search by test name or code/i
+    )
     fireEvent.change(testSearch, { target: { value: 'test' } })
 
     await waitFor(() => {
@@ -185,7 +191,8 @@ describe('NewLabSlipPage', () => {
 
     // Check if bill amount is calculated correctly (500 + 800 = 1300)
     await waitFor(() => {
-      const billText = screen.getByText(/Bill Amount:/i).nextSibling?.textContent
+      const billText =
+        screen.getByText(/Bill Amount:/i).nextSibling?.textContent
       expect(billText).toContain('1')
       expect(billText).toContain('300')
     })
@@ -199,7 +206,11 @@ describe('NewLabSlipPage', () => {
     )
 
     expect(screen.getByRole('button', { name: /Cancel/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Save Only/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Save & Print/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Save Only/i })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Save & Print/i })
+    ).toBeInTheDocument()
   })
 })

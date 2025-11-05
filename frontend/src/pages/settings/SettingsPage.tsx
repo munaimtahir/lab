@@ -8,7 +8,12 @@ interface SettingsTileProps {
   isImplemented?: boolean
 }
 
-function SettingsTile({ title, description, to, isImplemented = false }: SettingsTileProps) {
+function SettingsTile({
+  title,
+  description,
+  to,
+  isImplemented = false,
+}: SettingsTileProps) {
   const content = (
     <>
       <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
@@ -31,7 +36,9 @@ function SettingsTile({ title, description, to, isImplemented = false }: Setting
   }
 
   return (
-    <div className={`block bg-white rounded-lg shadow p-6 border-2 border-gray-200 ${!isImplemented ? 'opacity-60' : ''}`}>
+    <div
+      className={`block bg-white rounded-lg shadow p-6 border-2 border-gray-200 ${!isImplemented ? 'opacity-60' : ''}`}
+    >
       {content}
     </div>
   )
@@ -49,45 +56,45 @@ export function SettingsPage() {
           to={ROUTES.ADMIN_USERS}
           isImplemented={true}
         />
-        
+
         <SettingsTile
           title="Test Catalog"
           description="Manage test catalog and pricing"
           to={ROUTES.ADMIN_CATALOG}
           isImplemented={true}
         />
-        
+
         <SettingsTile
           title="Lab Terminals"
           description="Configure offline MRN ranges for terminals"
           to={ROUTES.ADMIN_TERMINALS}
           isImplemented={true}
         />
-        
+
         <SettingsTile
           title="Branches"
           description="Configure lab branches and locations"
           isImplemented={false}
         />
-        
+
         <SettingsTile
           title="Departments"
           description="Manage test departments"
           isImplemented={false}
         />
-        
+
         <SettingsTile
           title="Doctors"
           description="Doctor information and signatures"
           isImplemented={false}
         />
-        
+
         <SettingsTile
           title="System Settings"
           description="General system configuration"
           isImplemented={false}
         />
-        
+
         <SettingsTile
           title="Page Headers"
           description="Customize report headers and branding"
@@ -97,4 +104,3 @@ export function SettingsPage() {
     </div>
   )
 }
-
