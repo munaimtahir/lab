@@ -13,9 +13,11 @@ A production-ready Laboratory Information Management System (LIMS) for Al Shifa 
 cd infra && docker-compose up
 
 # Access the application
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:8000
-# Health Check: http://localhost:8000/api/health/
+# Local Frontend: http://localhost:5173
+# Local Backend API: http://localhost:8000
+# VPS Frontend: http://172.235.33.181:5173
+# VPS Backend API: http://172.235.33.181:8000
+# VPS Health Check: http://172.235.33.181:8000/api/health/
 
 # Default credentials: admin / admin123
 ```
@@ -25,6 +27,17 @@ cd infra && docker-compose up
 > 2. Set strong `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY`
 > 3. Use environment variables to override docker-compose defaults
 > 4. Never commit `.env` to version control
+
+## 🌐 Environment Configuration
+
+Network endpoints are configured through environment variables shared by Docker Compose, Django, and Vite.
+
+- `VITE_API_BASE_URL` &mdash; Defaults to `http://172.235.33.181:8000` for the VPS. Set to `http://localhost:8000` for local development or `/api` when nginx proxies requests.
+- `DJANGO_ALLOWED_HOSTS` &mdash; Include `172.235.33.181`, `localhost`, and `127.0.0.1` so Django accepts both VPS and local requests.
+- `DJANGO_CORS_ALLOWED_ORIGINS` &mdash; Origins permitted for cross-origin API calls. The default covers both the VPS (`http://172.235.33.181`, `http://172.235.33.181:5173`) and local dev (`http://localhost:5173`, `http://localhost`).
+- `DJANGO_CSRF_TRUSTED_ORIGINS` &mdash; Trusted origins for CSRF-protected POST requests.
+
+Copy `.env.example` to `.env` (and the app-specific `.env.example` files) to customize these values for your environment.
 
 ## 📦 Production Deployment
 
@@ -144,7 +157,7 @@ pnpm playwright test
 ## 🏥 Health Check
 
 ```bash
-curl http://localhost:8000/api/health/
+curl http://172.235.33.181:8000/api/health/
 # {"status": "healthy", "database": "healthy", "cache": "healthy"}
 ```
 

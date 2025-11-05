@@ -214,7 +214,14 @@ const result = await apiClient.post<Type>('/api/endpoint/', { data })
 Create a `.env` file in the frontend directory:
 
 ```env
-VITE_API_URL=http://localhost:8000
+# Default VPS deployment
+VITE_API_BASE_URL=http://172.235.33.181:8000
+
+# Local development override
+# VITE_API_BASE_URL=http://localhost:8000
+
+# When the frontend is served behind the same domain and nginx proxies /api/
+# VITE_API_BASE_URL=/api
 ```
 
 ## Color Palette

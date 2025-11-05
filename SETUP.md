@@ -44,8 +44,10 @@ source venv/bin/activate
 python manage.py runserver
 ```
 
-The backend will be available at http://localhost:8000
-- Health check endpoint: http://localhost:8000/health/
+The backend will be available at:
+- Local development: http://localhost:8000
+- VPS deployment: http://172.235.33.181:8000
+- Health check endpoint: http://172.235.33.181:8000/api/health/
 
 ### Frontend Development Server
 
@@ -54,7 +56,11 @@ cd frontend
 npm run dev
 ```
 
-The frontend will be available at http://localhost:5173
+The frontend will be available at:
+- Local development: http://localhost:5173
+- VPS deployment: http://172.235.33.181:5173
+
+> Update `.env` (root, backend, and frontend) with `VITE_API_BASE_URL`, `DJANGO_ALLOWED_HOSTS`, `DJANGO_CORS_ALLOWED_ORIGINS`, and `DJANGO_CSRF_TRUSTED_ORIGINS` to match your environment.
 
 ## Testing
 

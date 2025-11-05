@@ -30,13 +30,21 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
+def get_env_list(primary: str, fallback: str | None, default: list[str]) -> list[str]:
+    value = os.environ.get(primary)
+    if not value and fallback:
+        value = os.environ.get(fallback)
+
+    if value:
+        return [item.strip() for item in value.split(",") if item.strip()]
+
+    return default
+
+
+DEFAULT_ALLOWED_HOSTS = ["172.235.33.181", "localhost", "127.0.0.1"]
+
 # Parse ALLOWED_HOSTS from environment variable or use defaults
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get(
-        "ALLOWED_HOSTS", "localhost,127.0.0.1,172.235.33.181"
-    ).split(",")
-]
+ALLOWED_HOSTS = get_env_list("DJANGO_ALLOWED_HOSTS", "ALLOWED_HOSTS", DEFAULT_ALLOWED_HOSTS)
 
 
 # Application definition
@@ -200,12 +208,35 @@ SIMPLE_JWT = {
 }
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = DEBUG
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get(
-        "CORS_ALLOWED_ORIGINS",
-        "http://localhost:5173,http://localhost:3000,http://172.235.33.181,http://172.235.33.181:80",
-    ).split(",")
-    if origin.strip()
+def get_bool_env(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.lower() in {"1", "true", "yes", "on"}
+
+
+CORS_ALLOW_ALL_ORIGINS = get_bool_env("DJANGO_CORS_ALLOW_ALL_ORIGINS", DEBUG)
+
+DEFAULT_CORS_ALLOWED_ORIGINS = [
+    "http://172.235.33.181",
+    "http://172.235.33.181:5173",
+    "http://localhost:5173",
+    "http://localhost",
 ]
+
+CORS_ALLOWED_ORIGINS = get_env_list(
+    "DJANGO_CORS_ALLOWED_ORIGINS", "CORS_ALLOWED_ORIGINS", DEFAULT_CORS_ALLOWED_ORIGINS
+)
+
+DEFAULT_CSRF_TRUSTED_ORIGINS = [
+    "http://172.235.33.181",
+    "http://172.235.33.181:5173",
+    "http://localhost:5173",
+    "http://localhost",
+]
+
+CSRF_TRUSTED_ORIGINS = get_env_list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    "CSRF_TRUSTED_ORIGINS",
+    DEFAULT_CSRF_TRUSTED_ORIGINS,
+)

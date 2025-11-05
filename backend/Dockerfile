@@ -21,7 +21,7 @@ EXPOSE 8000
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health/ || exit 1
+    CMD curl -f "${BACKEND_HEALTHCHECK_URL:-http://127.0.0.1:8000/api/health/}" || exit 1
 
 # Run migrations, seed data, and start gunicorn bound to 0.0.0.0
 CMD python manage.py migrate && \

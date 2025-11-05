@@ -1,14 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { reportService } from './reports'
-import { apiClient } from './api'
+import { apiClient, API_BASE_URL } from './api'
 
-vi.mock('./api', () => ({
-  API_BASE_URL: 'http://localhost:8000',
-  apiClient: {
-    get: vi.fn(),
-    post: vi.fn(),
-  },
-}))
+vi.mock('./api', async () => {
+  const actual = await vi.importActual<typeof import('./api')>('./api')
+  return {
+    ...actual,
+    apiClient: {
+      get: vi.fn(),
+      post: vi.fn(),
+    },
+  }
+})
 
 describe('reportService', () => {
   beforeEach(() => {
@@ -75,7 +78,7 @@ describe('reportService', () => {
     it('should return the download URL for a report', () => {
       const url = reportService.getDownloadUrl(1)
 
-      expect(url).toBe('http://localhost:8000/api/reports/1/download/')
+      expect(url).toBe(`${API_BASE_URL}/api/reports/1/download/`)
     })
   })
 })

@@ -4,7 +4,28 @@ import { expect, test } from '@playwright/test';
 // Backend: python manage.py runserver
 // Frontend: pnpm dev
 
-const API_BASE = 'http://localhost:8000/api';
+const resolveApiBase = () => {
+  const fallback = 'http://172.235.33.181:8000'
+  const rawBase =
+    process.env.E2E_API_BASE_URL ??
+    process.env.VITE_API_BASE_URL ??
+    process.env.VITE_API_URL ??
+    fallback
+
+  const trimmed = rawBase.trim()
+  if (!trimmed) {
+    return `${fallback}/api`
+  }
+
+  const withoutTrailingSlash = trimmed.replace(/\/+$/, '')
+  if (withoutTrailingSlash.endsWith('/api')) {
+    return withoutTrailingSlash
+  }
+
+  return `${withoutTrailingSlash}/api`
+}
+
+const API_BASE = resolveApiBase()
 
 test.describe('LIMS Complete Workflow', () => {
   test('full workflow: register patient → order → sample → result → report', async ({ request }) => {

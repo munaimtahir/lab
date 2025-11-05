@@ -1,4 +1,5 @@
-import { API_BASE_URL, STORAGE_KEYS } from '../utils/constants'
+import { STORAGE_KEYS } from '../utils/constants'
+import { API_BASE_URL } from '../config/api'
 
 export { API_BASE_URL }
 
@@ -20,8 +21,24 @@ class ApiClient {
   private refreshToken: string | null = null
 
   constructor(baseURL: string) {
-    this.baseURL = baseURL
+    this.baseURL = baseURL.replace(/\/+$/, '')
     this.loadTokens()
+  }
+
+  private buildUrl(path: string): string {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`
+
+    if (!this.baseURL) {
+      return normalizedPath
+    }
+
+    const baseEndsWithApi = this.baseURL.endsWith('/api')
+    const resolvedPath =
+      baseEndsWithApi && normalizedPath.startsWith('/api/')
+        ? normalizedPath.replace(/^\/api/, '')
+        : normalizedPath
+
+    return `${this.baseURL}${resolvedPath}`
   }
 
   private loadTokens() {
@@ -53,7 +70,7 @@ class ApiClient {
       throw new ApiError('No refresh token available', 401)
     }
 
-    const response = await fetch(`${this.baseURL}/api/auth/refresh/`, {
+    const response = await fetch(this.buildUrl('/api/auth/refresh/'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -76,7 +93,7 @@ class ApiClient {
     path: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const url = `${this.baseURL}${path}`
+    const url = this.buildUrl(path)
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
