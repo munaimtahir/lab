@@ -8,8 +8,15 @@ import type { Order, Sample, Result, Report } from '../../types'
 import { ROUTES, COLORS } from '../../utils/constants'
 import { formatDateTime, formatCurrency } from '../../utils/validators'
 import { useAuth } from '../../hooks/useAuth'
+import { Modal } from '../../components/Modal'
+import { Toast } from '../../components/Toast'
 
 type TabType = 'summary' | 'samples' | 'results' | 'report'
+
+type ToastType = {
+  message: string
+  type: 'success' | 'error' | 'info'
+} | null
 
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -23,8 +30,14 @@ export function OrderDetailPage() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<TabType>('summary')
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
+  const [toast, setToast] = useState<ToastType>(null)
+
+  // Rejection modal state
+  const [rejectModal, setRejectModal] = useState<{
+    isOpen: boolean
+    sampleId: number | null
+  }>({ isOpen: false, sampleId: null })
+  const [rejectionReason, setRejectionReason] = useState('')
 
   // Results entry form state
   const [resultFormData, setResultFormData] = useState<
@@ -125,14 +138,15 @@ export function OrderDetailPage() {
 
   const handleCollectSample = async (sampleId: number) => {
     setActionLoading(`collect-${sampleId}`)
-    setError(null)
-    setSuccess(null)
     try {
       await sampleService.collect(sampleId)
-      setSuccess('Sample collected successfully')
+      setToast({ message: 'Sample collected successfully', type: 'success' })
       await fetchSamples()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to collect sample')
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to collect sample',
+        type: 'error',
+      })
     } finally {
       setActionLoading(null)
     }
@@ -140,14 +154,38 @@ export function OrderDetailPage() {
 
   const handleReceiveSample = async (sampleId: number) => {
     setActionLoading(`receive-${sampleId}`)
-    setError(null)
-    setSuccess(null)
     try {
       await sampleService.receive(sampleId)
-      setSuccess('Sample received successfully')
+      setToast({ message: 'Sample received successfully', type: 'success' })
       await fetchSamples()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to receive sample')
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to receive sample',
+        type: 'error',
+      })
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleRejectSample = async () => {
+    if (!rejectModal.sampleId || !rejectionReason.trim()) {
+      setToast({ message: 'Please enter a rejection reason', type: 'error' })
+      return
+    }
+
+    setActionLoading(`reject-${rejectModal.sampleId}`)
+    try {
+      await sampleService.reject(rejectModal.sampleId, rejectionReason)
+      setToast({ message: 'Sample rejected successfully', type: 'success' })
+      setRejectModal({ isOpen: false, sampleId: null })
+      setRejectionReason('')
+      await fetchSamples()
+    } catch (err) {
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to reject sample',
+        type: 'error',
+      })
     } finally {
       setActionLoading(null)
     }
@@ -155,12 +193,10 @@ export function OrderDetailPage() {
 
   const handleEnterResult = async (resultId: number, orderItemId: number) => {
     setActionLoading(`enter-${resultId}`)
-    setError(null)
-    setSuccess(null)
     try {
       const formData = resultFormData[orderItemId]
       if (!formData?.value) {
-        setError('Please enter a result value')
+        setToast({ message: 'Please enter a result value', type: 'error' })
         setActionLoading(null)
         return
       }
@@ -176,10 +212,13 @@ export function OrderDetailPage() {
           | undefined,
         notes: formData.notes,
       })
-      setSuccess('Result entered successfully')
+      setToast({ message: 'Result entered successfully', type: 'success' })
       await fetchResults()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to enter result')
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to enter result',
+        type: 'error',
+      })
     } finally {
       setActionLoading(null)
     }
@@ -187,14 +226,15 @@ export function OrderDetailPage() {
 
   const handleVerifyResult = async (resultId: number) => {
     setActionLoading(`verify-${resultId}`)
-    setError(null)
-    setSuccess(null)
     try {
       await resultService.verify(resultId)
-      setSuccess('Result verified successfully')
+      setToast({ message: 'Result verified successfully', type: 'success' })
       await fetchResults()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to verify result')
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to verify result',
+        type: 'error',
+      })
     } finally {
       setActionLoading(null)
     }
@@ -202,14 +242,15 @@ export function OrderDetailPage() {
 
   const handlePublishResult = async (resultId: number) => {
     setActionLoading(`publish-${resultId}`)
-    setError(null)
-    setSuccess(null)
     try {
       await resultService.publish(resultId)
-      setSuccess('Result published successfully')
+      setToast({ message: 'Result published successfully', type: 'success' })
       await fetchResults()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to publish result')
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to publish result',
+        type: 'error',
+      })
     } finally {
       setActionLoading(null)
     }
@@ -218,14 +259,15 @@ export function OrderDetailPage() {
   const handleGenerateReport = async () => {
     if (!order) return
     setActionLoading('generate-report')
-    setError(null)
-    setSuccess(null)
     try {
       await reportService.generate(order.id)
-      setSuccess('Report generated successfully')
+      setToast({ message: 'Report generated successfully', type: 'success' })
       await fetchReports()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate report')
+      setToast({
+        message: err instanceof Error ? err.message : 'Failed to generate report',
+        type: 'error',
+      })
     } finally {
       setActionLoading(null)
     }
@@ -279,6 +321,61 @@ export function OrderDetailPage() {
 
   return (
     <div>
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Rejection Modal */}
+      <Modal
+        isOpen={rejectModal.isOpen}
+        onClose={() => {
+          setRejectModal({ isOpen: false, sampleId: null })
+          setRejectionReason('')
+        }}
+        title="Reject Sample"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            Please provide a reason for rejecting this sample:
+          </p>
+          <textarea
+            value={rejectionReason}
+            onChange={e => setRejectionReason(e.target.value)}
+            rows={4}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="E.g., Hemolyzed sample, Insufficient volume, etc."
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => {
+                setRejectModal({ isOpen: false, sampleId: null })
+                setRejectionReason('')
+              }}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleRejectSample}
+              disabled={
+                !rejectionReason.trim() ||
+                actionLoading === `reject-${rejectModal.sampleId}`
+              }
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+            >
+              {actionLoading === `reject-${rejectModal.sampleId}`
+                ? 'Rejecting...'
+                : 'Reject Sample'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -301,18 +398,6 @@ export function OrderDetailPage() {
           Status: {order.status}
         </span>
       </div>
-
-      {/* Alert Messages */}
-      {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-800">{error}</p>
-        </div>
-      )}
-      {success && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-800">{success}</p>
-        </div>
-      )}
 
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow">
@@ -569,7 +654,19 @@ export function OrderDetailPage() {
                             </div>
                           )}
 
-                          <div className="flex gap-2 mt-3">
+                          {sample.status === 'REJECTED' &&
+                            sample.rejection_reason && (
+                              <div className="text-sm bg-red-50 p-2 rounded border border-red-200">
+                                <span className="text-red-800 font-medium">
+                                  Rejection Reason:{' '}
+                                </span>
+                                <span className="text-red-700">
+                                  {sample.rejection_reason}
+                                </span>
+                              </div>
+                            )}
+
+                          <div className="flex flex-wrap gap-2 mt-3">
                             {sample.status === 'PENDING' &&
                               canCollectSamples && (
                                 <button
@@ -587,17 +684,33 @@ export function OrderDetailPage() {
 
                             {sample.status === 'COLLECTED' &&
                               canReceiveSamples && (
-                                <button
-                                  onClick={() => handleReceiveSample(sample.id)}
-                                  disabled={
-                                    actionLoading === `receive-${sample.id}`
-                                  }
-                                  className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 text-sm"
-                                >
-                                  {actionLoading === `receive-${sample.id}`
-                                    ? 'Receiving...'
-                                    : 'Receive Sample'}
-                                </button>
+                                <>
+                                  <button
+                                    onClick={() =>
+                                      handleReceiveSample(sample.id)
+                                    }
+                                    disabled={
+                                      actionLoading === `receive-${sample.id}`
+                                    }
+                                    className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 text-sm"
+                                  >
+                                    {actionLoading === `receive-${sample.id}`
+                                      ? 'Receiving...'
+                                      : 'Receive Sample'}
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      setRejectModal({
+                                        isOpen: true,
+                                        sampleId: sample.id,
+                                      })
+                                    }
+                                    disabled={actionLoading !== null}
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm"
+                                  >
+                                    Reject Sample
+                                  </button>
+                                </>
                               )}
                           </div>
                         </div>

@@ -82,3 +82,39 @@ def receive_sample(request, pk):
 
     serializer = SampleSerializer(sample)
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def reject_sample(request, pk):
+    """Mark sample as rejected with reason."""
+    try:
+        sample = Sample.objects.get(pk=pk)
+    except Sample.DoesNotExist:
+        return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.user.role not in [
+        UserRole.TECHNOLOGIST,
+        UserRole.PATHOLOGIST,
+        UserRole.ADMIN,
+    ]:
+        return Response(
+            {"error": "Only lab staff can reject samples"},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
+    rejection_reason = request.data.get("rejection_reason", "").strip()
+    if not rejection_reason:
+        return Response(
+            {"error": "Rejection reason is required"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    sample.status = "REJECTED"
+    sample.rejection_reason = rejection_reason
+    sample.received_at = timezone.now()
+    sample.received_by = request.user
+    sample.save()
+
+    serializer = SampleSerializer(sample)
+    return Response(serializer.data)
