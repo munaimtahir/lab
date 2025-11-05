@@ -3,6 +3,8 @@
 // - Local dev: VITE_API_URL=http://localhost:8000 (see frontend/.env.development)
 // - VPS/Production: VITE_API_URL=/api (nginx proxies to backend, see frontend/.env.production)
 // No hardcoded default to ensure proper environment configuration
+
+// Read the environment variable
 const API_URL = import.meta.env.VITE_API_URL?.trim()
 
 if (!API_URL) {
@@ -20,6 +22,7 @@ if (!API_URL) {
   }
 }
 
+// Export as API_BASE_URL for consistency with existing codebase
 export const API_BASE_URL = API_URL || ''
 
 // Auth endpoints
