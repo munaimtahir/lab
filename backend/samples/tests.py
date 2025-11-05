@@ -198,6 +198,52 @@ class TestSampleAPI:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["barcode"] == sample.barcode
 
+    def test_reject_sample_as_tech(self):
+        """Test rejecting a sample as tech user."""
+        self.client.force_authenticate(user=self.tech_user)
+        sample = Sample.objects.create(
+            order_item=self.order_item,
+            sample_type="Blood",
+            status="COLLECTED",
+        )
+
+        response = self.client.post(
+            f"/api/samples/{sample.id}/reject/",
+            {"rejection_reason": "Hemolyzed sample"},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["status"] == "REJECTED"
+        assert response.data["rejection_reason"] == "Hemolyzed sample"
+        assert response.data["received_by"] == self.tech_user.id
+
+    def test_reject_sample_without_reason(self):
+        """Test rejecting a sample without a reason fails."""
+        self.client.force_authenticate(user=self.tech_user)
+        sample = Sample.objects.create(
+            order_item=self.order_item,
+            sample_type="Blood",
+            status="COLLECTED",
+        )
+
+        response = self.client.post(f"/api/samples/{sample.id}/reject/")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Rejection reason is required" in response.data["error"]
+
+    def test_reject_sample_as_phlebotomy_forbidden(self):
+        """Test that phlebotomy cannot reject samples."""
+        self.client.force_authenticate(user=self.phlebotomy_user)
+        sample = Sample.objects.create(
+            order_item=self.order_item,
+            sample_type="Blood",
+            status="COLLECTED",
+        )
+
+        response = self.client.post(
+            f"/api/samples/{sample.id}/reject/",
+            {"rejection_reason": "Hemolyzed sample"},
+        )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     def test_collect_nonexistent_sample(self):
         """Test collecting a non-existent sample returns 404."""
         self.client.force_authenticate(user=self.phlebotomy_user)

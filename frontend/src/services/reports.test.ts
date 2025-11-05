@@ -2,13 +2,20 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { reportService } from './reports'
 import { apiClient } from './api'
 
+// Test default API URL - used when VITE_API_URL is not set
+const TEST_DEFAULT_API_URL = 'http://localhost:8000'
+
+// Mock API_BASE_URL from environment or use test default
 vi.mock('./api', () => ({
-  API_BASE_URL: 'http://localhost:8000',
+  API_BASE_URL: import.meta.env.VITE_API_URL || TEST_DEFAULT_API_URL,
   apiClient: {
     get: vi.fn(),
     post: vi.fn(),
   },
 }))
+
+// Store the mocked API_BASE_URL for test assertions
+const TEST_API_BASE_URL = import.meta.env.VITE_API_URL || TEST_DEFAULT_API_URL
 
 describe('reportService', () => {
   beforeEach(() => {
@@ -75,7 +82,7 @@ describe('reportService', () => {
     it('should return the download URL for a report', () => {
       const url = reportService.getDownloadUrl(1)
 
-      expect(url).toBe('http://localhost:8000/api/reports/1/download/')
+      expect(url).toBe(`${TEST_API_BASE_URL}/api/reports/1/download/`)
     })
   })
 })
