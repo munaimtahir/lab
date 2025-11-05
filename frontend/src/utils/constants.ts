@@ -1,7 +1,20 @@
 // API Configuration
-// Default to VPS IP for production, can be overridden via VITE_API_URL env var
-const DEFAULT_API_BASE_URL = 'http://172.235.33.181:8000'
-export const API_BASE_URL = import.meta.env.VITE_API_URL?.trim() || DEFAULT_API_BASE_URL
+// IMPORTANT: VITE_API_URL must be set via environment variables
+// - Local dev: VITE_API_URL=http://localhost:8000 (see frontend/.env.development)
+// - VPS/Production: VITE_API_URL=/api (nginx proxies to backend, see frontend/.env.production)
+// No hardcoded default to ensure proper environment configuration
+const DEFAULT_API_BASE_URL = import.meta.env.VITE_API_URL?.trim()
+
+if (!DEFAULT_API_BASE_URL) {
+  console.error(
+    'VITE_API_URL environment variable is not set. ' +
+    'Please configure it in your .env file. ' +
+    'For local dev: VITE_API_URL=http://localhost:8000, ' +
+    'For production: VITE_API_URL=/api'
+  )
+}
+
+export const API_BASE_URL = DEFAULT_API_BASE_URL || ''
 
 // Auth endpoints
 export const AUTH_ENDPOINTS = {
