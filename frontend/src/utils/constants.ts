@@ -89,7 +89,12 @@ export const ROLE_PERMISSIONS = {
   RECEPTION: ['patients', 'orders', 'reports.view'],
   PHLEBOTOMY: ['samples.collect', 'worklist.view'],
   TECHNOLOGIST: ['samples.receive', 'results.enter', 'worklist.view'],
-  PATHOLOGIST: ['results.verify', 'results.publish', 'reports.generate', 'worklist.view'],
+  PATHOLOGIST: [
+    'results.verify',
+    'results.publish',
+    'reports.generate',
+    'worklist.view',
+  ],
 } as const
 
 // Color scheme matching existing xMed EMR

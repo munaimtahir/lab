@@ -67,7 +67,9 @@ describe('LabTerminalsPage', () => {
   })
 
   it('displays error message on fetch failure', async () => {
-    vi.mocked(terminalService.getAll).mockRejectedValue(new Error('Network error'))
+    vi.mocked(terminalService.getAll).mockRejectedValue(
+      new Error('Network error')
+    )
 
     render(
       <BrowserRouter>

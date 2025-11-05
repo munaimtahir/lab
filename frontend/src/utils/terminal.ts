@@ -11,10 +11,10 @@ import type { LabTerminal } from '../types'
  */
 export function calculateTerminalUtilization(terminal: LabTerminal): number {
   if (terminal.offline_current === 0) return 0
-  
+
   const total = terminal.offline_range_end - terminal.offline_range_start + 1
   const used = terminal.offline_current - terminal.offline_range_start + 1
-  
+
   return Math.round((used / total) * 100)
 }
 

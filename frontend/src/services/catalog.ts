@@ -32,7 +32,10 @@ export const catalogService = {
     return apiClient.post<TestCatalog>(CATALOG_ENDPOINTS.LIST, data)
   },
 
-  async update(id: number, data: Partial<TestCatalogFormData>): Promise<TestCatalog> {
+  async update(
+    id: number,
+    data: Partial<TestCatalogFormData>
+  ): Promise<TestCatalog> {
     return apiClient.patch<TestCatalog>(CATALOG_ENDPOINTS.DETAIL(id), data)
   },
 

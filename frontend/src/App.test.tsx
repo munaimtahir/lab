@@ -4,7 +4,9 @@ import App from './App'
 
 // Mock child components
 vi.mock('./hooks/useAuth', () => ({
-  AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   useAuth: () => ({
     user: null,
     isAuthenticated: false,

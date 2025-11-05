@@ -25,7 +25,10 @@ export const terminalService = {
     return apiClient.post<LabTerminal>(TERMINAL_ENDPOINTS.LIST, data)
   },
 
-  async update(id: number, data: Partial<LabTerminalFormData>): Promise<LabTerminal> {
+  async update(
+    id: number,
+    data: Partial<LabTerminalFormData>
+  ): Promise<LabTerminal> {
     return apiClient.patch<LabTerminal>(TERMINAL_ENDPOINTS.DETAIL(id), data)
   },
 

@@ -28,7 +28,7 @@ interface PatientFormData {
 
 export function NewLabSlipPage() {
   const navigate = useNavigate()
-  
+
   // Patient form state
   const [patientData, setPatientData] = useState<PatientFormData>({
     cnic: '',
@@ -40,21 +40,25 @@ export function NewLabSlipPage() {
     age: 0,
     age_unit: 'years',
   })
-  
+
   const [existingPatient, setExistingPatient] = useState<Patient | null>(null)
   const [patientSuggestions, setPatientSuggestions] = useState<Patient[]>([])
-  
+
   // Test selection state
   const [testSearch, setTestSearch] = useState('')
   const [testSuggestions, setTestSuggestions] = useState<Test[]>([])
   const [selectedTests, setSelectedTests] = useState<Test[]>([])
-  
+
   // Billing state
   const [discount, setDiscount] = useState(0)
   const [amountPaid, setAmountPaid] = useState(0)
-  const [reportDate, setReportDate] = useState(new Date().toISOString().split('T')[0])
-  const [reportTime, setReportTime] = useState(new Date().toTimeString().slice(0, 5))
-  
+  const [reportDate, setReportDate] = useState(
+    new Date().toISOString().split('T')[0]
+  )
+  const [reportTime, setReportTime] = useState(
+    new Date().toTimeString().slice(0, 5)
+  )
+
   // UI state
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -80,7 +84,9 @@ export function NewLabSlipPage() {
     const searchTests = async () => {
       if (testSearch.length >= 2) {
         const tests = await catalogService.search(testSearch)
-        setTestSuggestions(tests.filter(t => !selectedTests.find(s => s.id === t.id)))
+        setTestSuggestions(
+          tests.filter(t => !selectedTests.find(s => s.id === t.id))
+        )
       } else {
         setTestSuggestions([])
       }
@@ -221,7 +227,9 @@ export function NewLabSlipPage() {
 
       {/* Patient Information Section */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-blue-700 mb-4">Patient Information</h2>
+        <h2 className="text-xl font-semibold text-blue-700 mb-4">
+          Patient Information
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* CNIC */}
@@ -232,14 +240,18 @@ export function NewLabSlipPage() {
             <input
               type="text"
               value={patientData.cnic}
-              onChange={(e) => handlePatientChange('cnic', e.target.value)}
+              onChange={e => handlePatientChange('cnic', e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.cnic ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                errors.cnic
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
               }`}
               placeholder="12345-1234567-1"
             />
-            {errors.cnic && <p className="text-xs text-red-500 mt-1">{errors.cnic}</p>}
-            
+            {errors.cnic && (
+              <p className="text-xs text-red-500 mt-1">{errors.cnic}</p>
+            )}
+
             {/* Patient suggestions */}
             {patientSuggestions.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
@@ -251,7 +263,9 @@ export function NewLabSlipPage() {
                     className="w-full px-3 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-0"
                   >
                     <div className="font-medium">{patient.full_name}</div>
-                    <div className="text-xs text-gray-600">{patient.cnic} - {patient.phone}</div>
+                    <div className="text-xs text-gray-600">
+                      {patient.cnic} - {patient.phone}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -266,13 +280,17 @@ export function NewLabSlipPage() {
             <input
               type="text"
               value={patientData.phone}
-              onChange={(e) => handlePatientChange('phone', e.target.value)}
+              onChange={e => handlePatientChange('phone', e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.phone ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                errors.phone
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
               }`}
               placeholder="03001234567"
             />
-            {errors.phone && <p className="text-xs text-red-500 mt-1">{errors.phone}</p>}
+            {errors.phone && (
+              <p className="text-xs text-red-500 mt-1">{errors.phone}</p>
+            )}
           </div>
 
           {/* Full Name */}
@@ -283,18 +301,24 @@ export function NewLabSlipPage() {
             <input
               type="text"
               value={patientData.full_name}
-              onChange={(e) => handlePatientChange('full_name', e.target.value)}
+              onChange={e => handlePatientChange('full_name', e.target.value)}
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.full_name ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                errors.full_name
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
               }`}
               placeholder="Enter full name"
             />
-            {errors.full_name && <p className="text-xs text-red-500 mt-1">{errors.full_name}</p>}
+            {errors.full_name && (
+              <p className="text-xs text-red-500 mt-1">{errors.full_name}</p>
+            )}
           </div>
 
           {/* Patient ID (read-only) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Patient ID</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Patient ID
+            </label>
             <input
               type="text"
               value={patientData.patient_id}
@@ -306,10 +330,12 @@ export function NewLabSlipPage() {
 
           {/* Gender */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Gender
+            </label>
             <select
               value={patientData.gender}
-              onChange={(e) => handlePatientChange('gender', e.target.value)}
+              onChange={e => handlePatientChange('gender', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="M">Male</option>
@@ -327,17 +353,27 @@ export function NewLabSlipPage() {
               type="date"
               value={patientData.date_of_birth}
               max={new Date().toISOString().split('T')[0]}
-              onChange={(e) => handlePatientChange('date_of_birth', e.target.value)}
+              onChange={e =>
+                handlePatientChange('date_of_birth', e.target.value)
+              }
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.date_of_birth ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                errors.date_of_birth
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-300 focus:ring-blue-500'
               }`}
             />
-            {errors.date_of_birth && <p className="text-xs text-red-500 mt-1">{errors.date_of_birth}</p>}
+            {errors.date_of_birth && (
+              <p className="text-xs text-red-500 mt-1">
+                {errors.date_of_birth}
+              </p>
+            )}
           </div>
 
           {/* Age (calculated) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Age</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Age
+            </label>
             <div className="flex gap-2">
               <input
                 type="number"
@@ -361,19 +397,25 @@ export function NewLabSlipPage() {
 
       {/* Test Selection Section */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-blue-700 mb-4">Test Selection</h2>
+        <h2 className="text-xl font-semibold text-blue-700 mb-4">
+          Test Selection
+        </h2>
 
         {/* Test Search */}
         <div className="mb-4 relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Search Tests</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Search Tests
+          </label>
           <input
             type="text"
             value={testSearch}
-            onChange={(e) => setTestSearch(e.target.value)}
+            onChange={e => setTestSearch(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Search by test name or code"
           />
-          {errors.tests && <p className="text-xs text-red-500 mt-1">{errors.tests}</p>}
+          {errors.tests && (
+            <p className="text-xs text-red-500 mt-1">{errors.tests}</p>
+          )}
 
           {/* Test suggestions */}
           {testSuggestions.length > 0 && (
@@ -388,7 +430,9 @@ export function NewLabSlipPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="font-medium">{test.name}</div>
-                      <div className="text-xs text-gray-600">{test.code} - {test.specimen}</div>
+                      <div className="text-xs text-gray-600">
+                        {test.code} - {test.specimen}
+                      </div>
                     </div>
                     <div className="text-sm font-semibold text-blue-600">
                       {formatCurrency(test.price)}
@@ -406,20 +450,36 @@ export function NewLabSlipPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">Test Name</th>
-                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">Code</th>
-                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">Specimen</th>
-                  <th className="text-right py-2 px-3 text-sm font-medium text-gray-700">Price</th>
-                  <th className="text-center py-2 px-3 text-sm font-medium text-gray-700">Action</th>
+                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">
+                    Test Name
+                  </th>
+                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">
+                    Code
+                  </th>
+                  <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">
+                    Specimen
+                  </th>
+                  <th className="text-right py-2 px-3 text-sm font-medium text-gray-700">
+                    Price
+                  </th>
+                  <th className="text-center py-2 px-3 text-sm font-medium text-gray-700">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {selectedTests.map(test => (
                   <tr key={test.id} className="border-b border-gray-100">
                     <td className="py-2 px-3">{test.name}</td>
-                    <td className="py-2 px-3 text-sm text-gray-600">{test.code}</td>
-                    <td className="py-2 px-3 text-sm text-gray-600">{test.specimen}</td>
-                    <td className="py-2 px-3 text-right font-medium">{formatCurrency(test.price)}</td>
+                    <td className="py-2 px-3 text-sm text-gray-600">
+                      {test.code}
+                    </td>
+                    <td className="py-2 px-3 text-sm text-gray-600">
+                      {test.specimen}
+                    </td>
+                    <td className="py-2 px-3 text-right font-medium">
+                      {formatCurrency(test.price)}
+                    </td>
                     <td className="py-2 px-3 text-center">
                       <button
                         type="button"
@@ -439,46 +499,58 @@ export function NewLabSlipPage() {
 
       {/* Billing Section */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-blue-700 mb-4">Billing & Report Details</h2>
+        <h2 className="text-xl font-semibold text-blue-700 mb-4">
+          Billing & Report Details
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="flex justify-between items-center py-2 border-b">
               <span className="text-gray-700">Bill Amount:</span>
-              <span className="font-semibold text-lg">{formatCurrency(billAmount)}</span>
+              <span className="font-semibold text-lg">
+                {formatCurrency(billAmount)}
+              </span>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Discount</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Discount
+              </label>
               <input
                 type="number"
                 min="0"
                 max={billAmount}
                 value={discount}
-                onChange={(e) => setDiscount(Number(e.target.value))}
+                onChange={e => setDiscount(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="flex justify-between items-center py-2 border-b border-gray-400">
               <span className="text-gray-700 font-medium">Net Amount:</span>
-              <span className="font-bold text-xl text-blue-600">{formatCurrency(netAmount)}</span>
+              <span className="font-bold text-xl text-blue-600">
+                {formatCurrency(netAmount)}
+              </span>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Amount Paid</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Amount Paid
+              </label>
               <input
                 type="number"
                 min="0"
                 value={amountPaid}
-                onChange={(e) => setAmountPaid(Number(e.target.value))}
+                onChange={e => setAmountPaid(Number(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="flex justify-between items-center py-2">
               <span className="text-gray-700">Change:</span>
-              <span className={`font-semibold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <span
+                className={`font-semibold ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
                 {formatCurrency(Math.abs(change))}
               </span>
             </div>
@@ -486,21 +558,25 @@ export function NewLabSlipPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Report Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Report Date
+              </label>
               <input
                 type="date"
                 value={reportDate}
-                onChange={(e) => setReportDate(e.target.value)}
+                onChange={e => setReportDate(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Report Time</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Report Time
+              </label>
               <input
                 type="time"
                 value={reportTime}
-                onChange={(e) => setReportTime(e.target.value)}
+                onChange={e => setReportTime(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -538,4 +614,3 @@ export function NewLabSlipPage() {
     </div>
   )
 }
-

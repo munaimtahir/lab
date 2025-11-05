@@ -7,7 +7,11 @@ class IsAdminUser(permissions.BasePermission):
     """Permission class that only allows admin users."""
 
     def has_permission(self, request, view):
-        return request.user and request.user.is_authenticated and request.user.role == "ADMIN"
+        return (
+            request.user
+            and request.user.is_authenticated
+            and request.user.role == "ADMIN"
+        )
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):

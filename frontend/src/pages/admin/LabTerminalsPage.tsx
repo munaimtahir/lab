@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { terminalService } from '../../services/terminals'
 import { Modal } from '../../components/Modal'
-import { calculateTerminalUtilization, calculateRangeCapacity } from '../../utils/terminal'
+import {
+  calculateTerminalUtilization,
+  calculateRangeCapacity,
+} from '../../utils/terminal'
 import type { LabTerminal, LabTerminalFormData } from '../../types'
 
 interface TerminalFormProps {
@@ -60,7 +63,7 @@ function TerminalForm({ terminal, onSave, onCancel }: TerminalFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target
     const checked = e.target.checked
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]:
         type === 'checkbox'
@@ -149,7 +152,10 @@ function TerminalForm({ terminal, onSave, onCancel }: TerminalFormProps) {
           <strong>Note:</strong> Ensure MRN ranges do not overlap with existing
           terminals. Range: {formData.offline_range_start} -{' '}
           {formData.offline_range_end} (
-          {calculateRangeCapacity(formData.offline_range_start, formData.offline_range_end)}{' '}
+          {calculateRangeCapacity(
+            formData.offline_range_start,
+            formData.offline_range_end
+          )}{' '}
           MRNs)
         </p>
       </div>
@@ -181,7 +187,11 @@ function TerminalForm({ terminal, onSave, onCancel }: TerminalFormProps) {
           disabled={loading}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
-          {loading ? 'Saving...' : terminal ? 'Update Terminal' : 'Create Terminal'}
+          {loading
+            ? 'Saving...'
+            : terminal
+              ? 'Update Terminal'
+              : 'Create Terminal'}
         </button>
       </div>
     </form>
@@ -192,7 +202,9 @@ export function LabTerminalsPage() {
   const [terminals, setTerminals] = useState<LabTerminal[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [selectedTerminal, setSelectedTerminal] = useState<LabTerminal | null>(null)
+  const [selectedTerminal, setSelectedTerminal] = useState<LabTerminal | null>(
+    null
+  )
   const [error, setError] = useState<string>('')
 
   const fetchTerminals = async () => {
@@ -297,16 +309,19 @@ export function LabTerminalsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {terminals.map((terminal) => (
+              {terminals.map(terminal => (
                 <tr key={terminal.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{terminal.code}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {terminal.code}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{terminal.name}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {terminal.offline_range_start} - {terminal.offline_range_end}
+                    {terminal.offline_range_start} -{' '}
+                    {terminal.offline_range_end}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {terminal.offline_current || 'Not used'}

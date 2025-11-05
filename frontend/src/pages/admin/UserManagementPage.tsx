@@ -81,7 +81,7 @@ function UserForm({ user, onSave, onCancel }: UserFormProps) {
   ) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }))
@@ -183,7 +183,7 @@ function UserForm({ user, onSave, onCancel }: UserFormProps) {
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {USER_ROLES.map((role) => (
+            {USER_ROLES.map(role => (
               <option key={role.value} value={role.value}>
                 {role.label}
               </option>
@@ -352,7 +352,7 @@ export function UserManagementPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
+              {users.map(user => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
