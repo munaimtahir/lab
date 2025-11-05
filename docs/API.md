@@ -33,8 +33,15 @@ All endpoints return JSON. Consistent error envelope: `{error: {code, message, d
 - `GET /api/orders/` - List orders (supports `?patient=id` filter)
 - `POST /api/orders/` - Create order with `test_ids` array
 - `GET /api/orders/:id/` - Get order with items
+- `POST /api/orders/:id/cancel/` - Cancel order (Admin/Reception only)
 
-**Order States:** NEW → COLLECTED → IN_PROCESS → VERIFIED → PUBLISHED
+**Order States:** NEW → COLLECTED → IN_PROCESS → VERIFIED → PUBLISHED | CANCELLED
+
+**Order Cancellation:**
+- Can only cancel orders in NEW status
+- Cannot cancel if any samples have been collected or received
+- Cancellation also updates all related order items to CANCELLED status
+- Shows confirmation dialog before cancellation
 
 ## Samples
 
@@ -44,9 +51,16 @@ All endpoints return JSON. Consistent error envelope: `{error: {code, message, d
 - `GET /api/samples/:id/` - Get sample details
 - `POST /api/samples/:id/collect/` - Mark collected (Phlebotomy/Admin only)
 - `POST /api/samples/:id/receive/` - Mark received (Tech/Pathologist/Admin only)
+- `POST /api/samples/:id/reject/` - Reject sample with reason (Tech/Pathologist/Admin only)
 
-**Sample States:** PENDING → COLLECTED → RECEIVED
+**Sample States:** PENDING → COLLECTED → RECEIVED | REJECTED
 **Barcode Format:** SAM-YYYYMMDD-NNNN
+
+**Sample Rejection:**
+- Requires `rejection_reason` field in request body
+- Can only reject samples in PENDING, COLLECTED, or RECEIVED status
+- Rejected samples cannot be processed further
+- Rejection reason is displayed in UI with red badge
 
 ## Results
 
@@ -88,8 +102,10 @@ All endpoints return JSON. Consistent error envelope: `{error: {code, message, d
 |----------|-------|-----------|------------|--------------|-------------|
 | Patient CRUD | ✓ | ✓ | ✗ | ✗ | ✗ |
 | Order CRUD | ✓ | ✓ | ✗ | ✗ | ✗ |
+| Order Cancel | ✓ | ✓ | ✗ | ✗ | ✗ |
 | Sample Collect | ✓ | ✗ | ✓ | ✗ | ✗ |
 | Sample Receive | ✓ | ✗ | ✗ | ✓ | ✓ |
+| Sample Reject | ✓ | ✗ | ✗ | ✓ | ✓ |
 | Result Enter | ✓ | ✗ | ✗ | ✓ | ✗ |
 | Result Verify | ✓ | ✗ | ✗ | ✗ | ✓ |
 | Result Publish | ✓ | ✗ | ✗ | ✗ | ✓ |
