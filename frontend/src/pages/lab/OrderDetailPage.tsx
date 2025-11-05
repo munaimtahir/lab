@@ -354,24 +354,24 @@ export function OrderDetailPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Order Detail</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Order Detail</h1>
           <p className="text-gray-600">{order.order_number}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           {canActuallyCancelOrder && (
             <button
               onClick={handleCancelOrder}
               disabled={actionLoading === 'cancel-order'}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm sm:text-base"
             >
               {actionLoading === 'cancel-order' ? 'Cancelling...' : 'Cancel Order'}
             </button>
           )}
           <button
             onClick={() => navigate(ROUTES.LAB_WORKLIST)}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-sm sm:text-base"
           >
             Back to Worklist
           </button>
@@ -402,10 +402,10 @@ export function OrderDetailPage() {
       {/* Tabs */}
       <div className="bg-white rounded-lg shadow">
         <div className="border-b border-gray-200">
-          <nav className="flex -mb-px">
+          <nav className="flex -mb-px overflow-x-auto">
             <button
               onClick={() => setActiveTab('summary')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'summary'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -415,7 +415,7 @@ export function OrderDetailPage() {
             </button>
             <button
               onClick={() => setActiveTab('samples')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'samples'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -425,7 +425,7 @@ export function OrderDetailPage() {
             </button>
             <button
               onClick={() => setActiveTab('results')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'results'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -435,7 +435,7 @@ export function OrderDetailPage() {
             </button>
             <button
               onClick={() => setActiveTab('report')}
-              className={`px-6 py-3 border-b-2 font-medium text-sm ${
+              className={`px-4 sm:px-6 py-3 border-b-2 font-medium text-sm whitespace-nowrap ${
                 activeTab === 'report'
                   ? 'border-blue-600 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'
@@ -446,7 +446,7 @@ export function OrderDetailPage() {
           </nav>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Summary Tab */}
           {activeTab === 'summary' && (
             <div className="space-y-6">
@@ -455,7 +455,7 @@ export function OrderDetailPage() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">
                   Patient Information
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Name:</span>
                     <p className="font-medium">{order.patient.full_name}</p>
@@ -496,7 +496,7 @@ export function OrderDetailPage() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-3">
                   Order Information
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Order Number:</span>
                     <p className="font-medium">{order.order_number}</p>
@@ -1071,11 +1071,11 @@ export function OrderDetailPage() {
             />
           </div>
 
-          <div className="flex gap-2 justify-end">
+          <div className="flex flex-col sm:flex-row gap-2 justify-end">
             <button
               onClick={handleCloseRejectModal}
               disabled={actionLoading !== null}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 order-2 sm:order-1"
             >
               Cancel
             </button>
@@ -1086,7 +1086,7 @@ export function OrderDetailPage() {
                 !rejectionReason.trim() ||
                 !sampleToReject
               }
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 order-1 sm:order-2"
             >
               {actionLoading && sampleToReject
                 ? 'Rejecting...'
