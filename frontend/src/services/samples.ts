@@ -24,4 +24,10 @@ export const sampleService = {
   async receive(id: number): Promise<Sample> {
     return apiClient.post<Sample>(SAMPLE_ENDPOINTS.RECEIVE(id))
   },
+
+  async reject(id: number, reason: string): Promise<Sample> {
+    return apiClient.post<Sample>(SAMPLE_ENDPOINTS.REJECT(id), {
+      rejection_reason: reason,
+    })
+  },
 }

@@ -47,6 +47,7 @@ export const SAMPLE_ENDPOINTS = {
   DETAIL: (id: number) => `/api/samples/${id}/`,
   COLLECT: (id: number) => `/api/samples/${id}/collect/`,
   RECEIVE: (id: number) => `/api/samples/${id}/receive/`,
+  REJECT: (id: number) => `/api/samples/${id}/reject/`,
 } as const
 
 // Result endpoints
@@ -121,6 +122,7 @@ export const COLORS = {
     PUBLISHED: 'bg-green-200 text-green-900',
     PENDING: 'bg-gray-100 text-gray-800',
     RECEIVED: 'bg-teal-100 text-teal-800',
+    REJECTED: 'bg-red-100 text-red-800',
     DRAFT: 'bg-gray-100 text-gray-800',
     ENTERED: 'bg-blue-100 text-blue-800',
   },
