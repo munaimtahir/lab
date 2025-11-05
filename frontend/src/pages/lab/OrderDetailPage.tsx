@@ -169,7 +169,14 @@ export function OrderDetailPage() {
   }
 
   const handleRejectSample = async () => {
-    if (!rejectModal.sampleId || !rejectionReason.trim()) {
+    if (!rejectModal.sampleId) {
+      // This should not happen in normal operation
+      console.error('No sample ID provided for rejection')
+      setRejectModal({ isOpen: false, sampleId: null })
+      return
+    }
+
+    if (!rejectionReason.trim()) {
       setToast({ message: 'Please enter a rejection reason', type: 'error' })
       return
     }
@@ -1010,10 +1017,11 @@ export function OrderDetailPage() {
                                   actionLoading === `enter-${result.id}`
                                 }
                                 className="flex-1 sm:flex-none px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium shadow-sm"
+                                aria-label="Enter result"
                               >
                                 {actionLoading === `enter-${result.id}`
-                                  ? '⏳ Saving...'
-                                  : '✓ Enter Result'}
+                                  ? 'Saving...'
+                                  : 'Enter Result'}
                               </button>
                             )}
 
@@ -1025,10 +1033,11 @@ export function OrderDetailPage() {
                                     actionLoading === `verify-${result.id}`
                                   }
                                   className="flex-1 sm:flex-none px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 text-sm font-medium shadow-sm"
+                                  aria-label="Verify result"
                                 >
                                   {actionLoading === `verify-${result.id}`
-                                    ? '⏳ Verifying...'
-                                    : '✓ Verify Result'}
+                                    ? 'Verifying...'
+                                    : 'Verify Result'}
                                 </button>
                               )}
 
@@ -1040,16 +1049,17 @@ export function OrderDetailPage() {
                                     actionLoading === `publish-${result.id}`
                                   }
                                   className="flex-1 sm:flex-none px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 text-sm font-medium shadow-sm"
+                                  aria-label="Publish result"
                                 >
                                   {actionLoading === `publish-${result.id}`
-                                    ? '⏳ Publishing...'
-                                    : '📤 Publish Result'}
+                                    ? 'Publishing...'
+                                    : 'Publish Result'}
                                 </button>
                               )}
                             
                             {result.status === 'PUBLISHED' && (
                               <div className="flex-1 px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm border border-green-200">
-                                ✓ Result has been published
+                                Result has been published
                               </div>
                             )}
                           </div>
