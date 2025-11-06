@@ -1,6 +1,7 @@
 // API Configuration
-// Default to VPS IP for production, can be overridden via VITE_API_URL env var
-const DEFAULT_API_BASE_URL = 'http://172.235.33.181:8000'
+// Default to /api for production (nginx proxies to backend)
+// Can be overridden via VITE_API_URL env var for development
+const DEFAULT_API_BASE_URL = '/api'
 export const API_BASE_URL =
   import.meta.env.VITE_API_URL?.trim() || DEFAULT_API_BASE_URL
 
