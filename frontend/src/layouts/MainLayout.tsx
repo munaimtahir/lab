@@ -16,6 +16,7 @@ const navItems: NavItem[] = [
     label: 'Worklist',
     roles: ['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST', 'PATHOLOGIST'],
   },
+  { path: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', roles: ['ADMIN'] },
   { path: ROUTES.SETTINGS, label: 'Settings', roles: ['ADMIN'] },
 ]
 
@@ -92,7 +93,9 @@ export function MainLayout({ user, onLogout }: MainLayoutProps) {
                 </button>
               )}
 
-              <h1 className="text-xl md:text-2xl font-bold">Al-Shifa Laboratory</h1>
+              <h1 className="text-xl md:text-2xl font-bold">
+                Al-Shifa Laboratory
+              </h1>
 
               {/* Desktop Navigation */}
               {user && (

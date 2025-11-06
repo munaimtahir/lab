@@ -5,9 +5,7 @@ import { Toast } from './Toast'
 describe('Toast', () => {
   it('renders toast with success type', () => {
     const onClose = vi.fn()
-    render(
-      <Toast message="Success message" type="success" onClose={onClose} />
-    )
+    render(<Toast message="Success message" type="success" onClose={onClose} />)
 
     expect(screen.getByText('Success message')).toBeInTheDocument()
     expect(screen.getByRole('alert')).toBeInTheDocument()
