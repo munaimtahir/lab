@@ -66,6 +66,7 @@ def receive_sample(request, pk):
         return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.user.role not in [
+        UserRole.PHLEBOTOMY,
         UserRole.TECHNOLOGIST,
         UserRole.PATHOLOGIST,
         UserRole.ADMIN,
@@ -94,6 +95,7 @@ def reject_sample(request, pk):
         return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.user.role not in [
+        UserRole.PHLEBOTOMY,
         UserRole.TECHNOLOGIST,
         UserRole.PATHOLOGIST,
         UserRole.ADMIN,
