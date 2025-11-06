@@ -416,9 +416,7 @@ describe('TestCatalogPage', () => {
     await user.click(createButton)
 
     await waitFor(() => {
-      expect(
-        screen.getByText(/Test code already exists/)
-      ).toBeInTheDocument()
+      expect(screen.getByText(/Test code already exists/)).toBeInTheDocument()
     })
   })
 })

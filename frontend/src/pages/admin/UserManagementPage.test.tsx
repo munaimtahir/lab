@@ -294,8 +294,6 @@ describe('UserManagementPage', () => {
     // Verify password field is required (HTML5 validation)
     expect(passwordInput).toHaveAttribute('required')
 
-    const createButton = screen.getByRole('button', { name: /Create User/i })
-    
     // The form won't submit due to HTML5 validation if password is empty
     // So we just verify the input is marked as required
     expect(passwordInput).toBeInTheDocument()

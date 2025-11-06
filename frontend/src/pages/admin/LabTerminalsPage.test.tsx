@@ -353,10 +353,7 @@ describe('LabTerminalsPage', () => {
     await user.click(updateButton)
 
     await waitFor(() => {
-      expect(terminalService.update).toHaveBeenCalledWith(
-        1,
-        expect.any(Object)
-      )
+      expect(terminalService.update).toHaveBeenCalledWith(1, expect.any(Object))
     })
   })
 
