@@ -153,7 +153,8 @@ export function OrderDetailPage() {
       await fetchSamples()
     } catch (err) {
       setToast({
-        message: err instanceof Error ? err.message : 'Failed to collect sample',
+        message:
+          err instanceof Error ? err.message : 'Failed to collect sample',
         type: 'error',
       })
     } finally {
@@ -169,7 +170,8 @@ export function OrderDetailPage() {
       await fetchSamples()
     } catch (err) {
       setToast({
-        message: err instanceof Error ? err.message : 'Failed to receive sample',
+        message:
+          err instanceof Error ? err.message : 'Failed to receive sample',
         type: 'error',
       })
     } finally {
@@ -264,7 +266,8 @@ export function OrderDetailPage() {
       await fetchResults()
     } catch (err) {
       setToast({
-        message: err instanceof Error ? err.message : 'Failed to publish result',
+        message:
+          err instanceof Error ? err.message : 'Failed to publish result',
         type: 'error',
       })
     } finally {
@@ -281,7 +284,8 @@ export function OrderDetailPage() {
       await fetchReports()
     } catch (err) {
       setToast({
-        message: err instanceof Error ? err.message : 'Failed to generate report',
+        message:
+          err instanceof Error ? err.message : 'Failed to generate report',
         type: 'error',
       })
     } finally {
@@ -346,7 +350,8 @@ export function OrderDetailPage() {
     setActionLoading('edit-tests')
     try {
       await orderService.editTests(order.id, {
-        tests_to_add: selectedTestsToAdd.length > 0 ? selectedTestsToAdd : undefined,
+        tests_to_add:
+          selectedTestsToAdd.length > 0 ? selectedTestsToAdd : undefined,
         tests_to_remove: testsToRemove.length > 0 ? testsToRemove : undefined,
       })
       setToast({ message: 'Order tests updated successfully', type: 'success' })
@@ -354,7 +359,8 @@ export function OrderDetailPage() {
       await fetchOrder(order.id)
     } catch (err) {
       setToast({
-        message: err instanceof Error ? err.message : 'Failed to edit order tests',
+        message:
+          err instanceof Error ? err.message : 'Failed to edit order tests',
         type: 'error',
       })
     } finally {
@@ -364,13 +370,17 @@ export function OrderDetailPage() {
 
   const handleToggleTestToRemove = (testId: number) => {
     setTestsToRemove(prev =>
-      prev.includes(testId) ? prev.filter(id => id !== testId) : [...prev, testId]
+      prev.includes(testId)
+        ? prev.filter(id => id !== testId)
+        : [...prev, testId]
     )
   }
 
   const handleToggleTestToAdd = (testId: number) => {
     setSelectedTestsToAdd(prev =>
-      prev.includes(testId) ? prev.filter(id => id !== testId) : [...prev, testId]
+      prev.includes(testId)
+        ? prev.filter(id => id !== testId)
+        : [...prev, testId]
     )
   }
 
@@ -510,7 +520,8 @@ export function OrderDetailPage() {
                   <div>
                     <p className="font-medium">{item.test_detail?.name}</p>
                     <p className="text-sm text-gray-600">
-                      {item.test_detail?.code} - {formatCurrency(item.test_detail?.price || 0)}
+                      {item.test_detail?.code} -{' '}
+                      {formatCurrency(item.test_detail?.price || 0)}
                     </p>
                   </div>
                   <label className="flex items-center gap-2">
@@ -620,7 +631,9 @@ export function OrderDetailPage() {
               disabled={actionLoading === 'cancel-order'}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm sm:text-base"
             >
-              {actionLoading === 'cancel-order' ? 'Cancelling...' : 'Cancel Order'}
+              {actionLoading === 'cancel-order'
+                ? 'Cancelling...'
+                : 'Cancel Order'}
             </button>
           )}
           <button
@@ -1290,8 +1303,8 @@ export function OrderDetailPage() {
                               !canVerifyResults && (
                                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 w-full">
                                   <p className="text-sm text-blue-800">
-                                    ✓ Result entered. Waiting for pathologist
-                                    to verify.
+                                    ✓ Result entered. Waiting for pathologist to
+                                    verify.
                                   </p>
                                 </div>
                               )}
@@ -1327,7 +1340,7 @@ export function OrderDetailPage() {
                                     : 'Publish Result'}
                                 </button>
                               )}
-                            
+
                             {result.status === 'PUBLISHED' && (
                               <div className="flex-1 px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm border border-green-200">
                                 Result has been published

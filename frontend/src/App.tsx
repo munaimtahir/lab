@@ -13,6 +13,7 @@ import { SettingsPage } from './pages/settings/SettingsPage'
 import { UserManagementPage } from './pages/admin/UserManagementPage'
 import { TestCatalogPage } from './pages/admin/TestCatalogPage'
 import { LabTerminalsPage } from './pages/admin/LabTerminalsPage'
+import { DashboardPage } from './pages/admin/DashboardPage'
 import { ROUTES } from './utils/constants'
 
 const queryClient = new QueryClient({
@@ -91,6 +92,14 @@ function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <LabTerminalsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.ADMIN_DASHBOARD}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <DashboardPage />
               </ProtectedRoute>
             }
           />

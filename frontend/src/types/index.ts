@@ -191,3 +191,36 @@ export interface Report {
   generated_at: string
   generated_by: User
 }
+
+// Dashboard types
+export interface DashboardQuickTiles {
+  total_orders_today: number
+  reports_published_today: number
+}
+
+export interface OrdersPerDay {
+  date: string
+  count: number
+}
+
+export interface SampleStatusDistribution {
+  pending: number
+  collected: number
+  received: number
+  rejected: number
+}
+
+export interface ResultStatusDistribution {
+  draft: number
+  entered: number
+  verified: number
+  published: number
+}
+
+export interface DashboardAnalytics {
+  quick_tiles: DashboardQuickTiles
+  orders_per_day: OrdersPerDay[]
+  sample_status: SampleStatusDistribution
+  result_status: ResultStatusDistribution
+  avg_tat_hours: number
+}

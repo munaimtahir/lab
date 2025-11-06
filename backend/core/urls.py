@@ -30,6 +30,7 @@ urlpatterns = [
     path("api/samples/", include("samples.urls")),
     path("api/results/", include("results.urls")),
     path("api/reports/", include("reports.urls")),
+    path("api/dashboard/", include("dashboard.urls")),
     path("api/terminals/", LabTerminalListCreateView.as_view(), name="terminal-list"),
     path(
         "api/terminals/<int:pk>/",

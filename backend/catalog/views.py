@@ -1,7 +1,6 @@
 """Catalog views."""
 
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
 
 from core.permissions import IsAdminOrReadOnly
 

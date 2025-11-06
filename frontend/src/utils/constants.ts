@@ -69,6 +69,11 @@ export const REPORT_ENDPOINTS = {
   DOWNLOAD: (id: number) => `/api/reports/${id}/download/`,
 } as const
 
+// Dashboard endpoints
+export const DASHBOARD_ENDPOINTS = {
+  ANALYTICS: '/api/dashboard/analytics/',
+} as const
+
 // Health endpoint
 export const HEALTH_ENDPOINT = '/api/health/'
 
@@ -85,6 +90,7 @@ export const ROUTES = {
   ADMIN_USERS: '/settings/users',
   ADMIN_CATALOG: '/settings/catalog',
   ADMIN_TERMINALS: '/settings/terminals',
+  ADMIN_DASHBOARD: '/dashboard',
 } as const
 
 // Role-based permissions
