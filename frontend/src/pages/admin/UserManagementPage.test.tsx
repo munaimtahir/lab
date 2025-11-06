@@ -166,7 +166,7 @@ describe('UserManagementPage', () => {
   it('calls delete service on deactivate confirmation', async () => {
     vi.mocked(userService.getAll).mockResolvedValue(mockUsers)
     vi.mocked(userService.delete).mockResolvedValue(undefined)
-    global.confirm = vi.fn(() => true)
+    globalThis.confirm = vi.fn(() => true)
 
     render(
       <BrowserRouter>
@@ -189,7 +189,7 @@ describe('UserManagementPage', () => {
   it('does not call delete when deactivate is cancelled', async () => {
     vi.mocked(userService.getAll).mockResolvedValue(mockUsers)
     vi.mocked(userService.delete).mockResolvedValue(undefined)
-    global.confirm = vi.fn(() => false)
+    globalThis.confirm = vi.fn(() => false)
 
     render(
       <BrowserRouter>

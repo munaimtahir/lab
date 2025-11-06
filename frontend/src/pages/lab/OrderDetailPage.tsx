@@ -518,17 +518,17 @@ export function OrderDetailPage() {
                   className="flex items-center justify-between p-2 border rounded"
                 >
                   <div>
-                    <p className="font-medium">{item.test_detail?.name}</p>
+                    <p className="font-medium">{item.test.name}</p>
                     <p className="text-sm text-gray-600">
-                      {item.test_detail?.code} -{' '}
-                      {formatCurrency(item.test_detail?.price || 0)}
+                      {item.test.code} -{' '}
+                      {formatCurrency(item.test.price || 0)}
                     </p>
                   </div>
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      checked={testsToRemove.includes(item.test)}
-                      onChange={() => handleToggleTestToRemove(item.test)}
+                      checked={testsToRemove.includes(item.test.id)}
+                      onChange={() => handleToggleTestToRemove(item.test.id)}
                       className="rounded"
                     />
                     <span className="text-sm text-red-600">Remove</span>
@@ -544,7 +544,7 @@ export function OrderDetailPage() {
             <div className="max-h-60 overflow-y-auto space-y-2">
               {availableTests
                 .filter(
-                  test => !order?.items.some(item => item.test === test.id)
+                  test => !order?.items.some(item => item.test.id === test.id)
                 )
                 .map(test => (
                   <div
