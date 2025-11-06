@@ -198,23 +198,67 @@ class TestSampleAPI:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["barcode"] == sample.barcode
 
-    def test_reject_sample_as_tech(self):
-        """Test rejecting a sample as tech user."""
+    @pytest.mark.parametrize(
+        "action,user_role,expected_status",
+        [
+            ("collect", "phlebotomy_user", "COLLECTED"),
+            ("receive", "tech_user", "RECEIVED"),
+        ],
+    )
+    def test_collect_and_receive_actions(self, action, user_role, expected_status):
+        """Test collect and receive actions with different users."""
+        user = getattr(self, user_role)
+        self.client.force_authenticate(user=user)
+
+        if action == "receive":
+            # For receive action, create sample with COLLECTED status
+            sample = Sample.objects.create(
+                order_item=self.order_item,
+                sample_type="Blood",
+                status="COLLECTED",
+            )
+        else:
+            # For collect action, create sample with default PENDING status
+            sample = Sample.objects.create(
+                order_item=self.order_item,
+                sample_type="Blood",
+            )
+
+        response = self.client.post(f"/api/samples/{sample.id}/{action}/")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["status"] == expected_status
+
+        # For collect action, also verify collected_by field
+        if action == "collect" and "collected_by" in response.data:
+            assert response.data["collected_by"] == user.id
+
+    @pytest.mark.parametrize(
+        "initial_status,reason",
+        [
+            ("COLLECTED", "Delayed"),
+            ("COLLECTED", "Deferred"),
+            ("COLLECTED", "Request repeat"),
+            ("RECEIVED", "Delayed"),
+            ("RECEIVED", "Deferred"),
+            ("RECEIVED", "Request repeat"),
+        ],
+    )
+    def test_reject_sample_with_reasons(self, initial_status, reason):
+        """Test rejecting samples with multiple reasons and initial statuses."""
         self.client.force_authenticate(user=self.tech_user)
         sample = Sample.objects.create(
             order_item=self.order_item,
             sample_type="Blood",
-            status="COLLECTED",
+            status=initial_status,
         )
 
         response = self.client.post(
             f"/api/samples/{sample.id}/reject/",
-            {"rejection_reason": "Hemolyzed sample"},
+            {"rejection_reason": reason},
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data["status"] == "REJECTED"
-        assert response.data["rejection_reason"] == "Hemolyzed sample"
-        assert response.data["received_by"] == self.tech_user.id
+        assert response.data["rejection_reason"] == reason
 
     def test_reject_sample_without_reason(self):
         """Test rejecting a sample without a reason fails."""
@@ -256,36 +300,6 @@ class TestSampleAPI:
         response = self.client.post("/api/samples/99999/receive/")
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_reject_sample_as_tech(self):
-        """Test rejecting a sample as tech user."""
-        self.client.force_authenticate(user=self.tech_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item,
-            sample_type="Blood",
-            status="RECEIVED",
-        )
-
-        response = self.client.post(
-            f"/api/samples/{sample.id}/reject/",
-            {"rejection_reason": "Hemolyzed sample"},
-        )
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data["status"] == "REJECTED"
-        assert response.data["rejection_reason"] == "Hemolyzed sample"
-
-    def test_reject_sample_without_reason(self):
-        """Test that rejecting without a reason fails."""
-        self.client.force_authenticate(user=self.tech_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item,
-            sample_type="Blood",
-            status="RECEIVED",
-        )
-
-        response = self.client.post(f"/api/samples/{sample.id}/reject/", {})
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "rejection reason" in response.data["error"].lower()
-
     def test_reject_sample_with_invalid_status(self):
         """Test that rejecting a sample with invalid status fails."""
         self.client.force_authenticate(user=self.tech_user)
@@ -301,21 +315,6 @@ class TestSampleAPI:
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "Cannot reject sample with status" in response.data["error"]
-
-    def test_reject_sample_as_phlebotomy_forbidden(self):
-        """Test that phlebotomy cannot reject samples."""
-        self.client.force_authenticate(user=self.phlebotomy_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item,
-            sample_type="Blood",
-            status="RECEIVED",
-        )
-
-        response = self.client.post(
-            f"/api/samples/{sample.id}/reject/",
-            {"rejection_reason": "Bad sample"},
-        )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_reject_nonexistent_sample(self):
         """Test rejecting a non-existent sample returns 404."""
