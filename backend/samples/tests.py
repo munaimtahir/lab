@@ -177,8 +177,8 @@ class TestSampleAPI:
         assert response.data["status"] == "RECEIVED"
         assert response.data["received_by"] == self.tech_user.id
 
-    def test_receive_sample_as_phlebotomy_forbidden(self):
-        """Test that phlebotomy cannot receive samples."""
+    def test_receive_sample_as_phlebotomy(self):
+        """Test that phlebotomy can receive samples."""
         self.client.force_authenticate(user=self.phlebotomy_user)
         sample = Sample.objects.create(
             order_item=self.order_item,
@@ -187,7 +187,9 @@ class TestSampleAPI:
         )
 
         response = self.client.post(f"/api/samples/{sample.id}/receive/")
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["status"] == "RECEIVED"
+        assert response.data["received_by"] == self.phlebotomy_user.id
 
     def test_get_sample_detail(self):
         """Test getting sample detail."""
@@ -197,52 +199,6 @@ class TestSampleAPI:
         response = self.client.get(f"/api/samples/{sample.id}/")
         assert response.status_code == status.HTTP_200_OK
         assert response.data["barcode"] == sample.barcode
-
-    def test_reject_sample_as_tech(self):
-        """Test rejecting a sample as tech user."""
-        self.client.force_authenticate(user=self.tech_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item,
-            sample_type="Blood",
-            status="COLLECTED",
-        )
-
-        response = self.client.post(
-            f"/api/samples/{sample.id}/reject/",
-            {"rejection_reason": "Hemolyzed sample"},
-        )
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data["status"] == "REJECTED"
-        assert response.data["rejection_reason"] == "Hemolyzed sample"
-        assert response.data["received_by"] == self.tech_user.id
-
-    def test_reject_sample_without_reason(self):
-        """Test rejecting a sample without a reason fails."""
-        self.client.force_authenticate(user=self.tech_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item,
-            sample_type="Blood",
-            status="COLLECTED",
-        )
-
-        response = self.client.post(f"/api/samples/{sample.id}/reject/")
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "Rejection reason is required" in response.data["error"]
-
-    def test_reject_sample_as_phlebotomy_forbidden(self):
-        """Test that phlebotomy cannot reject samples."""
-        self.client.force_authenticate(user=self.phlebotomy_user)
-        sample = Sample.objects.create(
-            order_item=self.order_item,
-            sample_type="Blood",
-            status="COLLECTED",
-        )
-
-        response = self.client.post(
-            f"/api/samples/{sample.id}/reject/",
-            {"rejection_reason": "Hemolyzed sample"},
-        )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_collect_nonexistent_sample(self):
         """Test collecting a non-existent sample returns 404."""
@@ -302,20 +258,22 @@ class TestSampleAPI:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "Cannot reject sample with status" in response.data["error"]
 
-    def test_reject_sample_as_phlebotomy_forbidden(self):
-        """Test that phlebotomy cannot reject samples."""
+    def test_reject_sample_as_phlebotomy(self):
+        """Test that phlebotomy can reject samples."""
         self.client.force_authenticate(user=self.phlebotomy_user)
         sample = Sample.objects.create(
             order_item=self.order_item,
             sample_type="Blood",
-            status="RECEIVED",
+            status="COLLECTED",
         )
 
         response = self.client.post(
             f"/api/samples/{sample.id}/reject/",
             {"rejection_reason": "Bad sample"},
         )
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["status"] == "REJECTED"
+        assert response.data["rejection_reason"] == "Bad sample"
 
     def test_reject_nonexistent_sample(self):
         """Test rejecting a non-existent sample returns 404."""
