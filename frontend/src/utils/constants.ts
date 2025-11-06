@@ -1,12 +1,20 @@
 // API Configuration
 // Environment-driven API base URL configuration
 // Priority: VITE_API_URL env var > mode-based default
-// Production (build): Uses /api (nginx proxies to backend)
-// Development (dev): Uses http://localhost:8000 for direct backend access
+const PRODUCTION_API_URL = '/api' // nginx proxies to backend
+const DEVELOPMENT_API_URL = 'http://localhost:8000' // direct backend access
+
 const DEFAULT_API_BASE_URL =
-  import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:8000'
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL?.trim() || DEFAULT_API_BASE_URL
+  import.meta.env.MODE === 'production'
+    ? PRODUCTION_API_URL
+    : DEVELOPMENT_API_URL
+
+// Get VITE_API_URL from environment with type safety
+const envApiUrl = import.meta.env.VITE_API_URL
+const configuredApiUrl =
+  typeof envApiUrl === 'string' ? envApiUrl.trim() : undefined
+
+export const API_BASE_URL = configuredApiUrl || DEFAULT_API_BASE_URL
 
 // Auth endpoints
 export const AUTH_ENDPOINTS = {
