@@ -67,11 +67,19 @@ This application is designed to work seamlessly in both local development and VP
 
 **Frontend Configuration:**
 ```bash
-# Use /api for production (nginx proxies to backend)
+# The frontend automatically uses smart defaults:
+# - Production builds: /api (nginx proxy)
+# - Development mode: http://localhost:8000 (direct backend)
+
+# You can override with VITE_API_URL environment variable:
+# For production with nginx proxy:
 VITE_API_URL=/api
 
-# Or direct backend access for development
+# For direct backend access (development):
 VITE_API_URL=http://localhost:8000
+
+# For VPS without nginx proxy:
+VITE_API_URL=http://172.235.33.181:8000
 ```
 
 **Backend Configuration:**
