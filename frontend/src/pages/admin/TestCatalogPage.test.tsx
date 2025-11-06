@@ -161,7 +161,7 @@ describe('TestCatalogPage', () => {
   it('calls delete service on delete confirmation', async () => {
     vi.mocked(catalogService.getAll).mockResolvedValue(mockTests)
     vi.mocked(catalogService.delete).mockResolvedValue(undefined)
-    global.confirm = vi.fn(() => true)
+    globalThis.confirm = vi.fn(() => true)
 
     render(
       <BrowserRouter>
@@ -184,7 +184,7 @@ describe('TestCatalogPage', () => {
   it('does not call delete when cancelled', async () => {
     vi.mocked(catalogService.getAll).mockResolvedValue(mockTests)
     vi.mocked(catalogService.delete).mockResolvedValue(undefined)
-    global.confirm = vi.fn(() => false)
+    globalThis.confirm = vi.fn(() => false)
 
     render(
       <BrowserRouter>

@@ -1,6 +1,6 @@
 import { apiClient } from './api'
 import { DASHBOARD_ENDPOINTS } from '../utils/constants'
-import { DashboardAnalytics } from '../types'
+import type { DashboardAnalytics } from '../types'
 
 export const dashboardService = {
   async getAnalytics(params?: {

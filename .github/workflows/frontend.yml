@@ -13,12 +13,17 @@ on:
       - 'frontend/**'
       - '.github/workflows/frontend.yml'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
   frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     
     steps:
       - name: Checkout code
@@ -28,9 +33,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: 'pnpm'
       
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
           version: 8
       

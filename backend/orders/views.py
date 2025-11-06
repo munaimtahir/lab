@@ -95,9 +95,9 @@ def cancel_order(request, pk):
 def edit_order_tests(request, pk):
     """Edit tests in an order (add/remove) if no samples or results exist."""
     try:
-        order = Order.objects.prefetch_related(
-            "items__samples", "items__results"
-        ).get(pk=pk)
+        order = Order.objects.prefetch_related("items__samples", "items__results").get(
+            pk=pk
+        )
     except Order.DoesNotExist:
         return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
 

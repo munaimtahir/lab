@@ -338,5 +338,7 @@ class TestOrderAPI:
         """Test editing a non-existent order returns 404."""
         self.client.force_authenticate(user=self.user)
         data = {"tests_to_add": [self.test2.id]}
-        response = self.client.patch("/api/orders/99999/edit-tests/", data, format="json")
+        response = self.client.patch(
+            "/api/orders/99999/edit-tests/", data, format="json"
+        )
         assert response.status_code == status.HTTP_404_NOT_FOUND

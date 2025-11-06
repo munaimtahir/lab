@@ -36,8 +36,10 @@ class LabTerminalAdmin(admin.ModelAdmin):
                     "offline_range_end",
                     "offline_current",
                 ),
-                "description": "Configure the MRN range this terminal uses when offline. "
-                "Current shows the last allocated number (0 = range not yet used).",
+                "description": (
+                    "Configure the MRN range this terminal uses when offline. "
+                    "Current shows the last allocated number (0 = range not yet used)."
+                ),
             },
         ),
         (

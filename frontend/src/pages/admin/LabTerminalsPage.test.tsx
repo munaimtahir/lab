@@ -164,7 +164,7 @@ describe('LabTerminalsPage', () => {
   it('calls delete service on delete confirmation', async () => {
     vi.mocked(terminalService.getAll).mockResolvedValue(mockTerminals)
     vi.mocked(terminalService.delete).mockResolvedValue(undefined)
-    global.confirm = vi.fn(() => true)
+    globalThis.confirm = vi.fn(() => true)
 
     render(
       <BrowserRouter>
@@ -187,7 +187,7 @@ describe('LabTerminalsPage', () => {
   it('does not call delete when cancelled', async () => {
     vi.mocked(terminalService.getAll).mockResolvedValue(mockTerminals)
     vi.mocked(terminalService.delete).mockResolvedValue(undefined)
-    global.confirm = vi.fn(() => false)
+    globalThis.confirm = vi.fn(() => false)
 
     render(
       <BrowserRouter>
