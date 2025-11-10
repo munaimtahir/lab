@@ -33,9 +33,7 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 # Parse ALLOWED_HOSTS from environment variable or use production default
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get(
-        "ALLOWED_HOSTS", "172.235.33.181"
-    ).split(",")
+    for host in os.environ.get("ALLOWED_HOSTS", "172.235.33.181").split(",")
 ]
 
 
