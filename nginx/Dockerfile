@@ -3,8 +3,8 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Install pnpm (matching version from frontend/package.json)
+RUN npm install -g pnpm@8.15.9
 
 # Copy frontend package files
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
@@ -12,7 +12,7 @@ COPY frontend/package.json frontend/pnpm-lock.yaml ./
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy frontend application code and .env
+# Copy frontend application code
 COPY frontend/ ./
 
 # Create .env for build with relative API path (nginx will proxy /api/ to backend)

@@ -1,0 +1,321 @@
+# Production Deployment Guide for VPS (172.235.33.181)
+
+## Overview
+
+This document provides comprehensive instructions for deploying the Al Shifa LIMS application to the VPS with IP address **172.235.33.181**.
+
+## ✅ Pre-Deployment Checklist
+
+All configuration files have been optimized for production deployment:
+
+- [x] All localhost references removed from production configs
+- [x] Port 5173 (Vite dev server) removed from production configs
+- [x] CORS/CSRF configured for VPS IP only
+- [x] Frontend configured to use nginx proxy (`/api`)
+- [x] Backend configured for production (DEBUG=False)
+- [x] Nginx configured to serve on port 80
+- [x] Docker Compose configured correctly
+- [x] Multi-stage Docker builds implemented
+
+## 🚀 Deployment Architecture
+
+### Services
+
+| Service | Image | Port (External) | Port (Internal) | Purpose |
+|---------|-------|----------------|----------------|---------|
+| nginx | Multi-stage (Node + Nginx) | 80 | 80 | Frontend serving + API reverse proxy |
+| backend | Python 3.12-slim | 8000 | 8000 | Django API with Gunicorn |
+| db | postgres:16 | - | 5432 | PostgreSQL database |
+| redis | redis:7-alpine | - | 6379 | Cache and task queue |
+
+### Network Flow
+
+```
+User Browser
+    ↓
+http://172.235.33.181:80 (nginx)
+    ├─→ Frontend static files (/, /login, /lab, etc.)
+    └─→ /api/* → http://backend:8000 (Django API)
+            ├─→ postgres:5432 (database)
+            └─→ redis:6379 (cache)
+```
+
+## 📋 Deployment Steps
+
+### 1. Clone Repository on VPS
+
+```bash
+ssh user@172.235.33.181
+cd /opt  # or your preferred directory
+git clone https://github.com/munaimtahir/lab.git
+cd lab
+```
+
+### 2. Configure Environment
+
+The `.env` file is already configured for production with VPS IP 172.235.33.181. **IMPORTANT: Update security credentials before deployment!**
+
+```bash
+# Generate secure Django secret key
+python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+
+# Generate secure database password
+openssl rand -base64 32
+```
+
+Edit `.env` and update:
+```bash
+DJANGO_SECRET_KEY=<generated-secret-key>
+POSTGRES_PASSWORD=<generated-password>
+DEBUG=False  # Already set, verify it's False
+```
+
+### 3. Build and Deploy
+
+```bash
+# Build all services
+docker compose build
+
+# Start services
+docker compose up -d
+
+# Verify services are running
+docker compose ps
+
+# Check logs
+docker compose logs -f
+```
+
+### 4. Verify Deployment
+
+```bash
+# Health check
+curl http://172.235.33.181/api/health/
+
+# Expected response:
+# {"status":"healthy","timestamp":"...","database":"ok","redis":"ok"}
+
+# Access frontend
+# Open browser: http://172.235.33.181
+
+# Default credentials
+# Username: admin
+# Password: admin123
+```
+
+## 🔒 Security Configuration
+
+### Current Production Settings
+
+All configuration files are set for production:
+
+1. **`.env`**:
+   - `VITE_API_URL=/api` (uses nginx proxy)
+   - `ALLOWED_HOSTS=172.235.33.181` (VPS IP only)
+   - `CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80`
+   - `CSRF_TRUSTED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80`
+   - `DEBUG=False`
+
+2. **`backend/.env`**:
+   - Same security settings as root `.env`
+   - No localhost references
+   - No development ports
+
+3. **`frontend/.env`**:
+   - `VITE_API_URL=/api` (nginx proxy)
+   - Production-ready configuration
+
+4. **`docker-compose.yml`**:
+   - Backend exposes port 8000 (for direct access if needed)
+   - Nginx exposes port 80 (primary access point)
+   - All environment variables default to production values
+
+### Security Recommendations
+
+1. **Change Default Credentials**:
+   ```bash
+   docker compose exec backend python manage.py changepassword admin
+   ```
+
+2. **Enable HTTPS** (Recommended for production):
+   - Obtain SSL certificate (Let's Encrypt)
+   - Update nginx configuration for SSL
+   - Update CORS/CSRF origins to use https://
+
+3. **Firewall Configuration**:
+   ```bash
+   # Allow HTTP
+   sudo ufw allow 80/tcp
+   
+   # Allow HTTPS (when configured)
+   sudo ufw allow 443/tcp
+   
+   # Optional: Allow backend direct access for debugging
+   sudo ufw allow 8000/tcp
+   ```
+
+4. **Database Backups**:
+   ```bash
+   # Create backup
+   docker compose exec db pg_dump -U lims lims > backup_$(date +%Y%m%d_%H%M%S).sql
+   
+   # Restore backup
+   docker compose exec -T db psql -U lims lims < backup_file.sql
+   ```
+
+## 🔧 Maintenance
+
+### View Logs
+
+```bash
+# All services
+docker compose logs -f
+
+# Specific service
+docker compose logs -f nginx
+docker compose logs -f backend
+```
+
+### Restart Services
+
+```bash
+# Restart all
+docker compose restart
+
+# Restart specific service
+docker compose restart backend
+```
+
+### Update Application
+
+```bash
+# Pull latest changes
+git pull origin main
+
+# Rebuild and restart
+docker compose build
+docker compose up -d
+```
+
+### Database Migrations
+
+```bash
+# Migrations are run automatically on container start
+# To run manually:
+docker compose exec backend python manage.py migrate
+```
+
+## 🧪 Testing Endpoints
+
+### Backend API
+
+```bash
+# Health check
+curl http://172.235.33.181/api/health/
+
+# Login
+curl -X POST http://172.235.33.181/api/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# Get patients (requires authentication)
+curl http://172.235.33.181/api/patients/ \
+  -H "Authorization: Bearer <access_token>"
+```
+
+### Frontend
+
+- Main page: http://172.235.33.181/
+- Login page: http://172.235.33.181/login
+- Lab page: http://172.235.33.181/lab
+- Admin panel: http://172.235.33.181/admin
+
+## 📊 Monitoring
+
+### Container Status
+
+```bash
+docker compose ps
+```
+
+### Resource Usage
+
+```bash
+docker stats
+```
+
+### Database Status
+
+```bash
+docker compose exec db psql -U lims -d lims -c "SELECT version();"
+```
+
+### Redis Status
+
+```bash
+docker compose exec redis redis-cli ping
+# Should respond: PONG
+```
+
+## 🐛 Troubleshooting
+
+### Issue: Frontend shows blank page
+
+**Solution**: Check nginx logs
+```bash
+docker compose logs nginx
+```
+
+### Issue: API returns 502 Bad Gateway
+
+**Solution**: Check if backend is running
+```bash
+docker compose ps backend
+docker compose logs backend
+```
+
+### Issue: Database connection failed
+
+**Solution**: Check database health
+```bash
+docker compose exec db pg_isready -U lims
+```
+
+### Issue: CORS errors
+
+**Solution**: Verify CORS configuration matches your access URL
+```bash
+docker compose exec backend env | grep CORS
+```
+
+## 📚 Additional Resources
+
+- [README.md](README.md) - General project information
+- [SETUP.md](SETUP.md) - Local development setup
+- [.env.example](.env.example) - Environment variable documentation
+
+## 🎯 Quick Reference
+
+### URLs
+
+- **Frontend**: http://172.235.33.181
+- **Backend API**: http://172.235.33.181/api
+- **Backend Direct**: http://172.235.33.181:8000 (optional)
+- **Admin Panel**: http://172.235.33.181/admin
+
+### Default Credentials
+
+- **Username**: admin
+- **Password**: admin123
+
+### Key Files
+
+- **Production config**: `.env`
+- **Docker compose**: `docker-compose.yml`
+- **Nginx config**: `nginx/nginx.conf`
+- **Backend Dockerfile**: `backend/Dockerfile`
+- **Nginx Dockerfile**: `nginx/Dockerfile`
+
+---
+
+**Note**: This configuration is optimized for production deployment on VPS with IP 172.235.33.181. No localhost or development port references exist in production configuration files.
