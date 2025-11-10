@@ -24,29 +24,39 @@ cd infra && docker-compose up
 
 ### VPS/Production Deployment
 
+**📋 For complete production deployment instructions, see [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)**
+
+Quick deployment on VPS (172.235.33.181):
+
 ```bash
 # 1. Clone the repository
 git clone https://github.com/munaimtahir/lab.git
 cd lab
 
-# 2. Configure environment
-cp .env.example .env
-# Edit .env with your VPS IP and secure credentials
+# 2. Verify deployment configuration
+./verify-deployment.sh
 
-# 3. Build and start services
+# 3. Update .env with secure credentials
+# Generate secret key: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+# Generate password: openssl rand -base64 32
+
+# 4. Build and start services
 docker compose build
 docker compose up -d
 
-# 4. Access the application
-# Frontend: http://YOUR_VPS_IP (served via nginx on port 80)
-# Backend API: http://YOUR_VPS_IP/api/ (proxied through nginx)
-# Health Check: http://YOUR_VPS_IP/api/health/
+# 5. Access the application
+# Frontend: http://172.235.33.181 (served via nginx on port 80)
+# Backend API: http://172.235.33.181/api/ (proxied through nginx)
+# Health Check: http://172.235.33.181/api/health/
 ```
 
-> **Security Note**: The default configuration uses development credentials. For production:
+> **✅ Production Ready**: This repository is configured for production deployment on VPS with IP 172.235.33.181.
+> All localhost and development port references have been removed from production configurations.
+> 
+> **Security Note**: Before deploying:
 > 1. Generate strong passwords: `POSTGRES_PASSWORD=$(openssl rand -base64 32)`
 > 2. Generate secret key: `DJANGO_SECRET_KEY=$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')`
-> 3. Set `DEBUG=False` in production
+> 3. Verify `DEBUG=False` in production (already set)
 > 4. Never commit `.env` to version control
 
 ## 🌐 Deployment Configuration
