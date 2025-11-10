@@ -163,7 +163,7 @@ if [ -f nginx/nginx.conf ]; then
         check "Nginx proxies /api/ to backend"
     fi
     
-    if ! grep -q "localhost" nginx/nginx.conf || grep -q "server_name.*172.235.33.181" nginx/nginx.conf; then
+    if ! grep -q "localhost" nginx/nginx.conf; then
         check "No localhost in production nginx config"
     else
         warn "nginx.conf may contain localhost references"
