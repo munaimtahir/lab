@@ -30,11 +30,11 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-# Parse ALLOWED_HOSTS from environment variable or use defaults
+# Parse ALLOWED_HOSTS from environment variable or use production default
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
-        "ALLOWED_HOSTS", "localhost,127.0.0.1,172.235.33.181"
+        "ALLOWED_HOSTS", "172.235.33.181"
     ).split(",")
 ]
 
@@ -206,7 +206,7 @@ CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "CORS_ALLOWED_ORIGINS",
-        "http://localhost:5173,http://localhost:3000,http://172.235.33.181,http://172.235.33.181:80,http://172.235.33.181:5173",
+        "http://172.235.33.181,http://172.235.33.181:80",
     ).split(",")
     if origin.strip()
 ]
@@ -216,7 +216,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "CSRF_TRUSTED_ORIGINS",
-        "http://172.235.33.181,http://172.235.33.181:80,http://172.235.33.181:5173,http://localhost:5173",
+        "http://172.235.33.181,http://172.235.33.181:80",
     ).split(",")
     if origin.strip()
 ]
