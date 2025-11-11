@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test';
 
 // This test requires backend and frontend to be running
-// Backend: python manage.py runserver
-// Frontend: pnpm dev
+// Backend: python manage.py runserver (on localhost:8000)
+// Frontend: pnpm dev (on localhost:5173)
 
-// Use environment variable or default to localhost for E2E tests
-const API_BASE = process.env.VITE_API_URL || process.env.API_BASE_URL || 'http://localhost:8000';
-const API_URL = `${API_BASE}/api`;
+// E2E tests always use the full backend URL for API requests
+// Environment variable can override the default localhost:8000
+const API_BASE_URL = process.env.E2E_API_BASE_URL || 'http://localhost:8000';
+const API_URL = `${API_BASE_URL}/api`;
 
 test.describe('LIMS Complete Workflow', () => {
   test('full workflow: register patient → order → sample → result → report', async ({ request }) => {
@@ -51,7 +52,7 @@ test.describe('LIMS Complete Workflow', () => {
     console.log('Using test:', catalog[0].name);
 
     // 4. Create an order
-    const orderResponse = await request.post(`${API_BASE}/orders/`, {
+    const orderResponse = await request.post(`${API_URL}/orders/`, {
       headers,
       data: {
         patient: patient.id,
@@ -67,7 +68,7 @@ test.describe('LIMS Complete Workflow', () => {
 
     // 5. Create a sample
     const orderItemId = order.items[0].id;
-    const sampleResponse = await request.post(`${API_BASE}/samples/`, {
+    const sampleResponse = await request.post(`${API_URL}/samples/`, {
       headers,
       data: {
         order_item: orderItemId,
@@ -80,21 +81,21 @@ test.describe('LIMS Complete Workflow', () => {
     console.log('Created sample:', sample.barcode);
 
     // 6. Collect the sample
-    const collectResponse = await request.post(`${API_BASE}/samples/${sample.id}/collect/`, { headers });
+    const collectResponse = await request.post(`${API_URL}/samples/${sample.id}/collect/`, { headers });
     expect(collectResponse.ok()).toBeTruthy();
     const collectedSample = await collectResponse.json();
     expect(collectedSample.status).toBe('COLLECTED');
     console.log('Sample collected');
 
     // 7. Receive the sample
-    const receiveResponse = await request.post(`${API_BASE}/samples/${sample.id}/receive/`, { headers });
+    const receiveResponse = await request.post(`${API_URL}/samples/${sample.id}/receive/`, { headers });
     expect(receiveResponse.ok()).toBeTruthy();
     const receivedSample = await receiveResponse.json();
     expect(receivedSample.status).toBe('RECEIVED');
     console.log('Sample received');
 
     // 8. Create a result
-    const resultResponse = await request.post(`${API_BASE}/results/`, {
+    const resultResponse = await request.post(`${API_URL}/results/`, {
       headers,
       data: {
         order_item: orderItemId,
@@ -110,35 +111,35 @@ test.describe('LIMS Complete Workflow', () => {
     console.log('Created result');
 
     // 9. Enter the result
-    const enterResponse = await request.post(`${API_BASE}/results/${result.id}/enter/`, { headers });
+    const enterResponse = await request.post(`${API_URL}/results/${result.id}/enter/`, { headers });
     expect(enterResponse.ok()).toBeTruthy();
     const enteredResult = await enterResponse.json();
     expect(enteredResult.status).toBe('ENTERED');
     console.log('Result entered');
 
     // 10. Verify the result
-    const verifyResponse = await request.post(`${API_BASE}/results/${result.id}/verify/`, { headers });
+    const verifyResponse = await request.post(`${API_URL}/results/${result.id}/verify/`, { headers });
     expect(verifyResponse.ok()).toBeTruthy();
     const verifiedResult = await verifyResponse.json();
     expect(verifiedResult.status).toBe('VERIFIED');
     console.log('Result verified');
 
     // 11. Publish the result
-    const publishResponse = await request.post(`${API_BASE}/results/${result.id}/publish/`, { headers });
+    const publishResponse = await request.post(`${API_URL}/results/${result.id}/publish/`, { headers });
     expect(publishResponse.ok()).toBeTruthy();
     const publishedResult = await publishResponse.json();
     expect(publishedResult.status).toBe('PUBLISHED');
     console.log('Result published');
 
     // 12. Generate report
-    const reportResponse = await request.post(`${API_BASE}/reports/generate/${order.id}/`, { headers });
+    const reportResponse = await request.post(`${API_URL}/reports/generate/${order.id}/`, { headers });
     expect(reportResponse.ok()).toBeTruthy();
     const report = await reportResponse.json();
     expect(report.pdf_file).toBeTruthy();
     console.log('Report generated:', report.pdf_file);
 
     // 13. Download report
-    const downloadResponse = await request.get(`${API_BASE}/reports/${report.id}/download/`, { headers });
+    const downloadResponse = await request.get(`${API_URL}/reports/${report.id}/download/`, { headers });
     expect(downloadResponse.ok()).toBeTruthy();
     const pdfBuffer = await downloadResponse.body();
     expect(pdfBuffer).toBeTruthy();
@@ -150,7 +151,7 @@ test.describe('LIMS Complete Workflow', () => {
 
   test('authentication flow', async ({ request }) => {
     // Test login
-    const loginResponse = await request.post(`${API_BASE}/auth/login/`, {
+    const loginResponse = await request.post(`${API_URL}/auth/login/`, {
       data: {
         username: 'admin',
         password: 'admin123',
@@ -164,7 +165,7 @@ test.describe('LIMS Complete Workflow', () => {
     expect(username).toBe('admin');
 
     // Test token refresh
-    const refreshResponse = await request.post(`${API_BASE}/auth/refresh/`, {
+    const refreshResponse = await request.post(`${API_URL}/auth/refresh/`, {
       data: { refresh },
     });
     expect(refreshResponse.ok()).toBeTruthy();
@@ -173,7 +174,7 @@ test.describe('LIMS Complete Workflow', () => {
     expect(newAccess).not.toBe(access); // New token should be different
 
     // Test logout
-    const logoutResponse = await request.post(`${API_BASE}/auth/logout/`, {
+    const logoutResponse = await request.post(`${API_URL}/auth/logout/`, {
       headers: { Authorization: `Bearer ${access}` },
       data: { refresh },
     });
@@ -182,7 +183,7 @@ test.describe('LIMS Complete Workflow', () => {
 
   test('RBAC enforcement', async ({ request }) => {
     // Login as reception
-    const loginResponse = await request.post(`${API_BASE}/auth/login/`, {
+    const loginResponse = await request.post(`${API_URL}/auth/login/`, {
       data: {
         username: 'reception',
         password: 'reception123',
@@ -192,7 +193,7 @@ test.describe('LIMS Complete Workflow', () => {
     const { access } = await loginResponse.json();
 
     // Reception can create patients
-    const patientResponse = await request.post(`${API_BASE}/patients/`, {
+    const patientResponse = await request.post(`${API_URL}/patients/`, {
       headers: { Authorization: `Bearer ${access}` },
       data: {
         full_name: 'RBAC Test Patient',
@@ -207,7 +208,7 @@ test.describe('LIMS Complete Workflow', () => {
     expect(patientResponse.ok()).toBeTruthy();
 
     // But reception cannot verify results (requires pathologist)
-    const verifyResponse = await request.post(`${API_BASE}/results/1/verify/`, {
+    const verifyResponse = await request.post(`${API_URL}/results/1/verify/`, {
       headers: { Authorization: `Bearer ${access}` },
     });
     expect(verifyResponse.status()).toBe(403); // Forbidden
@@ -216,7 +217,7 @@ test.describe('LIMS Complete Workflow', () => {
 
 test.describe('Accessibility', () => {
   test('health endpoint is accessible', async ({ request }) => {
-    const response = await request.get(`${API_BASE}/health/`);
+    const response = await request.get(`${API_URL}/health/`);
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     expect(data.status).toBe('healthy');
