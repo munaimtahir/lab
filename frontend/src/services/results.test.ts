@@ -30,7 +30,7 @@ describe('resultService', () => {
 
       const result = await resultService.getAll()
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/results/')
+      expect(apiClient.get).toHaveBeenCalledWith('/results/')
       expect(result).toEqual(mockResults)
     })
   })
@@ -48,7 +48,7 @@ describe('resultService', () => {
 
       const result = await resultService.getById(1)
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/results/1/')
+      expect(apiClient.get).toHaveBeenCalledWith('/results/1/')
       expect(result).toEqual(mockResult)
     })
   })
@@ -72,14 +72,14 @@ describe('resultService', () => {
 
       const result = await resultService.enter(1, enterData)
 
-      expect(apiClient.patch).toHaveBeenCalledWith('/api/results/1/', {
+      expect(apiClient.patch).toHaveBeenCalledWith('/results/1/', {
         value: '120',
         unit: 'mg/dL',
         reference_range: undefined,
         flags: 'normal',
         notes: undefined,
       })
-      expect(apiClient.post).toHaveBeenCalledWith('/api/results/1/enter/')
+      expect(apiClient.post).toHaveBeenCalledWith('/results/1/enter/')
       expect(result).toEqual(mockResult)
     })
   })
@@ -97,7 +97,7 @@ describe('resultService', () => {
 
       const result = await resultService.verify(1)
 
-      expect(apiClient.post).toHaveBeenCalledWith('/api/results/1/verify/')
+      expect(apiClient.post).toHaveBeenCalledWith('/results/1/verify/')
       expect(result).toEqual(mockResult)
     })
   })
@@ -115,7 +115,7 @@ describe('resultService', () => {
 
       const result = await resultService.publish(1)
 
-      expect(apiClient.post).toHaveBeenCalledWith('/api/results/1/publish/')
+      expect(apiClient.post).toHaveBeenCalledWith('/results/1/publish/')
       expect(result).toEqual(mockResult)
     })
   })
