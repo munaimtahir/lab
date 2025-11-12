@@ -211,11 +211,50 @@ const result = await apiClient.post<Type>('/api/endpoint/', { data })
 
 ## Environment Variables
 
-Create a `.env` file in the frontend directory:
+The frontend uses environment variables to configure the API connection. The configuration differs between development and production environments.
+
+### Local Development
+
+Create a `.env` file in the frontend directory for local development:
 
 ```env
+# Local development - Frontend (Vite dev server) on http://localhost:5173
+# Backend on http://localhost:8000
 VITE_API_URL=http://localhost:8000
 ```
+
+Or use the provided `.env.development` file which is automatically loaded in development mode.
+
+### Production Deployment
+
+For production on the VPS (172.235.33.181) with nginx:
+
+```env
+# Production - Frontend served by nginx on http://172.235.33.181
+# Nginx proxies /api/* to backend:8000 internally
+VITE_API_URL=/api
+```
+
+Or use the provided `.env.production` file which is automatically loaded in production mode.
+
+### How It Works
+
+The frontend automatically determines the API URL in this order:
+
+1. **Environment variable**: If `VITE_API_URL` is set in `.env` file, use it
+2. **Mode-based default**: Otherwise, use:
+   - Development mode: `http://localhost:8000`
+   - Production mode: `/api`
+
+This means you can run the app without any `.env` file and it will use sensible defaults based on the build mode.
+
+### Production Architecture
+
+In production:
+- **Nginx** serves the built frontend on port 80
+- **Nginx** proxies `/api/*` requests to the backend container at `backend:8000`
+- Frontend uses **relative path** `/api` so requests go to the same host
+- No hardcoded IPs or hostnames in the frontend code
 
 ## Color Palette
 

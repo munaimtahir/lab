@@ -15,7 +15,9 @@ RUN pnpm install --frozen-lockfile
 # Copy frontend application code
 COPY frontend/ ./
 
-# Create .env for build with relative API path (nginx will proxy /api/ to backend)
+# Create .env for production build with relative API path
+# In production, nginx proxies /api/* to backend:8000 internally
+# This ensures the frontend uses the relative path /api for all API calls
 RUN echo "VITE_API_URL=/api" > .env
 
 # Build the application (creates dist directory)
