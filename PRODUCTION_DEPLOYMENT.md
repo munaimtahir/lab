@@ -79,6 +79,9 @@ docker compose build
 # Start services
 docker compose up -d
 
+# Wait for services to be ready (about 30 seconds)
+sleep 30
+
 # Verify services are running
 docker compose ps
 
@@ -88,12 +91,29 @@ docker compose logs -f
 
 ### 4. Verify Deployment
 
+#### Automated Smoke Tests (Recommended)
+
+```bash
+# Run comprehensive smoke tests
+./scripts/smoke_test.sh
+
+# Expected output:
+# ✅ All smoke tests PASSED
+# Deployment is healthy and ready for use!
+```
+
+#### Manual Verification
+
 ```bash
 # Health check
 curl http://172.235.33.181/api/health/
 
 # Expected response:
 # {"status":"healthy","timestamp":"...","database":"ok","redis":"ok"}
+
+# Test frontend
+curl -I http://172.235.33.181
+# Expected: HTTP/1.1 200 OK
 
 # Access frontend
 # Open browser: http://172.235.33.181
