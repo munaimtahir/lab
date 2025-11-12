@@ -44,7 +44,13 @@ cd lab
 docker compose build
 docker compose up -d
 
-# 5. Access the application
+# 5. Wait for services to be ready
+sleep 30
+
+# 6. Run smoke tests to verify deployment
+./scripts/smoke_test.sh
+
+# 7. Access the application
 # Frontend: http://172.235.33.181 (served via nginx on port 80)
 # Backend API: http://172.235.33.181/api/ (proxied through nginx)
 # Health Check: http://172.235.33.181/api/health/
