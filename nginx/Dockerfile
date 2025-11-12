@@ -15,12 +15,18 @@ RUN pnpm install --frozen-lockfile
 # Copy frontend application code
 COPY frontend/ ./
 
-# Create .env for production build with relative API path
-# In production, nginx proxies /api/* to backend:8000 internally
-# This ensures the frontend uses the relative path /api for all API calls
-RUN echo "VITE_API_URL=/api" > .env
+# Production API URL configuration
+# ARG allows override at build time: docker build --build-arg VITE_API_URL=/api
+# Default: /api (nginx proxies /api/* to backend:8000 internally)
+# This ensures the frontend uses the correct API path for the deployment environment
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=${VITE_API_URL}
 
-# Build the application (creates dist directory)
+# Create .env for production build
+RUN echo "VITE_API_URL=${VITE_API_URL}" > .env
+
+# Build the application in production mode (creates dist directory)
+# Uses .env.production and the VITE_API_URL env var set above
 RUN pnpm build
 
 # Stage 2: Serve with nginx

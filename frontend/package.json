@@ -5,8 +5,9 @@
   "type": "module",
   "packageManager": "pnpm@8.15.9",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "vite --mode development",
+    "build": "tsc -b && vite build --mode production",
+    "build:dev": "tsc -b && vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
