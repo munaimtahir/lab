@@ -53,7 +53,7 @@ class ApiClient {
       throw new ApiError('No refresh token available', 401)
     }
 
-    const response = await fetch(`${this.baseURL}/api/auth/refresh/`, {
+    const response = await fetch(`${this.baseURL}/auth/refresh/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

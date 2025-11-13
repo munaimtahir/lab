@@ -43,77 +43,80 @@ const getApiBaseUrl = (): string => {
 export const API_BASE_URL = getApiBaseUrl()
 
 // Auth endpoints
+// NOTE: These paths are relative to API_BASE_URL
+// In production: API_BASE_URL="/api" + "/auth/login/" = "/api/auth/login/"
+// In development: API_BASE_URL="http://localhost:8000" + "/auth/login/" = "http://localhost:8000/auth/login/"
 export const AUTH_ENDPOINTS = {
-  LOGIN: '/api/auth/login/',
-  REFRESH: '/api/auth/refresh/',
-  LOGOUT: '/api/auth/logout/',
+  LOGIN: '/auth/login/',
+  REFRESH: '/auth/refresh/',
+  LOGOUT: '/auth/logout/',
 } as const
 
 // User management endpoints
 export const USER_ENDPOINTS = {
-  LIST: '/api/auth/users/',
-  DETAIL: (id: number) => `/api/auth/users/${id}/`,
+  LIST: '/auth/users/',
+  DETAIL: (id: number) => `/auth/users/${id}/`,
 } as const
 
 // Patient endpoints
 export const PATIENT_ENDPOINTS = {
-  LIST: '/api/patients/',
-  DETAIL: (id: number) => `/api/patients/${id}/`,
+  LIST: '/patients/',
+  DETAIL: (id: number) => `/patients/${id}/`,
 } as const
 
 // Catalog endpoints
 export const CATALOG_ENDPOINTS = {
-  LIST: '/api/catalog/',
-  DETAIL: (id: number) => `/api/catalog/${id}/`,
+  LIST: '/catalog/',
+  DETAIL: (id: number) => `/catalog/${id}/`,
 } as const
 
 // Terminal endpoints
 export const TERMINAL_ENDPOINTS = {
-  LIST: '/api/terminals/',
-  DETAIL: (id: number) => `/api/terminals/${id}/`,
+  LIST: '/terminals/',
+  DETAIL: (id: number) => `/terminals/${id}/`,
 } as const
 
 // Order endpoints
 export const ORDER_ENDPOINTS = {
-  LIST: '/api/orders/',
-  DETAIL: (id: number) => `/api/orders/${id}/`,
-  CANCEL: (id: number) => `/api/orders/${id}/cancel/`,
-  EDIT_TESTS: (id: number) => `/api/orders/${id}/edit-tests/`,
+  LIST: '/orders/',
+  DETAIL: (id: number) => `/orders/${id}/`,
+  CANCEL: (id: number) => `/orders/${id}/cancel/`,
+  EDIT_TESTS: (id: number) => `/orders/${id}/edit-tests/`,
 } as const
 
 // Sample endpoints
 export const SAMPLE_ENDPOINTS = {
-  LIST: '/api/samples/',
-  DETAIL: (id: number) => `/api/samples/${id}/`,
-  COLLECT: (id: number) => `/api/samples/${id}/collect/`,
-  RECEIVE: (id: number) => `/api/samples/${id}/receive/`,
-  REJECT: (id: number) => `/api/samples/${id}/reject/`,
+  LIST: '/samples/',
+  DETAIL: (id: number) => `/samples/${id}/`,
+  COLLECT: (id: number) => `/samples/${id}/collect/`,
+  RECEIVE: (id: number) => `/samples/${id}/receive/`,
+  REJECT: (id: number) => `/samples/${id}/reject/`,
 } as const
 
 // Result endpoints
 export const RESULT_ENDPOINTS = {
-  LIST: '/api/results/',
-  DETAIL: (id: number) => `/api/results/${id}/`,
-  ENTER: (id: number) => `/api/results/${id}/enter/`,
-  VERIFY: (id: number) => `/api/results/${id}/verify/`,
-  PUBLISH: (id: number) => `/api/results/${id}/publish/`,
+  LIST: '/results/',
+  DETAIL: (id: number) => `/results/${id}/`,
+  ENTER: (id: number) => `/results/${id}/enter/`,
+  VERIFY: (id: number) => `/results/${id}/verify/`,
+  PUBLISH: (id: number) => `/results/${id}/publish/`,
 } as const
 
 // Report endpoints
 export const REPORT_ENDPOINTS = {
-  LIST: '/api/reports/',
-  DETAIL: (id: number) => `/api/reports/${id}/`,
-  GENERATE: (orderId: number) => `/api/reports/generate/${orderId}/`,
-  DOWNLOAD: (id: number) => `/api/reports/${id}/download/`,
+  LIST: '/reports/',
+  DETAIL: (id: number) => `/reports/${id}/`,
+  GENERATE: (orderId: number) => `/reports/generate/${orderId}/`,
+  DOWNLOAD: (id: number) => `/reports/${id}/download/`,
 } as const
 
 // Dashboard endpoints
 export const DASHBOARD_ENDPOINTS = {
-  ANALYTICS: '/api/dashboard/analytics/',
+  ANALYTICS: '/dashboard/analytics/',
 } as const
 
 // Health endpoint
-export const HEALTH_ENDPOINT = '/api/health/'
+export const HEALTH_ENDPOINT = '/health/'
 
 // Route paths
 export const ROUTES = {

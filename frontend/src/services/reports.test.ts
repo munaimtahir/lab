@@ -35,7 +35,7 @@ describe('reportService', () => {
 
       const result = await reportService.getAll()
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/reports/')
+      expect(apiClient.get).toHaveBeenCalledWith('/reports/')
       expect(result).toEqual(mockReports)
     })
   })
@@ -53,7 +53,7 @@ describe('reportService', () => {
 
       const result = await reportService.getById(1)
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/reports/1/')
+      expect(apiClient.get).toHaveBeenCalledWith('/reports/1/')
       expect(result).toEqual(mockReport)
     })
   })
@@ -71,7 +71,7 @@ describe('reportService', () => {
 
       const result = await reportService.generate(1)
 
-      expect(apiClient.post).toHaveBeenCalledWith('/api/reports/generate/1/')
+      expect(apiClient.post).toHaveBeenCalledWith('/reports/generate/1/')
       expect(result).toEqual(mockReport)
     })
   })
@@ -80,7 +80,7 @@ describe('reportService', () => {
     it('should return the download URL for a report', () => {
       const url = reportService.getDownloadUrl(1)
 
-      expect(url).toBe(`${TEST_API_BASE_URL}/api/reports/1/download/`)
+      expect(url).toBe(`${TEST_API_BASE_URL}/reports/1/download/`)
     })
   })
 })

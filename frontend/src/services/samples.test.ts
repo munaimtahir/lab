@@ -29,7 +29,7 @@ describe('sampleService', () => {
 
       const result = await sampleService.getAll()
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/samples/')
+      expect(apiClient.get).toHaveBeenCalledWith('/samples/')
       expect(result).toEqual(mockSamples)
     })
 
@@ -48,7 +48,7 @@ describe('sampleService', () => {
       const result = await sampleService.getAll({ status: 'COLLECTED' })
 
       expect(apiClient.get).toHaveBeenCalledWith(
-        '/api/samples/?status=COLLECTED'
+        '/samples/?status=COLLECTED'
       )
       expect(result).toEqual(mockSamples)
     })
@@ -67,7 +67,7 @@ describe('sampleService', () => {
 
       const result = await sampleService.getById(1)
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/samples/1/')
+      expect(apiClient.get).toHaveBeenCalledWith('/samples/1/')
       expect(result).toEqual(mockSample)
     })
   })
@@ -85,7 +85,7 @@ describe('sampleService', () => {
 
       const result = await sampleService.collect(1)
 
-      expect(apiClient.post).toHaveBeenCalledWith('/api/samples/1/collect/')
+      expect(apiClient.post).toHaveBeenCalledWith('/samples/1/collect/')
       expect(result).toEqual(mockSample)
     })
   })
@@ -103,7 +103,7 @@ describe('sampleService', () => {
 
       const result = await sampleService.receive(1)
 
-      expect(apiClient.post).toHaveBeenCalledWith('/api/samples/1/receive/')
+      expect(apiClient.post).toHaveBeenCalledWith('/samples/1/receive/')
       expect(result).toEqual(mockSample)
     })
   })
@@ -122,7 +122,7 @@ describe('sampleService', () => {
 
       const result = await sampleService.reject(1, 'Hemolyzed sample')
 
-      expect(apiClient.post).toHaveBeenCalledWith('/api/samples/1/reject/', {
+      expect(apiClient.post).toHaveBeenCalledWith('/samples/1/reject/', {
         rejection_reason: 'Hemolyzed sample',
       })
       expect(result).toEqual(mockSample)

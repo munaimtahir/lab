@@ -108,11 +108,28 @@ test_endpoint_content "Backend health (via proxy)" "${BASE_URL}/api/health/" "he
 # Test 4: Backend auth endpoint should be accessible
 test_endpoint "Backend auth endpoint" "${BASE_URL}/api/auth/login/" "405"  # POST-only, so GET returns 405
 
+# Test 5: Verify no double /api/api/ issue
+echo -n "Testing no double /api/api/ bug... "
+if curl -fsS --max-time "${TIMEOUT}" "${BASE_URL}/api/api/health/" 2>&1 | grep -q "Not Found"; then
+    echo -e "${GREEN}✓ PASS${NC} (correctly returns 404 for /api/api/)"
+    PASSED=$((PASSED + 1))
+else
+    response=$(curl -fsS --max-time "${TIMEOUT}" -w "\n%{http_code}" "${BASE_URL}/api/api/health/" 2>&1 || true)
+    status_code=$(echo "$response" | tail -n1)
+    if [ "$status_code" = "404" ]; then
+        echo -e "${GREEN}✓ PASS${NC} (correctly returns 404 for /api/api/)"
+        PASSED=$((PASSED + 1))
+    else
+        echo -e "${RED}✗ FAIL${NC} (double /api/api/ path should not exist)"
+        FAILED=$((FAILED + 1))
+    fi
+fi
+
 echo ""
 echo "3. Static Assets Tests"
 echo "----------------------------------------"
 
-# Test 5: Admin panel should be accessible (even if requires login)
+# Test 6: Admin panel should be accessible (even if requires login)
 test_endpoint "Admin panel" "${BASE_URL}/admin/" "200"
 
 echo ""
