@@ -58,8 +58,9 @@ class TestAuthenticationAPI:
         assert response.status_code == status.HTTP_200_OK
         assert "access" in response.data
         assert "refresh" in response.data
-        assert response.data["role"] == "RECEPTION"
-        assert response.data["username"] == "testuser"
+        assert "user" in response.data
+        assert response.data["user"]["role"] == "RECEPTION"
+        assert response.data["user"]["username"] == "testuser"
 
     def test_login_invalid_credentials(self):
         """Test login with invalid credentials."""
