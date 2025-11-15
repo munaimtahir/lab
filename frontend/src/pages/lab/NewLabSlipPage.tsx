@@ -282,13 +282,10 @@ export function NewLabSlipPage() {
 
       // Create order
       const order = await orderService.create({
-        patient_id: patientId,
+        patient: patientId,
         test_ids: selectedTests.map(t => t.id),
-        bill_amount: billAmount,
-        discount,
-        amount_paid: amountPaid,
-        report_date: reportDate,
-        report_time: reportTime,
+        priority: 'ROUTINE',
+        notes: '',
       })
 
       if (printImmediately) {

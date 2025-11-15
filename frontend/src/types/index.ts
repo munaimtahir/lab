@@ -129,25 +129,29 @@ export type OrderStatus =
   | 'PUBLISHED'
   | 'CANCELLED'
 
+export type OrderPriority = 'ROUTINE' | 'URGENT' | 'STAT'
+
 export interface OrderItem {
   id: number
-  test: Test
+  test: TestCatalog
+  test_detail?: TestCatalog
   status: OrderStatus
+  created_at: string
+  updated_at: string
 }
 
 export interface Order {
   id: number
-  order_number: string
+  order_no: string
   patient: Patient
+  patient_detail?: Patient
   items: OrderItem[]
+  priority: OrderPriority
   status: OrderStatus
+  notes?: string
   created_at: string
-  created_by: User
-  bill_amount: number
-  discount: number
-  amount_paid: number
-  report_date?: string
-  report_time?: string
+  updated_at: string
+  created_by?: User
 }
 
 // Sample types

@@ -154,7 +154,7 @@ export function LabWorklistPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-lg">
-                      {order.order_number}
+                      {order.order_no}
                     </h3>
                     <p className="text-sm text-blue-100">
                       {order.patient.full_name}
@@ -187,7 +187,7 @@ export function LabWorklistPage() {
               <div className="p-4">
                 <div className="text-sm text-gray-600 mb-3">
                   <p>{formatDateTime(order.created_at)}</p>
-                  <p>By: {order.created_by.username}</p>
+                  {order.created_by && <p>By: {order.created_by.username}</p>}
                 </div>
 
                 {/* Test Items */}

@@ -25,7 +25,7 @@ describe('reportService', () => {
       const mockReports = [
         {
           id: 1,
-          order: { id: 1, order_number: 'ORD-20240101-0001' },
+          order: { id: 1, order_no: 'ORD-20240101-0001' },
           pdf_file: '/media/reports/report_1.pdf',
           generated_at: '2024-01-01T10:00:00Z',
           generated_by: { id: 1, username: 'pathologist' },
@@ -44,7 +44,7 @@ describe('reportService', () => {
     it('should fetch a report by id', async () => {
       const mockReport = {
         id: 1,
-        order: { id: 1, order_number: 'ORD-20240101-0001' },
+        order: { id: 1, order_no: 'ORD-20240101-0001' },
         pdf_file: '/media/reports/report_1.pdf',
         generated_at: '2024-01-01T10:00:00Z',
         generated_by: { id: 1, username: 'pathologist' },
@@ -62,7 +62,7 @@ describe('reportService', () => {
     it('should generate a report for an order', async () => {
       const mockReport = {
         id: 1,
-        order: { id: 1, order_number: 'ORD-20240101-0001' },
+        order: { id: 1, order_no: 'ORD-20240101-0001' },
         pdf_file: '/media/reports/report_1.pdf',
         generated_at: '2024-01-01T10:00:00Z',
         generated_by: { id: 1, username: 'pathologist' },

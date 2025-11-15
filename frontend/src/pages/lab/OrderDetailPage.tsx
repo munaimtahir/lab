@@ -613,7 +613,7 @@ export function OrderDetailPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Order Detail
           </h1>
-          <p className="text-gray-600">{order.order_number}</p>
+          <p className="text-gray-600">{order.order_no}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           {canEditTests && (
@@ -761,7 +761,7 @@ export function OrderDetailPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Order Number:</span>
-                    <p className="font-medium">{order.order_number}</p>
+                    <p className="font-medium">{order.order_no}</p>
                   </div>
                   <div>
                     <span className="text-gray-600">Created:</span>
@@ -771,7 +771,7 @@ export function OrderDetailPage() {
                   </div>
                   <div>
                     <span className="text-gray-600">Created By:</span>
-                    <p className="font-medium">{order.created_by.username}</p>
+                    <p className="font-medium">{order.created_by?.username || 'N/A'}</p>
                   </div>
                   <div>
                     <span className="text-gray-600">Status:</span>

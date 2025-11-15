@@ -16,7 +16,7 @@ vi.mock('../../services/auth', () => ({
 
 const mockOrder = {
   id: 1,
-  order_number: 'ORD-001',
+  order_no: 'ORD-001',
   patient: {
     id: 1,
     mrn: 'PAT-001',
@@ -38,21 +38,25 @@ const mockOrder = {
         id: 1,
         code: 'CBC',
         name: 'Complete Blood Count',
+        description: '',
+        category: 'Hematology',
+        sample_type: 'Blood',
         price: 500,
-        specimen: 'Blood',
-        department: 'Hematology',
-        result_type: 'numeric' as const,
+        turnaround_time_hours: 24,
         is_active: true,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
       },
       status: 'NEW' as const,
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
     },
   ],
+  priority: 'ROUTINE' as const,
   status: 'NEW' as const,
+  notes: '',
   created_at: '2024-01-01T00:00:00Z',
-  created_by: { id: 1, username: 'admin', role: 'ADMIN' } as unknown as User,
-  bill_amount: 500,
-  discount: 0,
-  amount_paid: 500,
+  updated_at: '2024-01-01T00:00:00Z',
 }
 
 describe('OrderDetailPage', () => {
