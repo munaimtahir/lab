@@ -1,0 +1,67 @@
+---
+name: "Registration Form — Bug & Improvement Report"
+about: "Use this template to log issues or required changes in the patient registration form."
+title: "[Registration Form] "
+labels: ["bug", "frontend", "backend", "UI/UX"]
+assignees: ""
+---
+
+## Summary
+Briefly describe the issue or improvement needed.
+
+---
+
+## Issues & Required Changes
+
+### 1. Age & Date of Birth Logic
+- Age field should be directly editable.
+- Age and Date of Birth must sync both ways:
+  - Entering Age → system calculates DOB.
+  - Entering DOB → system calculates Age.
+- Age must have 3 fields (Years / Months / Days).
+- At least one of the three age fields should be required.
+- Blank age fields should be treated as zero.
+
+### 2. CNIC Field (Optional)
+- CNIC should not be mandatory.
+- When empty, system should pass `null` to API.
+
+### 3. Mobile Number Search
+- After entering mobile number, system should run a quick indexed search.
+- Should show previous MR numbers or existing registrations linked to this mobile.
+
+### 4. Test Selection Autocomplete
+- Test selection field must show live suggestions with each typed letter.
+- No need to write the full name before suggestions appear.
+
+### 5. Cash Calculation Bug
+- Total amount shows correctly for 1 test.
+- When more than 1 test is added, total becomes **NaN**.
+- After deleting tests and keeping only one, amount reappears.
+- Needs correction for multi-test calculations.
+
+### 6. Order Save / Save & Print Error
+- “Failed to create new order” error appears.
+- Network analysis suggests incorrect or missing API parameters.
+- Only mandatory fields should be:
+  - Name  
+  - Age  
+  - Phone Number
+- Add missing fields required by API (e.g., Father’s Name).
+- Empty optional fields should be sent as `null`.
+
+---
+
+## Screenshots / Logs (if any)
+_Paste error messages, screenshots, or console/network logs here._
+
+---
+
+## Expected Behaviour
+Describe how the form should ideally behave after fixes.
+
+---
+
+## Additional Notes
+Add any extra information the dev team may need.
+
