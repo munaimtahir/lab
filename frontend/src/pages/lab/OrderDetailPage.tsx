@@ -613,7 +613,7 @@ export function OrderDetailPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Order Detail
           </h1>
-          <p className="text-gray-600">{order.order_number}</p>
+          <p className="text-gray-600">{order.order_no}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           {canEditTests && (
@@ -727,9 +727,9 @@ export function OrderDetailPage() {
                   <div>
                     <span className="text-gray-600">Gender:</span>
                     <p className="font-medium">
-                      {order.patient.gender === 'M'
+                      {order.patient.sex === 'M'
                         ? 'Male'
-                        : order.patient.gender === 'F'
+                        : order.patient.sex === 'F'
                           ? 'Female'
                           : 'Other'}
                     </p>
@@ -737,7 +737,9 @@ export function OrderDetailPage() {
                   <div>
                     <span className="text-gray-600">Age:</span>
                     <p className="font-medium">
-                      {order.patient.age} {order.patient.age_unit}
+                      {order.patient.age_years !== undefined && order.patient.age_years !== null
+                        ? `${order.patient.age_years} years`
+                        : 'N/A'}
                     </p>
                   </div>
                   <div>
@@ -759,7 +761,7 @@ export function OrderDetailPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Order Number:</span>
-                    <p className="font-medium">{order.order_number}</p>
+                    <p className="font-medium">{order.order_no}</p>
                   </div>
                   <div>
                     <span className="text-gray-600">Created:</span>
@@ -769,7 +771,7 @@ export function OrderDetailPage() {
                   </div>
                   <div>
                     <span className="text-gray-600">Created By:</span>
-                    <p className="font-medium">{order.created_by.username}</p>
+                    <p className="font-medium">{order.created_by?.username || 'N/A'}</p>
                   </div>
                   <div>
                     <span className="text-gray-600">Status:</span>
@@ -812,7 +814,7 @@ export function OrderDetailPage() {
                             {item.test.code}
                           </td>
                           <td className="py-2 px-3 text-sm text-gray-600">
-                            {item.test.specimen}
+                            {item.test.sample_type}
                           </td>
                           <td className="py-2 px-3 text-right font-medium">
                             {formatCurrency(item.test.price)}
@@ -838,23 +840,14 @@ export function OrderDetailPage() {
                 </h3>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex justify-between mb-2">
-                    <span>Bill Amount:</span>
+                    <span>Total Amount:</span>
                     <span className="font-medium">
-                      {formatCurrency(order.bill_amount)}
+                      {formatCurrency(order.items.reduce((sum, item) => sum + Number(item.test.price || 0), 0))}
                     </span>
                   </div>
-                  <div className="flex justify-between mb-2">
-                    <span>Discount:</span>
-                    <span className="font-medium">
-                      {formatCurrency(order.discount)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-t pt-2">
-                    <span className="font-semibold">Amount Paid:</span>
-                    <span className="font-semibold text-blue-600">
-                      {formatCurrency(order.amount_paid)}
-                    </span>
-                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Detailed billing information coming soon
+                  </p>
                 </div>
               </div>
             </div>
@@ -881,7 +874,7 @@ export function OrderDetailPage() {
                             {item.test.name}
                           </h4>
                           <p className="text-sm text-gray-600">
-                            Specimen: {item.test.specimen}
+                            Sample Type: {item.test.sample_type}
                           </p>
                         </div>
                         {sample && (
@@ -1029,8 +1022,8 @@ export function OrderDetailPage() {
                             {item.test.name}
                           </h4>
                           <p className="text-sm text-gray-600">
-                            {item.test.reference_range &&
-                              `Reference: ${item.test.reference_range}`}
+                            {result?.reference_range &&
+                              `Reference: ${result.reference_range}`}
                           </p>
                         </div>
                         <div className="flex flex-col items-end gap-1">
@@ -1166,7 +1159,7 @@ export function OrderDetailPage() {
                                     })
                                   }
                                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  placeholder={item.test.unit || 'Unit'}
+                                  placeholder="Unit"
                                 />
                               </div>
 

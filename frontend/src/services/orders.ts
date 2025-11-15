@@ -3,13 +3,10 @@ import { ORDER_ENDPOINTS } from '../utils/constants'
 import type { Order } from '../types'
 
 interface CreateOrderData {
-  patient_id: number
+  patient: number
   test_ids: number[]
-  bill_amount: number
-  discount?: number
-  amount_paid?: number
-  report_date?: string
-  report_time?: string
+  priority?: 'ROUTINE' | 'URGENT' | 'STAT'
+  notes?: string
 }
 
 interface EditOrderTestsData {
