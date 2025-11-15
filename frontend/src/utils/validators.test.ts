@@ -6,6 +6,8 @@ import {
   formatPhone,
   validateDOB,
   calculateAge,
+  calculateAgeFromDOB,
+  calculateDOBFromAge,
   formatCurrency,
 } from './validators'
 
@@ -92,6 +94,66 @@ describe('validators', () => {
       const result = calculateAge(today)
       expect(result.unit).toBe('days')
       expect(result.age).toBe(0)
+    })
+  })
+
+  describe('Age from DOB calculation', () => {
+    it('calculates age components correctly', () => {
+      const fiveYearsAgo = new Date()
+      fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5)
+      const result = calculateAgeFromDOB(
+        fiveYearsAgo.toISOString().split('T')[0]
+      )
+      expect(result.years).toBeGreaterThanOrEqual(4)
+      expect(result.years).toBeLessThanOrEqual(5)
+      expect(result.months).toBeGreaterThanOrEqual(0)
+      expect(result.days).toBeGreaterThanOrEqual(0)
+    })
+
+    it('handles newborn correctly', () => {
+      const today = new Date().toISOString().split('T')[0]
+      const result = calculateAgeFromDOB(today)
+      expect(result.years).toBe(0)
+      expect(result.months).toBe(0)
+      expect(result.days).toBe(0)
+    })
+  })
+
+  describe('DOB from age calculation', () => {
+    it('calculates DOB from age years', () => {
+      const dob = calculateDOBFromAge(5, 0, 0)
+      const today = new Date()
+      const dobDate = new Date(dob)
+      const yearDiff = today.getFullYear() - dobDate.getFullYear()
+      expect(yearDiff).toBeGreaterThanOrEqual(4)
+      expect(yearDiff).toBeLessThanOrEqual(5)
+    })
+
+    it('calculates DOB from age months', () => {
+      const dob = calculateDOBFromAge(0, 6, 0)
+      const today = new Date()
+      const dobDate = new Date(dob)
+      const monthDiff =
+        (today.getFullYear() - dobDate.getFullYear()) * 12 +
+        (today.getMonth() - dobDate.getMonth())
+      expect(monthDiff).toBeGreaterThanOrEqual(5)
+      expect(monthDiff).toBeLessThanOrEqual(7)
+    })
+
+    it('handles zero age as today', () => {
+      const dob = calculateDOBFromAge(0, 0, 0)
+      const today = new Date().toISOString().split('T')[0]
+      expect(dob).toBe(today)
+    })
+
+    it('treats undefined values as zero', () => {
+      const dob1 = calculateDOBFromAge(0, 0, 0)
+      const dob2 = calculateDOBFromAge(
+        undefined as unknown as number,
+        undefined as unknown as number,
+        undefined as unknown as number
+      )
+      expect(dob1).toBe(dob2)
     })
   })
 

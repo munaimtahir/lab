@@ -10,7 +10,8 @@ import {
   validateDOB,
   formatCNIC,
   formatPhone,
-  calculateAge,
+  calculateAgeFromDOB,
+  calculateDOBFromAge,
   formatCurrency,
 } from '../../utils/validators'
 import { ROUTES } from '../../utils/constants'
@@ -22,8 +23,9 @@ interface PatientFormData {
   patient_id: string
   gender: 'M' | 'F' | 'O'
   date_of_birth: string
-  age: number
-  age_unit: 'years' | 'months' | 'days'
+  age_years: number
+  age_months: number
+  age_days: number
 }
 
 export function NewLabSlipPage() {
@@ -37,8 +39,9 @@ export function NewLabSlipPage() {
     patient_id: '',
     gender: 'M',
     date_of_birth: '',
-    age: 0,
-    age_unit: 'years',
+    age_years: 0,
+    age_months: 0,
+    age_days: 0,
   })
 
   const [existingPatient, setExistingPatient] = useState<Patient | null>(null)
@@ -66,10 +69,15 @@ export function NewLabSlipPage() {
   // Search for existing patients by CNIC or phone
   useEffect(() => {
     const searchPatients = async () => {
-      if (patientData.cnic.length >= 5 || patientData.phone.length >= 5) {
-        const query = patientData.cnic || patientData.phone
-        const patients = await patientService.search(query)
-        setPatientSuggestions(patients)
+      if (patientData.phone.length >= 5 || patientData.cnic.length >= 5) {
+        const query = patientData.phone || patientData.cnic
+        try {
+          const patients = await patientService.search(query)
+          setPatientSuggestions(patients)
+        } catch (error) {
+          console.error('Failed to search patients:', error)
+          setPatientSuggestions([])
+        }
       } else {
         setPatientSuggestions([])
       }
@@ -77,58 +85,108 @@ export function NewLabSlipPage() {
 
     const debounce = setTimeout(searchPatients, 300)
     return () => clearTimeout(debounce)
-  }, [patientData.cnic, patientData.phone])
+  }, [patientData.phone, patientData.cnic])
 
-  // Search tests
+  // Search tests with live autocomplete
   useEffect(() => {
     const searchTests = async () => {
-      if (testSearch.length >= 2) {
-        const tests = await catalogService.search(testSearch)
-        setTestSuggestions(
-          tests.filter(t => !selectedTests.find(s => s.id === t.id))
-        )
+      if (testSearch.length >= 1) {
+        try {
+          const tests = await catalogService.search(testSearch)
+          setTestSuggestions(
+            tests.filter(t => !selectedTests.find(s => s.id === t.id))
+          )
+        } catch (error) {
+          console.error('Failed to search tests:', error)
+          setTestSuggestions([])
+        }
       } else {
         setTestSuggestions([])
       }
     }
 
-    const debounce = setTimeout(searchTests, 300)
+    const debounce = setTimeout(searchTests, 200)
     return () => clearTimeout(debounce)
   }, [testSearch, selectedTests])
 
-  // Calculate age from DOB
-  useEffect(() => {
-    if (patientData.date_of_birth && validateDOB(patientData.date_of_birth)) {
-      const { age, unit } = calculateAge(patientData.date_of_birth)
-      setPatientData(prev => ({ ...prev, age, age_unit: unit }))
-    }
-  }, [patientData.date_of_birth])
-
-  const handlePatientChange = (field: keyof PatientFormData, value: string) => {
+  const handlePatientChange = (
+    field: keyof PatientFormData,
+    value: string | number
+  ) => {
     let formattedValue = value
 
-    if (field === 'cnic') {
+    if (field === 'cnic' && typeof value === 'string') {
       formattedValue = formatCNIC(value)
-    } else if (field === 'phone') {
+    } else if (field === 'phone' && typeof value === 'string') {
       formattedValue = formatPhone(value)
     }
 
-    setPatientData(prev => ({ ...prev, [field]: formattedValue }))
+    // Update the specific field
+    const updates: Partial<PatientFormData> = { [field]: formattedValue }
+
+    // If DOB changed, recalculate age
+    if (field === 'date_of_birth' && typeof value === 'string') {
+      if (validateDOB(value)) {
+        const age = calculateAgeFromDOB(value)
+        updates.age_years = age.years
+        updates.age_months = age.months
+        updates.age_days = age.days
+      }
+    }
+
+    // If any age field changed, recalculate DOB
+    if (
+      field === 'age_years' ||
+      field === 'age_months' ||
+      field === 'age_days'
+    ) {
+      const years =
+        field === 'age_years'
+          ? Number(value) || 0
+          : patientData.age_years || 0
+      const months =
+        field === 'age_months'
+          ? Number(value) || 0
+          : patientData.age_months || 0
+      const days =
+        field === 'age_days'
+          ? Number(value) || 0
+          : patientData.age_days || 0
+
+      // Recalculate DOB from age
+      updates.date_of_birth = calculateDOBFromAge(years, months, days)
+    }
+
+    setPatientData(prev => ({ ...prev, ...updates }))
     setExistingPatient(null)
     setErrors(prev => ({ ...prev, [field]: '' }))
   }
 
   const selectPatient = (patient: Patient) => {
     setExistingPatient(patient)
+    
+    // Calculate age from DOB if available
+    let ageYears = 0
+    let ageMonths = 0
+    let ageDays = 0
+    
+    if (patient.date_of_birth && validateDOB(patient.date_of_birth)) {
+      const age = calculateAgeFromDOB(patient.date_of_birth)
+      ageYears = age.years
+      ageMonths = age.months
+      ageDays = age.days
+    }
+    
     setPatientData({
-      cnic: patient.cnic,
+      cnic: patient.cnic || '',
       phone: patient.phone,
       full_name: patient.full_name,
       patient_id: patient.mrn,
       gender: patient.gender,
-      date_of_birth: patient.date_of_birth,
-      age: patient.age || 0,
-      age_unit: patient.age_unit || 'years',
+      date_of_birth: patient.date_of_birth || '',
+      age_years: ageYears,
+      age_months: ageMonths,
+      age_days: ageDays,
     })
     setPatientSuggestions([])
   }
@@ -143,7 +201,11 @@ export function NewLabSlipPage() {
     setSelectedTests(prev => prev.filter(t => t.id !== testId))
   }
 
-  const billAmount = selectedTests.reduce((sum, test) => sum + test.price, 0)
+  // Fix cash calculation to handle NaN properly
+  const billAmount = selectedTests.reduce((sum, test) => {
+    const price = Number(test.price) || 0
+    return sum + price
+  }, 0)
   const netAmount = billAmount - discount
   const change = amountPaid - netAmount
 
@@ -153,15 +215,25 @@ export function NewLabSlipPage() {
     if (!patientData.full_name.trim()) {
       newErrors.full_name = 'Full name is required'
     }
-    if (!patientData.cnic || !validateCNIC(patientData.cnic)) {
-      newErrors.cnic = 'Valid CNIC is required (e.g., 12345-1234567-1)'
+    // CNIC is now optional
+    if (patientData.cnic && !validateCNIC(patientData.cnic)) {
+      newErrors.cnic = 'Valid CNIC format required (e.g., 12345-1234567-1)'
     }
     if (!patientData.phone || !validatePhone(patientData.phone)) {
       newErrors.phone = 'Valid phone number is required'
     }
-    if (!patientData.date_of_birth || !validateDOB(patientData.date_of_birth)) {
-      newErrors.date_of_birth = 'Valid date of birth is required'
+    
+    // Either DOB or at least one age field must be provided
+    const hasAge =
+      patientData.age_years > 0 ||
+      patientData.age_months > 0 ||
+      patientData.age_days > 0
+    const hasDOB = patientData.date_of_birth && validateDOB(patientData.date_of_birth)
+    
+    if (!hasAge && !hasDOB) {
+      newErrors.age = 'Either date of birth or at least one age field is required'
     }
+    
     if (selectedTests.length === 0) {
       newErrors.tests = 'At least one test must be selected'
     }
@@ -179,13 +251,31 @@ export function NewLabSlipPage() {
       let patientId = existingPatient?.id
 
       if (!patientId) {
-        const newPatient = await patientService.create({
-          cnic: patientData.cnic,
+        // Prepare patient data - send only required fields and non-empty optional fields
+        const patientPayload: Record<string, string | number | undefined> = {
           phone: patientData.phone,
           full_name: patientData.full_name,
-          gender: patientData.gender,
-          date_of_birth: patientData.date_of_birth,
-        })
+          sex: patientData.gender,
+        }
+        
+        // Add CNIC only if provided (optional field)
+        if (patientData.cnic && validateCNIC(patientData.cnic)) {
+          patientPayload.cnic = patientData.cnic
+        }
+        
+        // Add age fields if provided
+        if (patientData.age_years > 0 || patientData.age_months > 0 || patientData.age_days > 0) {
+          patientPayload.age_years = patientData.age_years || 0
+          patientPayload.age_months = patientData.age_months || 0
+          patientPayload.age_days = patientData.age_days || 0
+        }
+        
+        // Add DOB if provided
+        if (patientData.date_of_birth && validateDOB(patientData.date_of_birth)) {
+          patientPayload.dob = patientData.date_of_birth
+        }
+        
+        const newPatient = await patientService.create(patientPayload)
         patientId = newPatient.id
       }
 
@@ -207,9 +297,13 @@ export function NewLabSlipPage() {
 
       // Navigate to order detail or lab home
       navigate(ROUTES.LAB_ORDER_DETAIL(order.id))
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to create order:', error)
-      setErrors({ submit: 'Failed to create order. Please try again.' })
+      const err = error as { response?: { data?: { detail?: string } }; message?: string }
+      const errorMessage = err?.response?.data?.detail || 
+                          err?.message || 
+                          'Failed to create order. Please try again.'
+      setErrors({ submit: errorMessage })
     } finally {
       setIsSubmitting(false)
     }
@@ -232,10 +326,10 @@ export function NewLabSlipPage() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* CNIC */}
+          {/* CNIC - Now Optional */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              CNIC <span className="text-red-500">*</span>
+              CNIC <span className="text-gray-400 text-xs">(Optional)</span>
             </label>
             <input
               type="text"
@@ -264,7 +358,7 @@ export function NewLabSlipPage() {
                   >
                     <div className="font-medium">{patient.full_name}</div>
                     <div className="text-xs text-gray-600">
-                      {patient.cnic} - {patient.phone}
+                      MRN: {patient.mrn} | {patient.phone}
                     </div>
                   </button>
                 ))}
@@ -272,8 +366,8 @@ export function NewLabSlipPage() {
             )}
           </div>
 
-          {/* Mobile */}
-          <div>
+          {/* Mobile - with patient search */}
+          <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Mobile <span className="text-red-500">*</span>
             </label>
@@ -344,10 +438,11 @@ export function NewLabSlipPage() {
             </select>
           </div>
 
-          {/* DOB */}
+          {/* DOB - Now editable and synced with Age */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Date of Birth <span className="text-red-500">*</span>
+              Date of Birth{' '}
+              <span className="text-gray-400 text-xs">(or enter age below)</span>
             </label>
             <input
               type="date"
@@ -357,40 +452,90 @@ export function NewLabSlipPage() {
                 handlePatientChange('date_of_birth', e.target.value)
               }
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.date_of_birth
+                errors.age
                   ? 'border-red-500 focus:ring-red-500'
                   : 'border-gray-300 focus:ring-blue-500'
               }`}
             />
-            {errors.date_of_birth && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.date_of_birth}
-              </p>
-            )}
           </div>
 
-          {/* Age (calculated) */}
-          <div>
+          {/* Age - Split into 3 editable fields */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Age
+              Age{' '}
+              <span className="text-red-500">*</span>{' '}
+              <span className="text-gray-400 text-xs">
+                (at least one field required)
+              </span>
             </label>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                value={patientData.age}
-                readOnly
-                className="w-20 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
-              />
-              <select
-                value={patientData.age_unit}
-                disabled
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
-              >
-                <option value="years">Years</option>
-                <option value="months">Months</option>
-                <option value="days">Days</option>
-              </select>
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <input
+                  type="number"
+                  min="0"
+                  max="150"
+                  value={patientData.age_years || ''}
+                  onChange={e =>
+                    handlePatientChange(
+                      'age_years',
+                      e.target.value ? Number(e.target.value) : 0
+                    )
+                  }
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    errors.age
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
+                  placeholder="Years"
+                />
+                <p className="text-xs text-gray-500 mt-1">Years</p>
+              </div>
+              <div>
+                <input
+                  type="number"
+                  min="0"
+                  max="11"
+                  value={patientData.age_months || ''}
+                  onChange={e =>
+                    handlePatientChange(
+                      'age_months',
+                      e.target.value ? Number(e.target.value) : 0
+                    )
+                  }
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    errors.age
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
+                  placeholder="Months"
+                />
+                <p className="text-xs text-gray-500 mt-1">Months</p>
+              </div>
+              <div>
+                <input
+                  type="number"
+                  min="0"
+                  max="30"
+                  value={patientData.age_days || ''}
+                  onChange={e =>
+                    handlePatientChange(
+                      'age_days',
+                      e.target.value ? Number(e.target.value) : 0
+                    )
+                  }
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
+                    errors.age
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-blue-500'
+                  }`}
+                  placeholder="Days"
+                />
+                <p className="text-xs text-gray-500 mt-1">Days</p>
+              </div>
             </div>
+            {errors.age && (
+              <p className="text-xs text-red-500 mt-1">{errors.age}</p>
+            )}
           </div>
         </div>
       </div>

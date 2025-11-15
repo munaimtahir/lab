@@ -39,22 +39,73 @@ export function formatPhone(value: string): string {
 
 // Date of Birth validation
 export function validateDOB(dob: string): boolean {
+  if (!dob) return false
   const date = new Date(dob)
   const today = new Date()
   return date <= today && !isNaN(date.getTime())
 }
 
-// Age calculation
-export function calculateAge(dob: string): {
-  age: number
-  unit: 'years' | 'months' | 'days'
+// Age calculation from DOB
+export function calculateAgeFromDOB(dob: string): {
+  years: number
+  months: number
+  days: number
 } {
   const birthDate = new Date(dob)
   const today = new Date()
 
-  const years = today.getFullYear() - birthDate.getFullYear()
-  const months = today.getMonth() - birthDate.getMonth()
-  const days = today.getDate() - birthDate.getDate()
+  let years = today.getFullYear() - birthDate.getFullYear()
+  let months = today.getMonth() - birthDate.getMonth()
+  let days = today.getDate() - birthDate.getDate()
+
+  // Adjust for negative days
+  if (days < 0) {
+    months--
+    const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0)
+    days += lastMonth.getDate()
+  }
+
+  // Adjust for negative months
+  if (months < 0) {
+    years--
+    months += 12
+  }
+
+  return {
+    years: Math.max(0, years),
+    months: Math.max(0, months),
+    days: Math.max(0, days),
+  }
+}
+
+// Calculate DOB from age
+export function calculateDOBFromAge(
+  years: number,
+  months: number,
+  days: number
+): string {
+  const today = new Date()
+  
+  // Treat empty/null values as 0
+  const y = years || 0
+  const m = months || 0
+  const d = days || 0
+  
+  // Calculate the date
+  const dob = new Date(today)
+  dob.setFullYear(today.getFullYear() - y)
+  dob.setMonth(today.getMonth() - m)
+  dob.setDate(today.getDate() - d)
+  
+  return dob.toISOString().split('T')[0]
+}
+
+// Legacy function for backward compatibility
+export function calculateAge(dob: string): {
+  age: number
+  unit: 'years' | 'months' | 'days'
+} {
+  const { years, months, days } = calculateAgeFromDOB(dob)
 
   if (years > 0) {
     return { age: years, unit: 'years' }
