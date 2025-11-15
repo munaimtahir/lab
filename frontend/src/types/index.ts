@@ -198,9 +198,9 @@ export interface Result {
 export interface Report {
   id: number
   order: Order
-  pdf_file: string
+  pdf_file: string | null
   generated_at: string
-  generated_by: User
+  generated_by?: User | null
 }
 
 // Dashboard types

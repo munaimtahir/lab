@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { patientService } from '../../services/patients'
 import { catalogService } from '../../services/catalog'
 import { orderService } from '../../services/orders'
-import type { Patient, Test } from '../../types'
+import type { Patient, TestCatalog } from '../../types'
 import {
   validateCNIC,
   validatePhone,
@@ -49,8 +49,8 @@ export function NewLabSlipPage() {
 
   // Test selection state
   const [testSearch, setTestSearch] = useState('')
-  const [testSuggestions, setTestSuggestions] = useState<Test[]>([])
-  const [selectedTests, setSelectedTests] = useState<Test[]>([])
+  const [testSuggestions, setTestSuggestions] = useState<TestCatalog[]>([])
+  const [selectedTests, setSelectedTests] = useState<TestCatalog[]>([])
 
   // Billing state
   const [discount, setDiscount] = useState(0)
@@ -192,7 +192,7 @@ export function NewLabSlipPage() {
     setPatientSuggestions([])
   }
 
-  const addTest = (test: Test) => {
+  const addTest = (test: TestCatalog) => {
     setSelectedTests(prev => [...prev, test])
     setTestSearch('')
     setTestSuggestions([])
@@ -574,7 +574,7 @@ export function NewLabSlipPage() {
                     <div className="flex-1">
                       <div className="font-medium">{test.name}</div>
                       <div className="text-xs text-gray-600">
-                        {test.code} - {test.specimen}
+                        {test.code} - {test.sample_type}
                       </div>
                     </div>
                     <div className="text-sm font-semibold text-blue-600">
@@ -600,7 +600,7 @@ export function NewLabSlipPage() {
                     Code
                   </th>
                   <th className="text-left py-2 px-3 text-sm font-medium text-gray-700">
-                    Specimen
+                    Sample Type
                   </th>
                   <th className="text-right py-2 px-3 text-sm font-medium text-gray-700">
                     Price
@@ -618,7 +618,7 @@ export function NewLabSlipPage() {
                       {test.code}
                     </td>
                     <td className="py-2 px-3 text-sm text-gray-600">
-                      {test.specimen}
+                      {test.sample_type}
                     </td>
                     <td className="py-2 px-3 text-right font-medium">
                       {formatCurrency(test.price)}

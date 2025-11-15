@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { LabWorklistPage } from './LabWorklistPage'
 import { orderService } from '../../services/orders'
-import type { User } from '../../types'
 
 vi.mock('../../services/orders')
 

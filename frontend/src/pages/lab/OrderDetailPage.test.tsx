@@ -4,7 +4,6 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { OrderDetailPage } from './OrderDetailPage'
 import { orderService } from '../../services/orders'
 import { AuthProvider } from '../../hooks/useAuth'
-import type { User } from '../../types'
 
 vi.mock('../../services/orders')
 vi.mock('../../services/auth', () => ({

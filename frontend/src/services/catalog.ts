@@ -1,6 +1,6 @@
 import { apiClient } from './api'
 import { CATALOG_ENDPOINTS } from '../utils/constants'
-import type { Test, TestCatalog, TestCatalogFormData } from '../types'
+import type { TestCatalog, TestCatalogFormData } from '../types'
 
 interface PaginatedResponse<T> {
   count: number
@@ -10,8 +10,8 @@ interface PaginatedResponse<T> {
 }
 
 export const catalogService = {
-  async search(query: string): Promise<Test[]> {
-    const response = await apiClient.get<{ results: Test[] }>(
+  async search(query: string): Promise<TestCatalog[]> {
+    const response = await apiClient.get<{ results: TestCatalog[] }>(
       `${CATALOG_ENDPOINTS.LIST}?search=${encodeURIComponent(query)}`
     )
     return response.results || []

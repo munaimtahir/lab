@@ -210,7 +210,7 @@ export function LabWorklistPage() {
                 <div className="border-t pt-3 mb-3">
                   <div className="flex justify-between text-sm font-medium">
                     <span>Total:</span>
-                    <span>{formatCurrency(order.bill_amount)}</span>
+                    <span>{formatCurrency(order.items.reduce((sum, item) => sum + Number(item.test.price || 0), 0))}</span>
                   </div>
                 </div>
 
