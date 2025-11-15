@@ -16,6 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Collect static files (creates /app/staticfiles with Django admin CSS/JS)
+# Set SECRET_KEY for build time (collectstatic doesn't need real secret or DB)
+ENV DJANGO_SECRET_KEY=build-time-secret-key-for-collectstatic
+RUN python manage.py collectstatic --noinput
+
 # Expose port
 EXPOSE 8000
 
