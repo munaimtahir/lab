@@ -84,9 +84,13 @@ describe('NewLabSlipPage', () => {
         cnic: '12345-1234567-1',
         phone: '03001234567',
         full_name: 'John Doe',
-        gender: 'M' as const,
-        date_of_birth: '1990-01-01',
+        sex: 'M' as const,
+        dob: '1990-01-01',
+        age_years: 34,
+        age_months: null,
+        age_days: null,
         created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
       },
     ]
 

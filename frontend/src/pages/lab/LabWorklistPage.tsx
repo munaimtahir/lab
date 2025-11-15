@@ -168,16 +168,16 @@ export function LabWorklistPage() {
                 </div>
                 <div className="mt-2 text-sm text-blue-100">
                   <span>
-                    {order.patient.gender === 'M'
+                    {order.patient.sex === 'M'
                       ? 'Male'
-                      : order.patient.gender === 'F'
+                      : order.patient.sex === 'F'
                         ? 'Female'
                         : 'Other'}
                   </span>
-                  {order.patient.age && (
+                  {order.patient.age_years !== undefined && order.patient.age_years !== null && (
                     <span>
                       {' '}
-                      • {order.patient.age} {order.patient.age_unit}
+                      • {order.patient.age_years} years
                     </span>
                   )}
                 </div>

@@ -43,14 +43,21 @@ export interface LoginResponse {
 export interface Patient {
   id: number
   mrn: string
-  cnic: string
+  cnic?: string | null
   phone: string
   full_name: string
-  gender: 'M' | 'F' | 'O'
-  date_of_birth: string
-  age?: number
-  age_unit?: 'years' | 'months' | 'days'
+  father_name?: string
+  sex: 'M' | 'F' | 'O'
+  dob: string | null
+  age_years?: number | null
+  age_months?: number | null
+  age_days?: number | null
+  address?: string
+  origin_terminal?: number | null
+  is_offline_entry?: boolean
+  synced_at?: string | null
   created_at: string
+  updated_at: string
 }
 
 // Catalog types

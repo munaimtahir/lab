@@ -727,9 +727,9 @@ export function OrderDetailPage() {
                   <div>
                     <span className="text-gray-600">Gender:</span>
                     <p className="font-medium">
-                      {order.patient.gender === 'M'
+                      {order.patient.sex === 'M'
                         ? 'Male'
-                        : order.patient.gender === 'F'
+                        : order.patient.sex === 'F'
                           ? 'Female'
                           : 'Other'}
                     </p>
@@ -737,7 +737,9 @@ export function OrderDetailPage() {
                   <div>
                     <span className="text-gray-600">Age:</span>
                     <p className="font-medium">
-                      {order.patient.age} {order.patient.age_unit}
+                      {order.patient.age_years !== undefined && order.patient.age_years !== null
+                        ? `${order.patient.age_years} years`
+                        : 'N/A'}
                     </p>
                   </div>
                   <div>

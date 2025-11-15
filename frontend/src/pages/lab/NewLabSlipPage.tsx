@@ -21,8 +21,8 @@ interface PatientFormData {
   phone: string
   full_name: string
   patient_id: string
-  gender: 'M' | 'F' | 'O'
-  date_of_birth: string
+  sex: 'M' | 'F' | 'O'
+  dob: string
   age_years: number
   age_months: number
   age_days: number
@@ -37,8 +37,8 @@ export function NewLabSlipPage() {
     phone: '',
     full_name: '',
     patient_id: '',
-    gender: 'M',
-    date_of_birth: '',
+    sex: 'M',
+    dob: '',
     age_years: 0,
     age_months: 0,
     age_days: 0,
@@ -125,7 +125,7 @@ export function NewLabSlipPage() {
     const updates: Partial<PatientFormData> = { [field]: formattedValue }
 
     // If DOB changed, recalculate age
-    if (field === 'date_of_birth' && typeof value === 'string') {
+    if (field === 'dob' && typeof value === 'string') {
       if (validateDOB(value)) {
         const age = calculateAgeFromDOB(value)
         updates.age_years = age.years
@@ -154,7 +154,7 @@ export function NewLabSlipPage() {
           : patientData.age_days || 0
 
       // Recalculate DOB from age
-      updates.date_of_birth = calculateDOBFromAge(years, months, days)
+      updates.dob = calculateDOBFromAge(years, months, days)
     }
 
     setPatientData(prev => ({ ...prev, ...updates }))
@@ -165,13 +165,14 @@ export function NewLabSlipPage() {
   const selectPatient = (patient: Patient) => {
     setExistingPatient(patient)
     
-    // Calculate age from DOB if available
-    let ageYears = 0
-    let ageMonths = 0
-    let ageDays = 0
+    // Use age fields from patient if available, otherwise calculate from DOB
+    let ageYears = patient.age_years || 0
+    let ageMonths = patient.age_months || 0
+    let ageDays = patient.age_days || 0
     
-    if (patient.date_of_birth && validateDOB(patient.date_of_birth)) {
-      const age = calculateAgeFromDOB(patient.date_of_birth)
+    // If no age fields but DOB exists, calculate age
+    if (!patient.age_years && !patient.age_months && !patient.age_days && patient.dob && validateDOB(patient.dob)) {
+      const age = calculateAgeFromDOB(patient.dob)
       ageYears = age.years
       ageMonths = age.months
       ageDays = age.days
@@ -182,8 +183,8 @@ export function NewLabSlipPage() {
       phone: patient.phone,
       full_name: patient.full_name,
       patient_id: patient.mrn,
-      gender: patient.gender,
-      date_of_birth: patient.date_of_birth || '',
+      sex: patient.sex,
+      dob: patient.dob || '',
       age_years: ageYears,
       age_months: ageMonths,
       age_days: ageDays,
@@ -228,7 +229,7 @@ export function NewLabSlipPage() {
       patientData.age_years > 0 ||
       patientData.age_months > 0 ||
       patientData.age_days > 0
-    const hasDOB = patientData.date_of_birth && validateDOB(patientData.date_of_birth)
+    const hasDOB = patientData.dob && validateDOB(patientData.dob)
     
     if (!hasAge && !hasDOB) {
       newErrors.age = 'Either date of birth or at least one age field is required'
@@ -255,7 +256,7 @@ export function NewLabSlipPage() {
         const patientPayload: Record<string, string | number | undefined> = {
           phone: patientData.phone,
           full_name: patientData.full_name,
-          sex: patientData.gender,
+          sex: patientData.sex,
         }
         
         // Add CNIC only if provided (optional field)
@@ -271,8 +272,8 @@ export function NewLabSlipPage() {
         }
         
         // Add DOB if provided
-        if (patientData.date_of_birth && validateDOB(patientData.date_of_birth)) {
-          patientPayload.dob = patientData.date_of_birth
+        if (patientData.dob && validateDOB(patientData.dob)) {
+          patientPayload.dob = patientData.dob
         }
         
         const newPatient = await patientService.create(patientPayload)
@@ -428,8 +429,8 @@ export function NewLabSlipPage() {
               Gender
             </label>
             <select
-              value={patientData.gender}
-              onChange={e => handlePatientChange('gender', e.target.value)}
+              value={patientData.sex}
+              onChange={e => handlePatientChange('sex', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="M">Male</option>
@@ -446,10 +447,10 @@ export function NewLabSlipPage() {
             </label>
             <input
               type="date"
-              value={patientData.date_of_birth}
+              value={patientData.dob}
               max={new Date().toISOString().split('T')[0]}
               onChange={e =>
-                handlePatientChange('date_of_birth', e.target.value)
+                handlePatientChange('dob', e.target.value)
               }
               className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
                 errors.age
