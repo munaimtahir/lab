@@ -154,7 +154,7 @@ export function LabWorklistPage() {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-lg">
-                      {order.order_number}
+                      {order.order_no}
                     </h3>
                     <p className="text-sm text-blue-100">
                       {order.patient.full_name}
@@ -168,16 +168,16 @@ export function LabWorklistPage() {
                 </div>
                 <div className="mt-2 text-sm text-blue-100">
                   <span>
-                    {order.patient.gender === 'M'
+                    {order.patient.sex === 'M'
                       ? 'Male'
-                      : order.patient.gender === 'F'
+                      : order.patient.sex === 'F'
                         ? 'Female'
                         : 'Other'}
                   </span>
-                  {order.patient.age && (
+                  {order.patient.age_years !== undefined && order.patient.age_years !== null && (
                     <span>
                       {' '}
-                      • {order.patient.age} {order.patient.age_unit}
+                      • {order.patient.age_years} years
                     </span>
                   )}
                 </div>
@@ -187,7 +187,7 @@ export function LabWorklistPage() {
               <div className="p-4">
                 <div className="text-sm text-gray-600 mb-3">
                   <p>{formatDateTime(order.created_at)}</p>
-                  <p>By: {order.created_by.username}</p>
+                  {order.created_by && <p>By: {order.created_by.username}</p>}
                 </div>
 
                 {/* Test Items */}
@@ -210,7 +210,7 @@ export function LabWorklistPage() {
                 <div className="border-t pt-3 mb-3">
                   <div className="flex justify-between text-sm font-medium">
                     <span>Total:</span>
-                    <span>{formatCurrency(order.bill_amount)}</span>
+                    <span>{formatCurrency(order.items.reduce((sum, item) => sum + Number(item.test.price || 0), 0))}</span>
                   </div>
                 </div>
 

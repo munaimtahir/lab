@@ -43,14 +43,21 @@ export interface LoginResponse {
 export interface Patient {
   id: number
   mrn: string
-  cnic: string
+  cnic?: string | null
   phone: string
   full_name: string
-  gender: 'M' | 'F' | 'O'
-  date_of_birth: string
-  age?: number
-  age_unit?: 'years' | 'months' | 'days'
+  father_name?: string
+  sex: 'M' | 'F' | 'O'
+  dob: string | null
+  age_years?: number | null
+  age_months?: number | null
+  age_days?: number | null
+  address?: string
+  origin_terminal?: number | null
+  is_offline_entry?: boolean
+  synced_at?: string | null
   created_at: string
+  updated_at: string
 }
 
 // Catalog types
@@ -122,25 +129,29 @@ export type OrderStatus =
   | 'PUBLISHED'
   | 'CANCELLED'
 
+export type OrderPriority = 'ROUTINE' | 'URGENT' | 'STAT'
+
 export interface OrderItem {
   id: number
-  test: Test
+  test: TestCatalog
+  test_detail?: TestCatalog
   status: OrderStatus
+  created_at: string
+  updated_at: string
 }
 
 export interface Order {
   id: number
-  order_number: string
+  order_no: string
   patient: Patient
+  patient_detail?: Patient
   items: OrderItem[]
+  priority: OrderPriority
   status: OrderStatus
+  notes?: string
   created_at: string
-  created_by: User
-  bill_amount: number
-  discount: number
-  amount_paid: number
-  report_date?: string
-  report_time?: string
+  updated_at: string
+  created_by?: User
 }
 
 // Sample types
@@ -187,9 +198,9 @@ export interface Result {
 export interface Report {
   id: number
   order: Order
-  pdf_file: string
+  pdf_file: string | null
   generated_at: string
-  generated_by: User
+  generated_by?: User | null
 }
 
 // Dashboard types
