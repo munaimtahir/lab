@@ -1,5 +1,5 @@
 # Stage 1: Build the frontend
-FROM node:20-slim AS builder
+FROM node:20-slim AS frontend-builder
 
 WORKDIR /app
 
@@ -29,11 +29,34 @@ RUN echo "VITE_API_URL=${VITE_API_URL}" > .env
 # Uses .env.production and the VITE_API_URL env var set above
 RUN pnpm build
 
-# Stage 2: Serve with nginx
+# Stage 2: Build backend and collect static files
+FROM python:3.12-slim AS backend-builder
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY backend/ .
+
+# Collect static files (creates /app/staticfiles with Django admin CSS/JS)
+RUN python manage.py collectstatic --noinput
+
+# Stage 3: Serve with nginx
 FROM nginx:alpine
 
-# Copy built frontend files from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built frontend files from frontend-builder stage
+COPY --from=frontend-builder /app/dist /usr/share/nginx/html
+
+# Copy Django static files from backend-builder stage
+COPY --from=backend-builder /app/staticfiles /app/staticfiles
 
 # Copy nginx configuration
 COPY nginx/nginx.conf /etc/nginx/nginx.conf

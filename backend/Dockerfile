@@ -16,6 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Collect static files (creates /app/staticfiles with Django admin CSS/JS)
+RUN python manage.py collectstatic --noinput
+
 # Expose port
 EXPOSE 8000
 
