@@ -13,7 +13,7 @@ The LIMS system maintains master data for:
 
 All this master data is maintained in a single Excel file located at:
 ```
-backend/seed_data/AlShifa_LIMS_Master_Full_v1.xlsx
+backend/seed_data/AlShifa_LIMS_Master.xlsx
 ```
 
 ## Excel File Structure
@@ -109,7 +109,7 @@ Import completed successfully!
 
 To update the master data:
 
-1. Edit the Excel file at `backend/seed_data/AlShifa_LIMS_Master_Full_v1.xlsx`
+1. Edit the Excel file at `backend/seed_data/AlShifa_LIMS_Master.xlsx`
 2. Run the import command:
    ```bash
    docker compose exec backend python manage.py import_lims_master
@@ -122,7 +122,7 @@ To update the master data:
 
 If you get a "file not found" error:
 - Make sure you're running the command from the project root
-- Check that the Excel file exists at `backend/seed_data/AlShifa_LIMS_Master_Full_v1.xlsx`
+- Check that the Excel file exists at `backend/seed_data/AlShifa_LIMS_Master.xlsx`
 - Try specifying the full path with `--file`
 
 ### Import Fails

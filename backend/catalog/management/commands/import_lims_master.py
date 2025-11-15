@@ -24,8 +24,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--file",
             type=str,
-            default="seed_data/AlShifa_LIMS_Master_Full_v1.xlsx",
-            help="Path to Excel file (default: seed_data/AlShifa_LIMS_Master_Full_v1.xlsx)",
+            default="seed_data/AlShifa_LIMS_Master.xlsx",
+            help="Path to Excel file (default: seed_data/AlShifa_LIMS_Master.xlsx)",
         )
         parser.add_argument(
             "--dry-run",
