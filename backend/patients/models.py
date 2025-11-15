@@ -31,17 +31,24 @@ class Patient(models.Model):
         help_text="Medical Record Number (auto-generated)",
     )
     full_name = models.CharField(max_length=255)
-    father_name = models.CharField(max_length=255)
-    dob = models.DateField(help_text="Date of birth")
+    father_name = models.CharField(max_length=255, blank=True, default="")
+    dob = models.DateField(help_text="Date of birth", null=True, blank=True)
     sex = models.CharField(max_length=1, choices=SEX_CHOICES)
     phone = models.CharField(max_length=20, validators=[phone_validator])
     cnic = models.CharField(
         max_length=15,
         validators=[cnic_validator],
         unique=True,
+        null=True,
+        blank=True,
         help_text="National ID in format #####-#######-#",
     )
-    address = models.TextField()
+    address = models.TextField(blank=True, default="")
+    
+    # Age fields (alternative to DOB)
+    age_years = models.IntegerField(null=True, blank=True, help_text="Age in years")
+    age_months = models.IntegerField(null=True, blank=True, help_text="Age in months")
+    age_days = models.IntegerField(null=True, blank=True, help_text="Age in days")
 
     # Offline registration support
     origin_terminal = models.ForeignKey(
