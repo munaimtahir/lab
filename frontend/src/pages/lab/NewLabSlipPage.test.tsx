@@ -65,9 +65,13 @@ describe('NewLabSlipPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Full name is required/i)).toBeInTheDocument()
-      expect(screen.getByText(/Valid CNIC is required/i)).toBeInTheDocument()
+      // CNIC is now optional, so we don't check for its validation
       expect(
         screen.getByText(/Valid phone number is required/i)
+      ).toBeInTheDocument()
+      // Age or DOB is required
+      expect(
+        screen.getByText(/Either date of birth or at least one age field is required/i)
       ).toBeInTheDocument()
     })
   })

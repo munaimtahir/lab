@@ -1,8 +1,8 @@
 """Patient serializers."""
 
-from datetime import date, timedelta
-from dateutil.relativedelta import relativedelta
+from datetime import date
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.utils import timezone
@@ -79,22 +79,22 @@ class PatientSerializer(serializers.ModelSerializer):
     def validate_cnic(self, value):
         """Validate CNIC format."""
         import re
-        
+
         # Allow None or empty string (optional field)
         if not value:
             return None
-        
+
         if not re.match(r"^\d{5}-\d{7}-\d$", value):
             raise serializers.ValidationError("CNIC must be in format #####-#######-#")
         return value
-    
+
     def validate(self, attrs):
         """Validate that either DOB or at least one age field is provided."""
         dob = attrs.get('dob')
         age_years = attrs.get('age_years')
         age_months = attrs.get('age_months')
         age_days = attrs.get('age_days')
-        
+
         # Check if either DOB or at least one age field is provided
         has_dob = dob is not None
         has_age = any([
@@ -102,36 +102,41 @@ class PatientSerializer(serializers.ModelSerializer):
             age_months is not None,
             age_days is not None
         ])
-        
+
         if not has_dob and not has_age:
             raise serializers.ValidationError(
-                "Either date of birth or at least one age field (years, months, days) must be provided."
+                "Either date of birth or at least one age field "
+                "(years, months, days) must be provided."
             )
-        
+
         # If age fields provided but no DOB, calculate DOB
         if has_age and not has_dob:
             years = age_years or 0
             months = age_months or 0
             days = age_days or 0
-            
+
             today = date.today()
             try:
                 # Calculate DOB from age
-                attrs['dob'] = today - relativedelta(years=years, months=months, days=days)
+                attrs["dob"] = today - relativedelta(
+                    years=years, months=months, days=days
+                )
             except Exception as e:
-                raise serializers.ValidationError(f"Invalid age values: {str(e)}")
-        
+                raise serializers.ValidationError(
+                    f"Invalid age values: {str(e)}"
+                ) from e
+
         # If DOB provided but no age fields, calculate age
         if has_dob and not has_age:
             dob_date = attrs['dob']
             today = date.today()
-            
+
             # Calculate age components
             delta = relativedelta(today, dob_date)
             attrs['age_years'] = delta.years
             attrs['age_months'] = delta.months
             attrs['age_days'] = delta.days
-        
+
         return attrs
 
     def create(self, validated_data):

@@ -252,7 +252,7 @@ export function NewLabSlipPage() {
 
       if (!patientId) {
         // Prepare patient data - send only required fields and non-empty optional fields
-        const patientPayload: any = {
+        const patientPayload: Record<string, string | number | undefined> = {
           phone: patientData.phone,
           full_name: patientData.full_name,
           sex: patientData.gender,
@@ -297,10 +297,11 @@ export function NewLabSlipPage() {
 
       // Navigate to order detail or lab home
       navigate(ROUTES.LAB_ORDER_DETAIL(order.id))
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to create order:', error)
-      const errorMessage = error?.response?.data?.detail || 
-                          error?.message || 
+      const err = error as { response?: { data?: { detail?: string } }; message?: string }
+      const errorMessage = err?.response?.data?.detail || 
+                          err?.message || 
                           'Failed to create order. Please try again.'
       setErrors({ submit: errorMessage })
     } finally {

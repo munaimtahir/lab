@@ -44,7 +44,7 @@ class Patient(models.Model):
         help_text="National ID in format #####-#######-#",
     )
     address = models.TextField(blank=True, default="")
-    
+
     # Age fields (alternative to DOB)
     age_years = models.IntegerField(null=True, blank=True, help_text="Age in years")
     age_months = models.IntegerField(null=True, blank=True, help_text="Age in months")
