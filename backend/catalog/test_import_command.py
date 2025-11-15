@@ -37,7 +37,7 @@ class ImportLIMSMasterCommandTest(TestCase):
 
     def test_dry_run_with_real_file(self):
         """Test dry-run mode with the actual Excel file."""
-        excel_file = "seed_data/AlShifa_LIMS_Master_Full_v1.xlsx"
+        excel_file = "seed_data/AlShifa_LIMS_Master.xlsx"
         
         # Skip test if file doesn't exist (e.g., in CI environment)
         if not os.path.exists(excel_file):

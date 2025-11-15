@@ -68,7 +68,7 @@ docker compose exec backend python manage.py import_lims_master --dry-run
 docker compose exec backend python manage.py import_lims_master
 ```
 
-This imports 987 tests, 1161 parameters, and reference ranges from the Excel file at `backend/seed_data/AlShifa_LIMS_Master_Full_v1.xlsx`.
+This imports 987 tests, 1161 parameters, and reference ranges from the Excel file at `backend/seed_data/AlShifa_LIMS_Master.xlsx`.
 
 **📖 For detailed instructions, see [LIMS Master Data Import Guide](backend/LIMS_IMPORT.md)**
 
