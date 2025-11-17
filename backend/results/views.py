@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from settings.utils import should_skip_verification
 from users.models import UserRole
 
 from .models import Result
@@ -101,11 +102,21 @@ def publish_result(request, pk):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    if result.status != "VERIFIED":
-        return Response(
-            {"error": "Result must be verified before publishing"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    # Check workflow settings - if verification is disabled, allow publishing from ENTERED status
+    skip_verification = should_skip_verification()
+    required_status = "ENTERED" if skip_verification else "VERIFIED"
+
+    if result.status != required_status:
+        if skip_verification:
+            return Response(
+                {"error": "Result must be entered before publishing"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            return Response(
+                {"error": "Result must be verified before publishing"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     result.status = "PUBLISHED"
     result.published_at = timezone.now()
