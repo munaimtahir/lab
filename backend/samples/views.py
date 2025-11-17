@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from users.models import UserRole
+from settings.permissions import user_can_collect
 
 from .models import Sample, SampleStatus
 from .serializers import SampleSerializer
@@ -41,9 +41,10 @@ def collect_sample(request, pk):
     except Sample.DoesNotExist:
         return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user.role not in [UserRole.PHLEBOTOMY, UserRole.ADMIN]:
+    # Check permission using role-based permission system
+    if not user_can_collect(request.user):
         return Response(
-            {"error": "Only phlebotomy or admin can collect samples"},
+            {"error": "You do not have permission to collect samples"},
             status=status.HTTP_403_FORBIDDEN,
         )
 

@@ -6,8 +6,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from settings.permissions import (
+    user_can_enter_result,
+    user_can_publish,
+    user_can_verify,
+)
 from settings.utils import should_skip_verification
-from users.models import UserRole
 
 from .models import Result
 from .serializers import ResultSerializer
@@ -42,9 +46,10 @@ def enter_result(request, pk):
     except Result.DoesNotExist:
         return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user.role not in [UserRole.TECHNOLOGIST, UserRole.ADMIN]:
+    # Check permission using role-based permission system
+    if not user_can_enter_result(request.user):
         return Response(
-            {"error": "Only technologists can enter results"},
+            {"error": "You do not have permission to enter results"},
             status=status.HTTP_403_FORBIDDEN,
         )
 
@@ -66,9 +71,10 @@ def verify_result(request, pk):
     except Result.DoesNotExist:
         return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user.role not in [UserRole.PATHOLOGIST, UserRole.ADMIN]:
+    # Check permission using role-based permission system
+    if not user_can_verify(request.user):
         return Response(
-            {"error": "Only pathologists can verify results"},
+            {"error": "You do not have permission to verify results"},
             status=status.HTTP_403_FORBIDDEN,
         )
 
@@ -96,9 +102,10 @@ def publish_result(request, pk):
     except Result.DoesNotExist:
         return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user.role not in [UserRole.PATHOLOGIST, UserRole.ADMIN]:
+    # Check permission using role-based permission system
+    if not user_can_publish(request.user):
         return Response(
-            {"error": "Only pathologists can publish results"},
+            {"error": "You do not have permission to publish results"},
             status=status.HTTP_403_FORBIDDEN,
         )
 
