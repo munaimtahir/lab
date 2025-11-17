@@ -24,11 +24,12 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Add healthcheck
+# === FIX 1 ===
+# The "|| exit 1" must be on the same line as the CMD.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health/ ||
-exit 1
+    CMD curl -f http://localhost:8000/api/health/ || exit 1
 
-# === FIX ===
+# === FIX 2 ===
 # Run migrations and start gunicorn.
 # The seed_data command has been removed as it is not idempotent
 # and should be run manually after deployment, as per README.md.
