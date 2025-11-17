@@ -6,6 +6,7 @@ from .views import (
     RolePermissionListView,
     RolePermissionUpdateView,
     WorkflowSettingsView,
+    get_user_permissions,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
         RolePermissionUpdateView.as_view(),
         name="permissions-update",
     ),
+    path("permissions/me/", get_user_permissions, name="user-permissions"),
 ]

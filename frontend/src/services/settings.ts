@@ -20,6 +20,19 @@ export interface RolePermission {
   updated_at?: string
 }
 
+export interface UserPermissions {
+  role: string
+  permissions: {
+    can_register: boolean
+    can_collect: boolean
+    can_enter_result: boolean
+    can_verify: boolean
+    can_publish: boolean
+    can_edit_catalog: boolean
+    can_edit_settings: boolean
+  }
+}
+
 export const settingsService = {
   async getWorkflowSettings(): Promise<WorkflowSettings> {
     return apiClient.get<WorkflowSettings>('/settings/workflow/')
@@ -42,5 +55,9 @@ export const settingsService = {
       '/settings/permissions/update/',
       permissions
     )
+  },
+
+  async getUserPermissions(): Promise<UserPermissions> {
+    return apiClient.get<UserPermissions>('/settings/permissions/me/')
   },
 }
