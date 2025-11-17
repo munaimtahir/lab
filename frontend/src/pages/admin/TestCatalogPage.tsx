@@ -239,6 +239,14 @@ export function TestCatalogPage() {
   const [selectedTest, setSelectedTest] = useState<TestCatalog | null>(null)
   const [error, setError] = useState<string>('')
 
+  const logError = (message: string, err: unknown) => {
+    if (import.meta.env.DEV) {
+      // Ensure we don't throw if console is not available in some environments
+      const safeConsole = typeof console !== 'undefined' ? console : null
+      safeConsole?.error?.(message, err)
+    }
+  }
+
   const fetchTests = async () => {
     setLoading(true)
     setError('')
@@ -246,6 +254,7 @@ export function TestCatalogPage() {
       const data = await catalogService.getAll()
       setTests(data)
     } catch (err) {
+      logError('Failed to load test catalog', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch tests')
     } finally {
       setLoading(false)
@@ -275,6 +284,7 @@ export function TestCatalogPage() {
       await catalogService.delete(test.id)
       await fetchTests()
     } catch (err) {
+      logError('Failed to delete test', err)
       setError(err instanceof Error ? err.message : 'Failed to delete test')
     }
   }

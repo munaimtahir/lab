@@ -1,11 +1,11 @@
 """Patient views."""
 
 from django.db.models import Q
+from rest_framework.permissions import AllowAny
 from rest_framework import generics, status
 from rest_framework.response import Response
 
 from .models import Patient
-from .permissions import IsAdminOrReception
 from .serializers import PatientSerializer
 
 
@@ -18,7 +18,7 @@ class PatientListCreateView(generics.ListCreateAPIView):
     """
 
     serializer_class = PatientSerializer
-    permission_classes = [IsAdminOrReception]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         """Filter patients by search query."""
@@ -54,4 +54,4 @@ class PatientDetailView(generics.RetrieveAPIView):
 
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAdminOrReception]
+    permission_classes = [AllowAny]

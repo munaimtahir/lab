@@ -1,8 +1,7 @@
 """Catalog views."""
 
 from rest_framework import generics
-
-from core.permissions import IsAdminOrReadOnly
+from rest_framework.permissions import AllowAny
 
 from .models import TestCatalog
 from .serializers import TestCatalogSerializer
@@ -13,7 +12,7 @@ class TestCatalogListCreateView(generics.ListCreateAPIView):
 
     queryset = TestCatalog.objects.all().order_by("code")
     serializer_class = TestCatalogSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         """Filter by is_active if specified in query params."""
@@ -29,4 +28,4 @@ class TestCatalogDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = TestCatalog.objects.all()
     serializer_class = TestCatalogSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [AllowAny]

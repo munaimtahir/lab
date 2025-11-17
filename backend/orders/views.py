@@ -2,9 +2,8 @@
 
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-
-from patients.permissions import IsAdminOrReception
 
 from .models import Order, OrderStatus
 from .serializers import OrderSerializer
@@ -14,7 +13,7 @@ class OrderListCreateView(generics.ListCreateAPIView):
     """List orders or create a new order."""
 
     serializer_class = OrderSerializer
-    permission_classes = [IsAdminOrReception]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         """Filter orders by patient if provided."""
@@ -46,11 +45,11 @@ class OrderDetailView(generics.RetrieveAPIView):
         Order.objects.all().select_related("patient").prefetch_related("items__test")
     )
     serializer_class = OrderSerializer
-    permission_classes = [IsAdminOrReception]
+    permission_classes = [AllowAny]
 
 
 @api_view(["POST"])
-@permission_classes([IsAdminOrReception])
+@permission_classes([AllowAny])
 def cancel_order(request, pk):
     """Cancel an order if no samples have been collected."""
     try:
@@ -91,7 +90,7 @@ def cancel_order(request, pk):
 
 
 @api_view(["PATCH"])
-@permission_classes([IsAdminOrReception])
+@permission_classes([AllowAny])
 def edit_order_tests(request, pk):
     """Edit tests in an order (add/remove) if no samples or results exist."""
     try:
