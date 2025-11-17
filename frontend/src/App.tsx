@@ -10,6 +10,8 @@ import { NewLabSlipPage } from './pages/lab/NewLabSlipPage'
 import { LabWorklistPage } from './pages/lab/LabWorklistPage'
 import { OrderDetailPage } from './pages/lab/OrderDetailPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
+import { WorkflowSettingsPage } from './pages/settings/WorkflowSettingsPage'
+import { RolePermissionsPage } from './pages/settings/RolePermissionsPage'
 import { UserManagementPage } from './pages/admin/UserManagementPage'
 import { TestCatalogPage } from './pages/admin/TestCatalogPage'
 import { LabTerminalsPage } from './pages/admin/LabTerminalsPage'
@@ -92,6 +94,22 @@ function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <LabTerminalsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/workflow"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <WorkflowSettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/permissions"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <RolePermissionsPage />
               </ProtectedRoute>
             }
           />

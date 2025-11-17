@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "results",
     "reports",
     "dashboard",
+    "settings",
 ]
 
 MIDDLEWARE = [
