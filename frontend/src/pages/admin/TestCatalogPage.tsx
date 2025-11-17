@@ -239,6 +239,9 @@ export function TestCatalogPage() {
   const [selectedTest, setSelectedTest] = useState<TestCatalog | null>(null)
   const [error, setError] = useState<string>('')
 
+  const getErrorMessage = (err: unknown) =>
+    err instanceof Error ? err.message : 'Failed to fetch tests'
+
   const fetchTests = async () => {
     setLoading(true)
     setError('')
@@ -246,7 +249,9 @@ export function TestCatalogPage() {
       const data = await catalogService.getAll()
       setTests(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch tests')
+      const message = getErrorMessage(err)
+      console.error('[TestCatalogPage] Failed to load tests', { message })
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -275,7 +280,9 @@ export function TestCatalogPage() {
       await catalogService.delete(test.id)
       await fetchTests()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete test')
+      const message = err instanceof Error ? err.message : 'Failed to delete test'
+      console.error('[TestCatalogPage] Failed to delete test', { message })
+      setError(message)
     }
   }
 

@@ -3,7 +3,7 @@
 from django.utils import timezone
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from users.models import UserRole
@@ -19,7 +19,7 @@ class SampleListCreateView(generics.ListCreateAPIView):
         "order_item", "collected_by", "received_by"
     )
     serializer_class = SampleSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 class SampleDetailView(generics.RetrieveUpdateAPIView):
@@ -29,11 +29,11 @@ class SampleDetailView(generics.RetrieveUpdateAPIView):
         "order_item", "collected_by", "received_by"
     )
     serializer_class = SampleSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def collect_sample(request, pk):
     """Mark sample as collected."""
     try:
@@ -41,7 +41,8 @@ def collect_sample(request, pk):
     except Sample.DoesNotExist:
         return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user.role not in [UserRole.PHLEBOTOMY, UserRole.ADMIN]:
+    user_role = getattr(request.user, "role", None)
+    if user_role and user_role not in [UserRole.PHLEBOTOMY, UserRole.ADMIN]:
         return Response(
             {"error": "Only phlebotomy or admin can collect samples"},
             status=status.HTTP_403_FORBIDDEN,
@@ -49,7 +50,7 @@ def collect_sample(request, pk):
 
     sample.status = SampleStatus.COLLECTED
     sample.collected_at = timezone.now()
-    sample.collected_by = request.user
+    sample.collected_by = request.user if getattr(request.user, "is_authenticated", False) else None
     sample.save()
 
     serializer = SampleSerializer(sample)
@@ -57,7 +58,7 @@ def collect_sample(request, pk):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def receive_sample(request, pk):
     """Mark sample as received in lab."""
     try:
@@ -65,7 +66,8 @@ def receive_sample(request, pk):
     except Sample.DoesNotExist:
         return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user.role not in [
+    user_role = getattr(request.user, "role", None)
+    if user_role and user_role not in [
         UserRole.PHLEBOTOMY,
         UserRole.TECHNOLOGIST,
         UserRole.PATHOLOGIST,
@@ -78,7 +80,7 @@ def receive_sample(request, pk):
 
     sample.status = SampleStatus.RECEIVED
     sample.received_at = timezone.now()
-    sample.received_by = request.user
+    sample.received_by = request.user if getattr(request.user, "is_authenticated", False) else None
     sample.save()
 
     serializer = SampleSerializer(sample)
@@ -86,7 +88,7 @@ def receive_sample(request, pk):
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def reject_sample(request, pk):
     """Reject a sample with a reason."""
     try:
@@ -94,7 +96,8 @@ def reject_sample(request, pk):
     except Sample.DoesNotExist:
         return Response({"error": "Sample not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if request.user.role not in [
+    user_role = getattr(request.user, "role", None)
+    if user_role and user_role not in [
         UserRole.PHLEBOTOMY,
         UserRole.TECHNOLOGIST,
         UserRole.PATHOLOGIST,

@@ -73,6 +73,9 @@ class ApiClient {
   }
 
   public async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    // Always refresh tokens from storage before each request to avoid stale headers
+    this.loadTokens()
+
     const url = `${this.baseURL}${path}`
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -83,10 +86,19 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${this.accessToken}`
     }
 
-    let response = await fetch(url, {
-      ...options,
-      headers,
-    })
+    let response: Response
+    try {
+      response = await fetch(url, {
+        ...options,
+        headers,
+      })
+    } catch (error) {
+      console.error('[apiClient] Network error', {
+        path,
+        message: error instanceof Error ? error.message : String(error),
+      })
+      throw error
+    }
 
     // If 401, try to refresh token and retry once
     if (
@@ -109,8 +121,16 @@ class ApiClient {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
+      console.error('[apiClient] Request failed', {
+        path,
+        status: response.status,
+        message:
+          (errorData as { message?: string }).message ||
+          `Request failed with status ${response.status}`,
+      })
       throw new ApiError(
-        errorData.message || `Request failed with status ${response.status}`,
+        (errorData as { message?: string }).message ||
+          `Request failed with status ${response.status}`,
         response.status,
         errorData
       )

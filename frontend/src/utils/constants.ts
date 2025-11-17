@@ -5,7 +5,7 @@
 // ==============================================================================
 
 // Default API URLs for each mode
-const DEFAULT_DEV_API_URL = 'http://localhost:8000' // Direct backend access for local dev
+const DEFAULT_DEV_API_URL = '/api' // Use same-origin API proxy for stability
 const DEFAULT_PROD_API_URL = '/api' // Nginx proxies /api to backend in production
 
 /**
@@ -14,7 +14,7 @@ const DEFAULT_PROD_API_URL = '/api' // Nginx proxies /api to backend in producti
  * Resolution order:
  * 1. If VITE_API_URL environment variable is set and non-empty, use it
  * 2. Otherwise, use mode-based default:
- *    - development: http://localhost:8000
+ *    - development: /api
  *    - production: /api
  * 
  * Production setup:
@@ -24,8 +24,8 @@ const DEFAULT_PROD_API_URL = '/api' // Nginx proxies /api to backend in producti
  * 
  * Development setup:
  * - Frontend dev server on localhost:5173
- * - Backend dev server on localhost:8000
- * - Frontend uses full URL http://localhost:8000
+ * - Backend dev server on localhost:8000 (via proxy if needed)
+ * - Frontend uses relative path /api
  */
 const getApiBaseUrl = (): string => {
   const envApiUrl = import.meta.env.VITE_API_URL
