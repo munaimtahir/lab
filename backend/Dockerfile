@@ -15,7 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
-
 # Collect static files (creates /app/staticfiles with Django admin CSS/JS)
 # Set SECRET_KEY for build time (collectstatic doesn't need real secret or DB)
 ENV DJANGO_SECRET_KEY=build-time-secret-key-for-collectstatic
@@ -26,9 +25,12 @@ EXPOSE 8000
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health/ || exit 1
+    CMD curl -f http://localhost:8000/api/health/ ||
+exit 1
 
-# Run migrations, seed data, and start gunicorn bound to 0.0.0.0
+# === FIX ===
+# Run migrations and start gunicorn.
+# The seed_data command has been removed as it is not idempotent
+# and should be run manually after deployment, as per README.md.
 CMD python manage.py migrate && \
-    python manage.py seed_data && \
     gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers ${WORKERS:-$((2 * $(nproc) + 1))} --timeout 120 --access-logfile - --error-logfile -
