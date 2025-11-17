@@ -72,6 +72,20 @@ export function SettingsPage() {
         />
 
         <SettingsTile
+          title="Workflow Customization"
+          description="Configure which workflow steps are enabled"
+          to="/settings/workflow"
+          isImplemented={true}
+        />
+
+        <SettingsTile
+          title="Role & Permissions"
+          description="Configure permissions for each role"
+          to="/settings/permissions"
+          isImplemented={true}
+        />
+
+        <SettingsTile
           title="Branches"
           description="Configure lab branches and locations"
           isImplemented={false}

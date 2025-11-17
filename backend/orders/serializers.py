@@ -1,9 +1,12 @@
 """Order serializers."""
 
+from django.utils import timezone
 from rest_framework import serializers
 
 from catalog.serializers import TestCatalogSerializer
 from patients.serializers import PatientSerializer
+from samples.models import Sample, SampleStatus
+from settings.utils import should_skip_sample_collection, should_skip_sample_receive
 
 from .models import Order, OrderItem
 
@@ -48,12 +51,39 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "order_no", "status", "created_at", "updated_at"]
 
     def create(self, validated_data):
-        """Create order with order items."""
+        """Create order with order items and samples."""
         test_ids = validated_data.pop("test_ids")
         order = Order.objects.create(**validated_data)
 
-        # Create order items
+        # Get workflow settings
+        skip_collection = should_skip_sample_collection()
+        skip_receive = should_skip_sample_receive()
+
+        # Create order items and samples
         for test_id in test_ids:
-            OrderItem.objects.create(order=order, test_id=test_id)
+            order_item = OrderItem.objects.create(order=order, test_id=test_id)
+
+            # Auto-create sample for this order item
+            sample_status = SampleStatus.PENDING
+            collected_at = None
+            received_at = None
+
+            # If collection is disabled, mark as collected automatically
+            if skip_collection:
+                sample_status = SampleStatus.COLLECTED
+                collected_at = timezone.now()
+
+            # If both collection and receive are disabled, mark as received
+            if skip_collection and skip_receive:
+                sample_status = SampleStatus.RECEIVED
+                received_at = timezone.now()
+
+            Sample.objects.create(
+                order_item=order_item,
+                sample_type=order_item.test.sample_type,
+                status=sample_status,
+                collected_at=collected_at,
+                received_at=received_at,
+            )
 
         return order

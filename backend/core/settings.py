@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "results",
     "reports",
     "dashboard",
+    "settings",
 ]
 
 MIDDLEWARE = [
@@ -188,7 +189,9 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        # STAGE 1: Temporarily allow all permissions for development
+        # Will be replaced with proper role-based permissions in Stage 3
+        "rest_framework.permissions.AllowAny",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
