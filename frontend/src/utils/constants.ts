@@ -5,7 +5,7 @@
 // ==============================================================================
 
 // Default API URLs for each mode
-const DEFAULT_DEV_API_URL = 'http://localhost:8000' // Direct backend access for local dev
+const DEFAULT_DEV_API_URL = 'http://localhost:8000/api' // Direct backend access for local dev
 const DEFAULT_PROD_API_URL = '/api' // Nginx proxies /api to backend in production
 
 /**
@@ -25,7 +25,7 @@ const DEFAULT_PROD_API_URL = '/api' // Nginx proxies /api to backend in producti
  * Development setup:
  * - Frontend dev server on localhost:5173
  * - Backend dev server on localhost:8000
- * - Frontend uses full URL http://localhost:8000
+ * - Frontend uses full URL http://localhost:8000/api
  */
 const getApiBaseUrl = (): string => {
   const envApiUrl = import.meta.env.VITE_API_URL
@@ -45,7 +45,7 @@ export const API_BASE_URL = getApiBaseUrl()
 // Auth endpoints
 // NOTE: These paths are relative to API_BASE_URL
 // In production: API_BASE_URL="/api" + "/auth/login/" = "/api/auth/login/"
-// In development: API_BASE_URL="http://localhost:8000" + "/auth/login/" = "http://localhost:8000/auth/login/"
+// In development: API_BASE_URL="http://localhost:8000/api" + "/auth/login/" = "http://localhost:8000/api/auth/login/"
 export const AUTH_ENDPOINTS = {
   LOGIN: '/auth/login/',
   REFRESH: '/auth/refresh/',

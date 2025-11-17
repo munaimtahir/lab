@@ -308,6 +308,36 @@ export function TestCatalogPage() {
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
           <p className="mt-2 text-gray-600">Loading tests...</p>
         </div>
+      ) : tests.length === 0 ? (
+        <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="text-gray-400 mb-4">
+            <svg
+              className="mx-auto h-12 w-12"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            No tests in catalog
+          </h3>
+          <p className="text-gray-500 mb-6">
+            Get started by adding your first test to the catalog.
+          </p>
+          <button
+            onClick={handleAddTest}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Add Test
+          </button>
+        </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200">
