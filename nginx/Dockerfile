@@ -54,6 +54,9 @@ RUN python manage.py collectstatic --noinput
 # Stage 3: Serve with nginx
 FROM nginx:alpine
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 # Copy built frontend files from frontend-builder stage
 COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 
@@ -68,7 +71,7 @@ EXPOSE 80 443
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+    CMD curl -f http://localhost/ || exit 1
 
 # nginx runs in foreground by default
 CMD ["nginx", "-g", "daemon off;"]
