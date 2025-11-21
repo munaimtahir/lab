@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { settingsService, WorkflowSettings } from '../services/settings'
 
+/**
+ * Custom hook for fetching and managing workflow settings.
+ * @returns {object} An object containing the workflow settings, loading state, error state, and a refresh function.
+ */
 export function useWorkflowSettings() {
   const [settings, setSettings] = useState<WorkflowSettings | null>(null)
   const [loading, setLoading] = useState(true)
@@ -23,6 +27,9 @@ export function useWorkflowSettings() {
     }
   }
 
+  /**
+   * Refreshes the workflow settings.
+   */
   const refresh = () => {
     fetchSettings()
   }
@@ -32,7 +39,6 @@ export function useWorkflowSettings() {
     loading,
     error,
     refresh,
-    // Helper flags
     enableSampleCollection: settings?.enable_sample_collection ?? true,
     enableSampleReceive: settings?.enable_sample_receive ?? true,
     enableVerification: settings?.enable_verification ?? true,

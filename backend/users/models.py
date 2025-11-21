@@ -5,8 +5,9 @@ from django.db import models
 
 
 class UserRole(models.TextChoices):
-    """User role choices."""
-
+    """
+    Enumeration for user roles.
+    """
     ADMIN = "ADMIN", "Admin"
     RECEPTION = "RECEPTION", "Reception"
     PHLEBOTOMY = "PHLEBOTOMY", "Phlebotomy"
@@ -15,7 +16,13 @@ class UserRole(models.TextChoices):
 
 
 class User(AbstractUser):
-    """Custom user model with role-based permissions."""
+    """
+    Custom user model with role-based access control.
+
+    Attributes:
+        role (CharField): The user's role, which determines their permissions.
+        phone (CharField): The user's phone number.
+    """
 
     role = models.CharField(
         max_length=20,
@@ -29,4 +36,5 @@ class User(AbstractUser):
         ordering = ["id"]
 
     def __str__(self):
+        """Returns a string representation of the user."""
         return f"{self.username} ({self.get_role_display()})"

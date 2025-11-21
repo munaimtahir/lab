@@ -5,12 +5,15 @@ from django.db import models
 
 class WorkflowSettings(models.Model):
     """
-    Workflow configuration settings (singleton pattern).
-    
-    Controls which workflow steps are enabled:
-    - Sample collection step
-    - Sample receive step
-    - Result verification step
+    Singleton model for workflow configuration settings.
+
+    This model controls which steps are enabled in the laboratory workflow.
+
+    Attributes:
+        enable_sample_collection (BooleanField): If true, manual sample collection is required.
+        enable_sample_receive (BooleanField): If true, manual sample reception is required.
+        enable_verification (BooleanField): If true, result verification is required before publishing.
+        updated_at (DateTimeField): The timestamp of the last update.
     """
 
     enable_sample_collection = models.BooleanField(
@@ -33,25 +36,43 @@ class WorkflowSettings(models.Model):
         verbose_name_plural = "Workflow Settings"
 
     def __str__(self):
+        """Returns a string representation of the workflow settings."""
         return "Workflow Settings"
 
     def save(self, *args, **kwargs):
-        """Ensure only one instance exists (singleton pattern)."""
+        """
+        Overrides the save method to ensure only one instance of this model exists.
+        """
         self.pk = 1
         super().save(*args, **kwargs)
 
     @classmethod
     def load(cls):
-        """Load or create the singleton instance."""
+        """
+        Loads the singleton instance of the workflow settings.
+
+        Returns:
+            WorkflowSettings: The singleton instance.
+        """
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
 
 
 class RolePermission(models.Model):
     """
-    Role-based permissions matrix.
-    
-    Maps each role to specific capabilities in the system.
+    Defines the permissions for each user role in the system.
+
+    Attributes:
+        ROLE_CHOICES (list): Choices for the user roles.
+        role (CharField): The user role.
+        can_register (BooleanField): Permission to register new patients.
+        can_collect (BooleanField): Permission to collect samples.
+        can_enter_result (BooleanField): Permission to enter test results.
+        can_verify (BooleanField): Permission to verify test results.
+        can_publish (BooleanField): Permission to publish test results.
+        can_edit_catalog (BooleanField): Permission to edit the test catalog.
+        can_edit_settings (BooleanField): Permission to edit system settings.
+        updated_at (DateTimeField): The timestamp of the last update.
     """
 
     ROLE_CHOICES = [
@@ -103,4 +124,5 @@ class RolePermission(models.Model):
         ordering = ["role"]
 
     def __str__(self):
+        """Returns a string representation of the role permissions."""
         return f"{self.get_role_display()} Permissions"

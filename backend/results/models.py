@@ -6,8 +6,9 @@ from orders.models import OrderItem
 
 
 class ResultStatus(models.TextChoices):
-    """Result status choices."""
-
+    """
+    Enumeration for the status of a test result.
+    """
     DRAFT = "DRAFT", "Draft"
     ENTERED = "ENTERED", "Entered"
     VERIFIED = "VERIFIED", "Verified"
@@ -15,7 +16,25 @@ class ResultStatus(models.TextChoices):
 
 
 class Result(models.Model):
-    """Result model for test results."""
+    """
+    Represents the result of a single test parameter for an order item.
+
+    Attributes:
+        order_item (ForeignKey): The order item this result is for.
+        value (CharField): The result value.
+        unit (CharField): The unit of measurement for the result.
+        reference_range (CharField): The reference range for this result.
+        flags (CharField): Flags for abnormal results (e.g., 'H' for high).
+        status (CharField): The current status of the result in the workflow.
+        entered_by (ForeignKey): The user who entered the result.
+        entered_at (DateTimeField): The timestamp when the result was entered.
+        verified_by (ForeignKey): The user who verified the result.
+        verified_at (DateTimeField): The timestamp when the result was verified.
+        published_at (DateTimeField): The timestamp when the result was published.
+        notes (TextField): Any notes or comments related to the result.
+        created_at (DateTimeField): The timestamp when the result was created.
+        updated_at (DateTimeField): The timestamp when the result was last updated.
+    """
 
     order_item = models.ForeignKey(
         OrderItem, on_delete=models.CASCADE, related_name="results"
@@ -56,4 +75,5 @@ class Result(models.Model):
         ]
 
     def __str__(self):
+        """Returns a string representation of the result."""
         return f"{self.order_item} - {self.value} {self.unit}"

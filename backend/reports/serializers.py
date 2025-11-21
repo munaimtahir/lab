@@ -6,7 +6,9 @@ from .models import Report
 
 
 class ReportSerializer(serializers.ModelSerializer):
-    """Report serializer."""
+    """
+    Serializer for the Report model.
+    """
 
     class Meta:
         model = Report
