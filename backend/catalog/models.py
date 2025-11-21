@@ -4,7 +4,23 @@ from django.db import models
 
 
 class TestCatalog(models.Model):
-    """Test catalog model for available lab tests."""
+    """
+    Represents an available lab test in the catalog.
+
+    This model stores the details of each test that can be ordered, including
+    its code, name, price, and other metadata. It serves as the master list of
+    all available tests.
+
+    Attributes:
+        code (str): A unique code for the test.
+        name (str): The full name of the test.
+        description (str): A detailed description of the test.
+        category (str): The category the test belongs to (e.g., 'Hematology').
+        sample_type (str): The type of sample required (e.g., 'Blood').
+        price (Decimal): The price of the test.
+        turnaround_time_hours (int): The expected turnaround time in hours.
+        is_active (bool): Whether the test is currently available.
+    """
 
     code = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=255)
@@ -30,7 +46,20 @@ class TestCatalog(models.Model):
 
 
 class Parameter(models.Model):
-    """Parameter (Analyte) model - maps to Excel 'Parameters' sheet."""
+    """
+    Represents a single parameter or analyte that can be measured.
+
+    This model defines the individual components of a test, such as 'Hemoglobin'
+    or 'Glucose'. It includes details about the parameter's units, data type,
+    and how it should be displayed.
+
+    Attributes:
+        code (str): A unique code for the parameter.
+        name (str): The full name of the parameter.
+        unit (str): The unit of measurement (e.g., 'g/dL', 'mg/dL').
+        data_type (str): The type of data (e.g., 'Numeric', 'Text').
+        is_calculated (bool): Whether the parameter is calculated from others.
+    """
 
     code = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
@@ -62,7 +91,20 @@ class Parameter(models.Model):
 
 
 class Test(models.Model):
-    """Test model - maps to Excel 'Tests' sheet."""
+    """
+    Represents a single orderable test, which may consist of multiple parameters.
+
+    This model is a more detailed representation of a test than `TestCatalog`,
+    and it is used for linking tests to their constituent parameters. It is
+    imported from the 'Tests' sheet of the LIMS master Excel file.
+
+    Attributes:
+        code (str): A unique code for the test.
+        name (str): The full name of the test.
+        department (str): The lab department that performs the test.
+        specimen_type (str): The type of specimen required.
+        default_charge (Decimal): The default price for the test.
+    """
 
     code = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
@@ -98,7 +140,18 @@ class Test(models.Model):
 
 
 class TestParameter(models.Model):
-    """Test-Parameter relationship model - maps to Excel 'Test_Parameters' sheet."""
+    """
+    Links a `Test` to its constituent `Parameter` models.
+
+    This model creates a many-to-many relationship between tests and parameters,
+    defining which parameters are included in each test. It also specifies the
+    order in which the parameters should be displayed.
+
+    Attributes:
+        test (Test): The test that includes the parameter.
+        parameter (Parameter): The parameter included in the test.
+        display_order (int): The order of the parameter within the test.
+    """
 
     test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="test_parameters")
     parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="test_parameters")
@@ -127,7 +180,21 @@ class TestParameter(models.Model):
 
 
 class ReferenceRange(models.Model):
-    """Reference range model - maps to Excel 'Reference_Ranges' sheet."""
+    """
+    Defines the normal reference ranges for a `Parameter`.
+
+    This model stores the low and high values of a parameter that are considered
+    normal, as well as critical thresholds. The ranges can be specific to
+    demographics such as age and sex.
+
+    Attributes:
+        parameter (Parameter): The parameter these ranges apply to.
+        sex (str): The sex the range applies to ('Male', 'Female', 'All').
+        age_min (int): The minimum age for this range.
+        age_max (int): The maximum age for this range.
+        normal_low (Decimal): The lower bound of the normal range.
+        normal_high (Decimal): The upper bound of the normal range.
+    """
 
     parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="reference_ranges")
     method_code = models.CharField(max_length=50, blank=True)
@@ -159,7 +226,18 @@ class ReferenceRange(models.Model):
 
 
 class ParameterQuickText(models.Model):
-    """Parameter quick text templates model - maps to Excel 'Parameter_Quick_Text' sheet."""
+    """
+    Stores predefined text templates for `Parameter` results.
+
+    This model allows for the creation of quick text snippets that can be easily
+    inserted into parameter results, saving time for technologists. For example,
+    a 'remarks' parameter might have quick text options like 'Sample was hemolyzed'.
+
+    Attributes:
+        parameter (Parameter): The parameter the quick text applies to.
+        template_title (str): A short title for the template.
+        template_body (str): The full text of the template.
+    """
 
     parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="quick_texts")
     template_title = models.CharField(max_length=255)

@@ -9,14 +9,29 @@ from .serializers import TestCatalogSerializer
 
 
 class TestCatalogListCreateView(generics.ListCreateAPIView):
-    """List all tests or create a new test (Admin only for create)."""
+    """
+    API view for listing and creating test catalog items.
+
+    This view allows any authenticated user to list the available tests,
+    but restricts the creation of new tests to admin users. It supports
+    filtering the list by `is_active` status.
+    """
 
     queryset = TestCatalog.objects.all().order_by("code")
     serializer_class = TestCatalogSerializer
     permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
-        """Filter by is_active if specified in query params."""
+        """
+        Optionally filters the queryset to show only active or inactive tests.
+
+        This method checks for an `is_active` query parameter in the URL.
+        If `is_active=true`, it returns only active tests. If `is_active=false`,
+        it returns only inactive tests.
+
+        Returns:
+            QuerySet: The filtered queryset of `TestCatalog` objects.
+        """
         queryset = super().get_queryset()
         is_active = self.request.query_params.get("is_active")
         if is_active is not None:
@@ -25,7 +40,13 @@ class TestCatalogListCreateView(generics.ListCreateAPIView):
 
 
 class TestCatalogDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """Retrieve, update, or delete a test (Admin only for update/delete)."""
+    """
+    API view for retrieving, updating, and deleting a test catalog item.
+
+    This view allows any authenticated user to retrieve the details of a
+    specific test. However, updating or deleting a test is restricted to
+    admin users.
+    """
 
     queryset = TestCatalog.objects.all()
     serializer_class = TestCatalogSerializer

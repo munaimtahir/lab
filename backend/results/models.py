@@ -6,7 +6,12 @@ from orders.models import OrderItem
 
 
 class ResultStatus(models.TextChoices):
-    """Result status choices."""
+    """
+    Enumeration for the status of a test result.
+
+    This class defines the workflow stages for a result, from its initial
+    draft to final publication.
+    """
 
     DRAFT = "DRAFT", "Draft"
     ENTERED = "ENTERED", "Entered"
@@ -15,7 +20,24 @@ class ResultStatus(models.TextChoices):
 
 
 class Result(models.Model):
-    """Result model for test results."""
+    """
+    Represents the result of a single test for an order item.
+
+    This model stores the value of a test, its units, and reference range.
+    It also tracks the result's progress through the entry, verification,
+    and publication workflow, recording which user performed each action and
+    when.
+
+    Attributes:
+        order_item (OrderItem): The order item this result is for.
+        value (str): The value of the test result (e.g., '12.5', 'Positive').
+        unit (str): The unit of measurement (e.g., 'g/dL').
+        reference_range (str): The normal range for this test.
+        flags (str): Flags indicating if the result is high, low, or normal.
+        status (str): The current status of the result in the workflow.
+        entered_by (User): The user who entered the result.
+        verified_by (User): The user who verified the result.
+    """
 
     order_item = models.ForeignKey(
         OrderItem, on_delete=models.CASCADE, related_name="results"

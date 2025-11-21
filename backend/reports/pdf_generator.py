@@ -17,7 +17,21 @@ from reportlab.platypus import (
 
 
 def generate_report_pdf(order):
-    """Generate PDF report for an order using Al Shifa template."""
+    """
+    Generates a PDF report for a given order.
+
+    This function creates a PDF document in memory using the ReportLab library.
+    The report is formatted with the Al Shifa Laboratory template, including
+    a header, patient information, a table of results, and signatory details.
+
+    Args:
+        order (Order): The order object for which to generate the report.
+                       It is expected to have related `patient` and `items`
+                       with published `results`.
+
+    Returns:
+        io.BytesIO: A byte stream containing the generated PDF document.
+    """
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5 * inch)
     story = []

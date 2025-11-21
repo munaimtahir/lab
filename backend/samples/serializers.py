@@ -6,7 +6,13 @@ from .models import Sample
 
 
 class SampleSerializer(serializers.ModelSerializer):
-    """Sample serializer."""
+    """
+    Serializes `Sample` data for API responses.
+
+    This serializer converts `Sample` model instances into JSON format,
+    making them suitable for use in API views. It exposes all the relevant
+    fields for tracking a sample's status and history.
+    """
 
     class Meta:
         model = Sample

@@ -12,7 +12,14 @@ from .models import Order, OrderItem
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    """Order item serializer."""
+    """
+    Serializes `OrderItem` data for API responses.
+
+    This serializer is used as a nested serializer within `OrderSerializer` to
+    display the details of each test included in an order. It includes a
+    read-only `test_detail` field to provide the full catalog information for
+    the test.
+    """
 
     test_detail = TestCatalogSerializer(source="test", read_only=True)
 
@@ -23,7 +30,14 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    """Order serializer."""
+    """
+    Serializes `Order` data for creating and retrieving orders.
+
+    This serializer handles the main `Order` model, and it includes nested
+    serialization for the associated `OrderItem` and `Patient` models to
+    provide detailed responses. It also accepts a `test_ids` field for
+    creating a new order with multiple tests.
+    """
 
     items = OrderItemSerializer(many=True, read_only=True)
     patient_detail = PatientSerializer(source="patient", read_only=True)
@@ -51,7 +65,20 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "order_no", "status", "created_at", "updated_at"]
 
     def create(self, validated_data):
-        """Create order with order items and samples."""
+        """
+        Creates a new order, its associated items, and corresponding samples.
+
+        This method overrides the default `create` to handle the creation of
+        `OrderItem` and `Sample` objects based on a list of `test_ids`. It also
+        checks the system settings to determine if the sample collection and
+        receiving steps should be automatically skipped.
+
+        Args:
+            validated_data (dict): The validated data for the new order.
+
+        Returns:
+            Order: The newly created order instance.
+        """
         test_ids = validated_data.pop("test_ids")
         order = Order.objects.create(**validated_data)
 

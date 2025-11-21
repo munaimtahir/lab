@@ -257,6 +257,8 @@ pnpm playwright test
 
 ## 📚 Documentation
 
+The codebase is thoroughly documented with in-code docstrings, providing a detailed guide to the functionality of each module, class, and function. This documentation is intended to make it easy for new developers to understand the codebase and contribute effectively.
+
 - [API Reference](docs/API.md)
 - [Frontend Guide](docs/FRONTEND.md)
 - [Data Model](docs/DATA_MODEL.md)

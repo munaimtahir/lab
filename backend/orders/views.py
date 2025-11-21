@@ -11,13 +11,27 @@ from .serializers import OrderSerializer
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
-    """List orders or create a new order."""
+    """
+    API view for listing and creating orders.
+
+    This view allows users with Admin or Reception roles to list all orders
+    or create a new order. The list of orders can be filtered by patient ID.
+    """
 
     serializer_class = OrderSerializer
     permission_classes = [IsAdminOrReception]
 
     def get_queryset(self):
-        """Filter orders by patient if provided."""
+        """
+        Returns a queryset of orders, optionally filtered by patient.
+
+        If a `patient` query parameter is provided, the queryset will only
+        include orders for that patient. It also optimizes the query by
+        pre-fetching related patient and test data.
+
+        Returns:
+            QuerySet: A queryset of `Order` objects.
+        """
         queryset = (
             Order.objects.all()
             .select_related("patient")
@@ -29,7 +43,21 @@ class OrderListCreateView(generics.ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        """Create a new order."""
+        """
+        Handles the creation of a new order.
+
+        This method validates the incoming data using the `OrderSerializer`
+        and creates a new order along with its associated items and samples.
+
+        Args:
+            request (Request): The request object containing the order data.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            Response: A response with the created order's data and a 201
+                      status code, or an error response if validation fails.
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -40,7 +68,12 @@ class OrderListCreateView(generics.ListCreateAPIView):
 
 
 class OrderDetailView(generics.RetrieveAPIView):
-    """Retrieve order details."""
+    """
+    API view for retrieving the details of a specific order.
+
+    This view allows users with Admin or Reception roles to get the detailed
+    information for a single order, including its items and patient data.
+    """
 
     queryset = (
         Order.objects.all().select_related("patient").prefetch_related("items__test")
@@ -52,7 +85,21 @@ class OrderDetailView(generics.RetrieveAPIView):
 @api_view(["POST"])
 @permission_classes([IsAdminOrReception])
 def cancel_order(request, pk):
-    """Cancel an order if no samples have been collected."""
+    """
+    Cancels an order, if possible.
+
+    An order can only be canceled if none of its associated samples have been
+    collected. If the cancellation is successful, the order and all its items
+    are marked as 'CANCELLED'.
+
+    Args:
+        request (Request): The request object.
+        pk (int): The primary key of the order to cancel.
+
+    Returns:
+        Response: The serialized order data if successful, or an error
+                  response if the order cannot be canceled.
+    """
     try:
         order = Order.objects.prefetch_related("items__samples").get(pk=pk)
     except Order.DoesNotExist:
@@ -93,7 +140,22 @@ def cancel_order(request, pk):
 @api_view(["PATCH"])
 @permission_classes([IsAdminOrReception])
 def edit_order_tests(request, pk):
-    """Edit tests in an order (add/remove) if no samples or results exist."""
+    """
+    Edits the tests in an order by adding or removing items.
+
+    Tests can only be edited if the order has not yet progressed to the
+    sample collection or results entry stage. This prevents modifications
+    that would invalidate the existing workflow.
+
+    Args:
+        request (Request): The request object, containing lists of
+                           `tests_to_add` and `tests_to_remove`.
+        pk (int): The primary key of the order to edit.
+
+    Returns:
+        Response: The updated serialized order data if successful, or an
+                  error response if the order cannot be edited.
+    """
     try:
         order = Order.objects.prefetch_related("items__samples", "items__results").get(
             pk=pk

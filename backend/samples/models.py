@@ -6,7 +6,12 @@ from orders.models import OrderItem
 
 
 class SampleStatus(models.TextChoices):
-    """Sample status choices."""
+    """
+    Enumeration for the status of a lab sample.
+
+    This class defines the different stages a sample goes through, from
+    pending collection to being received in the lab or rejected.
+    """
 
     PENDING = "PENDING", "Pending Collection"
     COLLECTED = "COLLECTED", "Collected"
@@ -15,7 +20,23 @@ class SampleStatus(models.TextChoices):
 
 
 class Sample(models.Model):
-    """Sample model for lab specimen tracking."""
+    """
+    Represents a single lab sample (specimen).
+
+    This model tracks a sample from collection to receipt in the lab. Each
+    sample is linked to a specific `OrderItem` and has a unique barcode for
+    identification.
+
+    Attributes:
+        order_item (OrderItem): The order item this sample is for.
+        sample_type (str): The type of sample (e.g., 'Blood', 'Urine').
+        barcode (str): A unique, auto-generated barcode for the sample.
+        status (str): The current status of the sample (e.g., 'PENDING').
+        collected_at (datetime): Timestamp of when the sample was collected.
+        collected_by (User): The user who collected the sample.
+        received_at (datetime): Timestamp of when the sample was received.
+        received_by (User): The user who received the sample.
+    """
 
     order_item = models.ForeignKey(
         OrderItem, on_delete=models.CASCADE, related_name="samples"
@@ -56,7 +77,16 @@ class Sample(models.Model):
         return f"{self.barcode} - {self.sample_type}"
 
     def save(self, *args, **kwargs):
-        """Generate barcode on first save."""
+        """
+        Overrides the default save method to generate a unique barcode.
+
+        If the sample is being created and does not yet have a barcode, this
+        method generates one in the format `SAM-YYYYMMDD-NNNN`.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         if not self.barcode:
             # Generate barcode: SAM-YYYYMMDD-NNNN
             from django.utils import timezone

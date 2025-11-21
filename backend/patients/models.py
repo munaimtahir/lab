@@ -7,7 +7,31 @@ from core.models import LabTerminal
 
 
 class Patient(models.Model):
-    """Patient model with demographics."""
+    """
+    Represents a patient record in the system.
+
+    This model stores demographic and contact information for patients,
+    as well as system-specific details like the Medical Record Number (MRN)
+    and data synchronization status for offline entries.
+
+    Attributes:
+        mrn (str): The unique Medical Record Number for the patient.
+        full_name (str): The patient's full name.
+        father_name (str): The patient's father's name.
+        dob (date): The patient's date of birth.
+        sex (str): The patient's sex (M, F, or O).
+        phone (str): The patient's phone number.
+        cnic (str): The patient's National ID card number.
+        address (str): The patient's mailing address.
+        age_years (int): The patient's age in years (if dob is not available).
+        age_months (int): The patient's age in months (if dob is not available).
+        age_days (int): The patient's age in days (if dob is not available).
+        origin_terminal (LabTerminal): The terminal where the patient was registered.
+        is_offline_entry (bool): Whether the patient was registered offline.
+        synced_at (datetime): When the offline record was synced.
+        created_at (datetime): The timestamp when the record was created.
+        updated_at (datetime): The timestamp when the record was last updated.
+    """
 
     SEX_CHOICES = [
         ("M", "Male"),
@@ -85,7 +109,17 @@ class Patient(models.Model):
         return f"{self.mrn} - {self.full_name}"
 
     def save(self, *args, **kwargs):
-        """Generate MRN on first save."""
+        """
+        Overrides the default save method to generate a Medical Record Number (MRN).
+
+        If the patient record is new and does not have an MRN, this method
+        generates a unique MRN based on the current date and a sequential number.
+        The format is `PAT-YYYYMMDD-NNNN`.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         if not self.mrn:
             # Generate MRN: PAT-YYYYMMDD-NNNN
             from django.utils import timezone

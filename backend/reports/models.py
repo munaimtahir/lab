@@ -6,7 +6,18 @@ from orders.models import Order
 
 
 class Report(models.Model):
-    """Report model for lab reports."""
+    """
+    Represents a generated PDF report for an order.
+
+    This model links an order to its corresponding PDF report file. It also
+    tracks when the report was generated and by whom.
+
+    Attributes:
+        order (Order): The order that this report is for.
+        pdf_file (FileField): A reference to the generated PDF file in storage.
+        generated_at (datetime): The timestamp when the report was generated.
+        generated_by (User): The user who generated the report.
+    """
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="report")
     pdf_file = models.FileField(upload_to="reports/", null=True, blank=True)

@@ -18,7 +18,12 @@ from .serializers import ResultSerializer
 
 
 class ResultListCreateView(generics.ListCreateAPIView):
-    """List or create results."""
+    """
+    API view for listing and creating results.
+
+    This view provides `GET` and `POST` methods for listing all results and
+    creating new ones. Access is restricted to authenticated users.
+    """
 
     queryset = Result.objects.all().select_related(
         "order_item", "entered_by", "verified_by"
@@ -28,7 +33,12 @@ class ResultListCreateView(generics.ListCreateAPIView):
 
 
 class ResultDetailView(generics.RetrieveUpdateAPIView):
-    """Retrieve or update result."""
+    """
+    API view for retrieving and updating a single result.
+
+    This view allows authenticated users to retrieve the details of a specific
+    result or update its information.
+    """
 
     queryset = Result.objects.all().select_related(
         "order_item", "entered_by", "verified_by"
@@ -40,7 +50,20 @@ class ResultDetailView(generics.RetrieveUpdateAPIView):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def enter_result(request, pk):
-    """Enter result (technologist)."""
+    """
+    Marks a result as 'ENTERED'.
+
+    This action is typically performed by a technologist. It updates the
+    result's status and records the user and time of entry.
+
+    Args:
+        request (Request): The request object.
+        pk (int): The primary key of the result to be entered.
+
+    Returns:
+        Response: The serialized result data if successful, or an error
+                  response if the user lacks permission.
+    """
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
@@ -65,7 +88,21 @@ def enter_result(request, pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def verify_result(request, pk):
-    """Verify result (pathologist)."""
+    """
+    Marks a result as 'VERIFIED'.
+
+    This action is typically performed by a pathologist. It serves as a
+    check on the entered result before it can be published.
+
+    Args:
+        request (Request): The request object.
+        pk (int): The primary key of the result to be verified.
+
+    Returns:
+        Response: The serialized result data if successful, or an error
+                  response if the result is not in the correct state or
+                  the user lacks permission.
+    """
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
@@ -96,7 +133,22 @@ def verify_result(request, pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def publish_result(request, pk):
-    """Publish result (pathologist)."""
+    """
+    Marks a result as 'PUBLISHED'.
+
+    This is the final step in the result workflow, making the result
+    officially available. Depending on system settings, this may require
+    the result to be 'VERIFIED' first.
+
+    Args:
+        request (Request): The request object.
+        pk (int): The primary key of the result to be published.
+
+    Returns:
+        Response: The serialized result data if successful, or an error
+                  response if the result is not in the correct state or
+                  the user lacks permission.
+    """
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:

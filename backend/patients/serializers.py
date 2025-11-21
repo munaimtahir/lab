@@ -13,7 +13,18 @@ from .services import allocate_patient_mrn
 
 
 class PatientSerializer(serializers.ModelSerializer):
-    """Patient serializer with validation and offline registration support."""
+    """
+    Serializes Patient data for API output and validates incoming data.
+
+    This serializer handles the conversion of Patient model instances to JSON
+    and validates data for creating and updating patient records. It also
+    supports fields for offline registration, allowing patient data to be
+    captured on a terminal and synced later.
+
+    The serializer ensures that either a date of birth or age is provided,
+    and it can calculate one from the other. It also normalizes phone numbers
+    and validates the format of the National ID (CNIC).
+    """
 
     # Write-only fields for offline registration
     origin_terminal_code = serializers.CharField(
@@ -62,13 +73,38 @@ class PatientSerializer(serializers.ModelSerializer):
         ]
 
     def validate_dob(self, value):
-        """Validate that date of birth is not in the future."""
+        """
+        Validates that the date of birth is not in the future.
+
+        Args:
+            value (date): The date of birth to validate.
+
+        Returns:
+            date: The validated date of birth.
+
+        Raises:
+            serializers.ValidationError: If the date of birth is in the future.
+        """
         if value and value > date.today():
             raise serializers.ValidationError("Date of birth cannot be in the future.")
         return value
 
     def validate_phone(self, value):
-        """Normalize phone number."""
+        """
+        Normalizes and validates a Pakistani mobile phone number.
+
+        The number is normalized by removing spaces and hyphens. It then
+        validates that the number starts with a valid prefix ('+92' or '0').
+
+        Args:
+            value (str): The phone number to validate.
+
+        Returns:
+            str: The normalized phone number.
+
+        Raises:
+            serializers.ValidationError: If the phone number format is invalid.
+        """
         # Remove spaces and hyphens
         phone = value.replace(" ", "").replace("-", "")
         # Ensure it starts with +92 or 0
@@ -77,7 +113,21 @@ class PatientSerializer(serializers.ModelSerializer):
         return phone
 
     def validate_cnic(self, value):
-        """Validate CNIC format."""
+        """
+        Validates the format of a Pakistani National ID card (CNIC).
+
+        The expected format is '#####-#######-#'. The field is optional,
+        so None or an empty string are considered valid.
+
+        Args:
+            value (str): The CNIC number to validate.
+
+        Returns:
+            str or None: The validated CNIC number or None if it's empty.
+
+        Raises:
+            serializers.ValidationError: If the CNIC format is invalid.
+        """
         import re
 
         # Allow None or empty string (optional field)
@@ -89,7 +139,26 @@ class PatientSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        """Validate that either DOB or at least one age field is provided."""
+        """
+        Validates that either DOB or age is provided and calculates missing values.
+
+        This method ensures that a patient record contains either a date of birth
+        or at least one age component (years, months, or days). If one is missing,
+        it calculates it from the other.
+
+        - If only age is provided, DOB is calculated from the current date.
+        - If only DOB is provided, age components are calculated.
+
+        Args:
+            attrs (dict): The dictionary of attributes to validate.
+
+        Returns:
+            dict: The validated and updated attributes.
+
+        Raises:
+            serializers.ValidationError: If neither DOB nor age is provided, or if
+                                     the age values are invalid.
+        """
         dob = attrs.get('dob')
         age_years = attrs.get('age_years')
         age_months = attrs.get('age_months')
@@ -140,7 +209,23 @@ class PatientSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        """Create a patient with offline registration support."""
+        """
+        Creates a new patient record with support for offline registration.
+
+        This method handles both online and offline patient creation. For offline
+        registrations, it uses the `allocate_patient_mrn` service to generate
+        a Medical Record Number (MRN) from a terminal-specific range.
+
+        Args:
+            validated_data (dict): The validated data for creating a patient.
+
+        Returns:
+            Patient: The newly created patient instance.
+
+        Raises:
+            serializers.ValidationError: If there are issues with offline registration,
+                                     such as an invalid terminal or exhausted MRN range.
+        """
         # Extract offline-specific fields
         origin_terminal_code = validated_data.pop("origin_terminal_code", None)
         offline = validated_data.pop("offline", False)

@@ -16,7 +16,13 @@ from .serializers import ReportSerializer
 
 
 class ReportListView(generics.ListAPIView):
-    """List all reports."""
+    """
+    API view for listing all generated reports.
+
+    This view provides a `GET` method to retrieve a list of all reports that
+    have been generated in the system. Access is restricted to authenticated
+    users.
+    """
 
     queryset = Report.objects.all().select_related("order", "generated_by")
     serializer_class = ReportSerializer
@@ -24,7 +30,12 @@ class ReportListView(generics.ListAPIView):
 
 
 class ReportDetailView(generics.RetrieveAPIView):
-    """Retrieve a specific report."""
+    """
+    API view for retrieving a single report.
+
+    This view allows authenticated users to retrieve the details of a specific
+    report by its ID.
+    """
 
     queryset = Report.objects.all().select_related("order", "generated_by")
     serializer_class = ReportSerializer
@@ -34,7 +45,22 @@ class ReportDetailView(generics.RetrieveAPIView):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def generate_report(request, order_id):
-    """Generate PDF report for an order."""
+    """
+    Generates and saves a PDF report for a given order.
+
+    This view triggers the PDF generation process for an order. It checks if
+    all results for the order are published and if the user has the correct
+    permissions (Pathologist or Admin). The generated PDF is then saved to
+    a `Report` model instance.
+
+    Args:
+        request (Request): The request object.
+        order_id (int): The primary key of the order to generate a report for.
+
+    Returns:
+        Response: The serialized report data if successful, or an error
+                  response if the report cannot be generated.
+    """
     try:
         order = Order.objects.get(pk=order_id)
     except Order.DoesNotExist:
@@ -74,7 +100,21 @@ def generate_report(request, order_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def download_report(request, pk):
-    """Download report PDF."""
+    """
+    Allows a user to download a generated report PDF.
+
+    This view serves the PDF file associated with a report, allowing users
+    to download it. It returns a `FileResponse` with the appropriate headers
+    to trigger a download in the browser.
+
+    Args:
+        request (Request): The request object.
+        pk (int): The primary key of the report to download.
+
+    Returns:
+        FileResponse: The PDF file as a downloadable attachment, or an
+                      error response if the report or file is not found.
+    """
     try:
         report = Report.objects.get(pk=pk)
     except Report.DoesNotExist:

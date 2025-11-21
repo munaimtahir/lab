@@ -13,7 +13,12 @@ from .serializers import SampleSerializer
 
 
 class SampleListCreateView(generics.ListCreateAPIView):
-    """List or create samples."""
+    """
+    API view for listing and creating samples.
+
+    This view provides `GET` and `POST` methods for listing all samples and
+    creating new ones. Access is restricted to authenticated users.
+    """
 
     queryset = Sample.objects.all().select_related(
         "order_item", "collected_by", "received_by"
@@ -23,7 +28,12 @@ class SampleListCreateView(generics.ListCreateAPIView):
 
 
 class SampleDetailView(generics.RetrieveUpdateAPIView):
-    """Retrieve or update sample."""
+    """
+    API view for retrieving and updating a single sample.
+
+    This view allows authenticated users to retrieve the details of a specific
+    sample or update its information.
+    """
 
     queryset = Sample.objects.all().select_related(
         "order_item", "collected_by", "received_by"
@@ -35,7 +45,22 @@ class SampleDetailView(generics.RetrieveUpdateAPIView):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def collect_sample(request, pk):
-    """Mark sample as collected."""
+    """
+    Marks a sample as collected.
+
+    This view updates the sample's status to 'COLLECTED' and records the
+    user who performed the action and the time of collection. Access is
+    controlled by the `user_can_collect` permission.
+
+    Args:
+        request (Request): The request object.
+        pk (int): The primary key of the sample to be collected.
+
+    Returns:
+        Response: The serialized sample data if successful, or an error
+                  response if the sample is not found or the user lacks
+                  permission.
+    """
     try:
         sample = Sample.objects.get(pk=pk)
     except Sample.DoesNotExist:
@@ -60,7 +85,22 @@ def collect_sample(request, pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def receive_sample(request, pk):
-    """Mark sample as received in lab."""
+    """
+    Marks a sample as received in the lab.
+
+    This view updates the sample's status to 'RECEIVED' and records the
+    user who received it and the time of receipt. Access is restricted
+    to lab staff.
+
+    Args:
+        request (Request): The request object.
+        pk (int): The primary key of the sample to be received.
+
+    Returns:
+        Response: The serialized sample data if successful, or an error
+                  response if the sample is not found or the user lacks
+                  permission.
+    """
     try:
         sample = Sample.objects.get(pk=pk)
     except Sample.DoesNotExist:
@@ -89,7 +129,23 @@ def receive_sample(request, pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def reject_sample(request, pk):
-    """Reject a sample with a reason."""
+    """
+    Rejects a sample and records the reason.
+
+    This view updates the sample's status to 'REJECTED' and saves the
+    provided reason. A sample can only be rejected if it has not already
+    been processed. Access is restricted to lab staff.
+
+    Args:
+        request (Request): The request object, containing the
+                           `rejection_reason`.
+        pk (int): The primary key of the sample to be rejected.
+
+    Returns:
+        Response: The serialized sample data if successful, or an error
+                  response if the sample cannot be rejected or the reason
+                  is missing.
+    """
     try:
         sample = Sample.objects.get(pk=pk)
     except Sample.DoesNotExist:

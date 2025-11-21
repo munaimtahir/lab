@@ -7,7 +7,12 @@ from patients.models import Patient
 
 
 class OrderStatus(models.TextChoices):
-    """Order status choices."""
+    """
+    Enumeration for the status of an order or order item.
+
+    This class defines the various stages an order can go through in its
+    lifecycle, from creation to completion.
+    """
 
     NEW = "NEW", "New"
     COLLECTED = "COLLECTED", "Collected"
@@ -18,7 +23,12 @@ class OrderStatus(models.TextChoices):
 
 
 class OrderPriority(models.TextChoices):
-    """Order priority choices."""
+    """
+    Enumeration for the priority level of an order.
+
+    This class defines the urgency of an order, which can affect how it is
+    processed in the lab.
+    """
 
     ROUTINE = "ROUTINE", "Routine"
     URGENT = "URGENT", "Urgent"
@@ -26,7 +36,19 @@ class OrderPriority(models.TextChoices):
 
 
 class Order(models.Model):
-    """Order model."""
+    """
+    Represents a patient's order for one or more lab tests.
+
+    This model is the central record for a test order, linking a patient to the
+    tests they need. It tracks the overall status and priority of the order.
+
+    Attributes:
+        order_no (str): A unique, auto-generated number for the order.
+        patient (Patient): The patient the order belongs to.
+        priority (str): The priority of the order (e.g., 'ROUTINE', 'URGENT').
+        status (str): The current status of the order (e.g., 'NEW', 'COLLECTED').
+        notes (str): Any additional notes about the order.
+    """
 
     order_no = models.CharField(max_length=20, unique=True)
     patient = models.ForeignKey(
@@ -59,7 +81,16 @@ class Order(models.Model):
         return f"{self.order_no} - {self.patient.full_name}"
 
     def save(self, *args, **kwargs):
-        """Generate order number on first save."""
+        """
+        Overrides the default save method to generate a unique order number.
+
+        If the order is being created and does not have an `order_no`, this
+        method generates one in the format `ORD-YYYYMMDD-NNNN`.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        """
         if not self.order_no:
             from django.utils import timezone
 
@@ -79,7 +110,18 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    """Order item model representing a test in an order."""
+    """
+    Represents a single test within an `Order`.
+
+    An order can consist of multiple tests, and each test is represented by an
+    `OrderItem`. This allows for individual tracking of the status of each
+t   est in an order.
+
+    Attributes:
+        order (Order): The order this item belongs to.
+        test (TestCatalog): The specific test that was ordered.
+        status (str): The status of this individual test.
+    """
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     test = models.ForeignKey(TestCatalog, on_delete=models.PROTECT)

@@ -5,7 +5,13 @@ from django.db import models
 
 
 class UserRole(models.TextChoices):
-    """User role choices."""
+    """
+    Enumeration for user roles within the system.
+
+    This class defines the available roles that can be assigned to a user,
+    restricting their permissions and access to different parts of the
+    application.
+    """
 
     ADMIN = "ADMIN", "Admin"
     RECEPTION = "RECEPTION", "Reception"
@@ -15,7 +21,17 @@ class UserRole(models.TextChoices):
 
 
 class User(AbstractUser):
-    """Custom user model with role-based permissions."""
+    """
+    Custom user model for the application.
+
+    This model extends Django's built-in `AbstractUser` to include a `role`
+    field, which is used for role-based access control (RBAC). It also adds
+    an optional `phone` number field.
+
+    Attributes:
+        role (str): The user's role, chosen from the `UserRole` enumeration.
+        phone (str): The user's phone number.
+    """
 
     role = models.CharField(
         max_length=20,
