@@ -4,12 +4,16 @@ FROM node:20-slim AS frontend-builder
 WORKDIR /app
 
 # Install pnpm (matching version from frontend/package.json)
+# Note: strict-ssl=false is needed for CI/CD environments with self-signed certificates.
+# For production, consider configuring proper SSL certificates instead.
 RUN npm config set strict-ssl false && npm install -g pnpm@8.15.9
 
 # Copy frontend package files
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
 # Install dependencies
+# Note: strict-ssl=false is needed for CI/CD environments with self-signed certificates.
+# For production, consider configuring proper SSL certificates instead.
 RUN pnpm config set strict-ssl false && pnpm install --frozen-lockfile
 
 # Copy frontend application code

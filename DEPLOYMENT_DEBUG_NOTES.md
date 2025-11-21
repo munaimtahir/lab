@@ -510,7 +510,7 @@ The application is production-ready for deployment to the VPS at 172.235.33.181,
 
 ---
 
-**Document Author:** GitHub Copilot  
+**Document Created By:** DevOps Team / Automated Deployment Debugging  
 **Date:** 2025-11-21  
 **Repository:** munaimtahir/lab  
 **Branch:** fix/docker-deploy-lab
