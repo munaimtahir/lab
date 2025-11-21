@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from settings.permissions import user_can_collect
+from users.models import UserRole
 
 from .models import Sample, SampleStatus
 from .serializers import SampleSerializer
