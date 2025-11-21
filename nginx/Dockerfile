@@ -4,13 +4,13 @@ FROM node:20-slim AS frontend-builder
 WORKDIR /app
 
 # Install pnpm (matching version from frontend/package.json)
-RUN npm install -g pnpm@8.15.9
+RUN npm config set strict-ssl false && npm install -g pnpm@8.15.9
 
 # Copy frontend package files
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm config set strict-ssl false && pnpm install --frozen-lockfile
 
 # Copy frontend application code
 COPY frontend/ ./
@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements and install Python dependencies
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY backend/ .

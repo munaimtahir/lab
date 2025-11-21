@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { settingsService, RolePermission } from '../../services/settings'
+import { settingsService, type RolePermission } from '../../services/settings'
 
 export function RolePermissionsPage() {
   const [permissions, setPermissions] = useState<RolePermission[]>([])
