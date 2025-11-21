@@ -4,13 +4,17 @@ FROM node:20-slim AS frontend-builder
 WORKDIR /app
 
 # Install pnpm (matching version from frontend/package.json)
-RUN npm install -g pnpm@8.15.9
+# Note: strict-ssl=false is needed for CI/CD environments with self-signed certificates.
+# For production, consider configuring proper SSL certificates instead.
+RUN npm config set strict-ssl false && npm install -g pnpm@8.15.9
 
 # Copy frontend package files
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+# Note: strict-ssl=false is needed for CI/CD environments with self-signed certificates.
+# For production, consider configuring proper SSL certificates instead.
+RUN pnpm config set strict-ssl false && pnpm install --frozen-lockfile
 
 # Copy frontend application code
 COPY frontend/ ./
@@ -41,7 +45,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements and install Python dependencies
 COPY backend/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY backend/ .
@@ -53,6 +57,9 @@ RUN python manage.py collectstatic --noinput
 
 # Stage 3: Serve with nginx
 FROM nginx:alpine
+
+# Install curl for healthcheck
+RUN apk add --no-cache curl
 
 # Copy built frontend files from frontend-builder stage
 COPY --from=frontend-builder /app/dist /usr/share/nginx/html
@@ -68,7 +75,7 @@ EXPOSE 80 443
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+    CMD curl -f http://localhost/ || exit 1
 
 # nginx runs in foreground by default
 CMD ["nginx", "-g", "daemon off;"]

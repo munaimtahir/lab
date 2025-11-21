@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { settingsService, UserPermissions } from '../services/settings'
+import { settingsService, type UserPermissions } from '../services/settings'
 
 export function useUserPermissions() {
   const [permissions, setPermissions] = useState<UserPermissions | null>(null)

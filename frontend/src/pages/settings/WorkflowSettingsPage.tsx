@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { settingsService, WorkflowSettings } from '../../services/settings'
+import { settingsService, type WorkflowSettings } from '../../services/settings'
 
 export function WorkflowSettingsPage() {
   const [settings, setSettings] = useState<WorkflowSettings>({
