@@ -20,6 +20,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         user_serializer = UserSerializer(self.user)
         data["user"] = user_serializer.data
+        # Add role and username at top level for convenience
+        data["role"] = self.user.role
+        data["username"] = self.user.username
         return data
 
 
