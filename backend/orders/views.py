@@ -11,13 +11,26 @@ from .serializers import OrderSerializer
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
-    """List orders or create a new order."""
+    """
+    Lists and creates orders.
+
+    Allows for the retrieval of a list of all orders, and the creation of new
+    orders. Creation is restricted to admin and reception users.
+
+    Filtering:
+    - `patient` (integer): Filters orders by the patient's ID.
+    """
 
     serializer_class = OrderSerializer
     permission_classes = [IsAdminOrReception]
 
     def get_queryset(self):
-        """Filter orders by patient if provided."""
+        """
+        Optionally filters the queryset by a `patient` ID.
+
+        Returns:
+            QuerySet: The filtered queryset of `Order` objects.
+        """
         queryset = (
             Order.objects.all()
             .select_related("patient")
@@ -29,7 +42,17 @@ class OrderListCreateView(generics.ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        """Create a new order."""
+        """
+        Creates a new order.
+
+        Args:
+            request: The request object.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            Response: The response object with the created order data.
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -40,7 +63,9 @@ class OrderListCreateView(generics.ListCreateAPIView):
 
 
 class OrderDetailView(generics.RetrieveAPIView):
-    """Retrieve order details."""
+    """
+    Retrieves the details of a specific order.
+    """
 
     queryset = (
         Order.objects.all().select_related("patient").prefetch_related("items__test")
@@ -52,7 +77,16 @@ class OrderDetailView(generics.RetrieveAPIView):
 @api_view(["POST"])
 @permission_classes([IsAdminOrReception])
 def cancel_order(request, pk):
-    """Cancel an order if no samples have been collected."""
+    """
+    Cancels an order if no samples have been collected.
+
+    Args:
+        request: The request object.
+        pk (int): The primary key of the order to cancel.
+
+    Returns:
+        Response: A response object with a success or error message.
+    """
     try:
         order = Order.objects.prefetch_related("items__samples").get(pk=pk)
     except Order.DoesNotExist:
@@ -69,7 +103,7 @@ def cancel_order(request, pk):
     for item in order.items.all():
         if item.samples.filter(
             status__in=["COLLECTED", "RECEIVED"]
-        ).exists():  # Sample status strings are fine here
+        ).exists():
             has_collected_samples = True
             break
 
@@ -93,7 +127,18 @@ def cancel_order(request, pk):
 @api_view(["PATCH"])
 @permission_classes([IsAdminOrReception])
 def edit_order_tests(request, pk):
-    """Edit tests in an order (add/remove) if no samples or results exist."""
+    """
+    Edits the tests in an order (add/remove).
+
+    This is only possible if no samples or results have been created for the order.
+
+    Args:
+        request: The request object, containing `tests_to_add` and/or `tests_to_remove`.
+        pk (int): The primary key of the order to edit.
+
+    Returns:
+        Response: A response object with the updated order data or an error message.
+    """
     try:
         order = Order.objects.prefetch_related("items__samples", "items__results").get(
             pk=pk

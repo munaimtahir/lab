@@ -6,7 +6,9 @@ from .models import RolePermission, WorkflowSettings
 
 
 class WorkflowSettingsSerializer(serializers.ModelSerializer):
-    """Serializer for workflow settings."""
+    """
+    Serializer for the WorkflowSettings model.
+    """
 
     class Meta:
         model = WorkflowSettings
@@ -20,7 +22,9 @@ class WorkflowSettingsSerializer(serializers.ModelSerializer):
 
 
 class RolePermissionSerializer(serializers.ModelSerializer):
-    """Serializer for role permissions."""
+    """
+    Serializer for the RolePermission model.
+    """
 
     class Meta:
         model = RolePermission

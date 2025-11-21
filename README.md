@@ -72,8 +72,7 @@ This imports 987 tests, 1161 parameters, and reference ranges from the Excel fil
 
 **📖 For detailed instructions, see [LIMS Master Data Import Guide](backend/LIMS_IMPORT.md)**
 
-> **✅ Production Ready**: This repository is configured for production deployment on VPS with IP 172.235.33.181.
-> All localhost and development port references have been removed from production configurations.
+> **✅ Production Ready**: This repository is configured for production deployment on a VPS. All localhost and development port references have been removed from production configurations.
 > 
 > **Security Note**: Before deploying:
 > 1. Generate strong passwords: `POSTGRES_PASSWORD=$(openssl rand -base64 32)`
@@ -110,79 +109,47 @@ VITE_API_URL=/api
 # For direct backend access (development):
 VITE_API_URL=http://localhost:8000
 
-# For VPS without nginx proxy:
-VITE_API_URL=http://172.235.33.181:8000
+# For a VPS without a reverse proxy:
+VITE_API_URL=http://<your_vps_ip>:8000
 ```
 
 **Backend Configuration:**
 ```bash
 # Allowed hosts (comma-separated)
-ALLOWED_HOSTS=172.235.33.181,localhost,127.0.0.1
+ALLOWED_HOSTS=<your_domain_or_ip>,localhost,127.0.0.1
 
 # CORS origins (comma-separated)
-CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://localhost:5173
+CORS_ALLOWED_ORIGINS=http://<your_domain_or_ip>,http://localhost:5173
 
 # CSRF trusted origins (comma-separated)
-CSRF_TRUSTED_ORIGINS=http://172.235.33.181,http://localhost:5173
-```
-
-### Deployment Scenarios
-
-#### Scenario 1: Local Development
-```bash
-cd infra
-docker-compose up
-
-# Frontend: http://localhost:5173
-# Backend: http://localhost:8000
-# Configuration: infra/.env.example → .env
-```
-
-#### Scenario 2: VPS Production (e.g., http://172.235.33.181)
-```bash
-# Root directory
-docker compose up -d
-
-# Frontend: http://172.235.33.181 (nginx on port 80)
-# Backend: http://172.235.33.181/api/ (proxied)
-# Configuration: .env.example → .env (update IP address)
-```
-
-#### Scenario 3: Domain-based Production (e.g., https://lims.example.com)
-```bash
-# Update .env:
-# ALLOWED_HOSTS=lims.example.com
-# CORS_ALLOWED_ORIGINS=https://lims.example.com
-# CSRF_TRUSTED_ORIGINS=https://lims.example.com
-
-docker compose up -d
+CSRF_TRUSTED_ORIGINS=http://<your_domain_or_ip>,http://localhost:5173
 ```
 
 ## 🏗️ Architecture
 
-- **Backend**: Python 3.12, Django 5.2, Django REST Framework, PostgreSQL 16, Redis 7
-- **Frontend**: React 19, TypeScript, Vite, TailwindCSS
-- **Authentication**: JWT with token blacklisting and role-based access control
-- **Infrastructure**: Docker Compose with health checks, GitHub Actions CI/CD, Nginx reverse proxy
-- **Testing**: 99% backend coverage, 166 comprehensive tests
+- **Backend**: Python 3.12, Django 5.2, Django REST Framework, PostgreSQL 16, Redis 7. A modular architecture with separate apps for each major feature.
+- **Frontend**: React 19, TypeScript, Vite, TailwindCSS. A modern, component-based architecture with a focus on reusability and performance.
+- **Authentication**: JWT with token blacklisting and role-based access control.
+- **Infrastructure**: Docker Compose for container orchestration, with health checks for all services.
+- **CI/CD**: GitHub Actions for automated testing, linting, and building of Docker images on every push and pull request.
 
 ## ✨ Complete LIMS Workflow
 
-1. **Patient Registration** - Auto-generated MRN, Pakistani ID validation
-2. **Order Creation** - Multi-test orders with tracking
-3. **Sample Collection** - Barcode generation, phlebotomy workflow
-4. **Sample Receiving** - Lab acceptance workflow
-5. **Result Entry** - Technologist interface
-6. **Result Verification** - Pathologist review
-7. **Result Publishing** - Final authorization
-8. **PDF Reports** - Al Shifa template with signatures
-9. **Report Download** - Secure delivery
+1. **Patient Registration**: Auto-generated MRN, Pakistani ID validation, and offline registration support.
+2. **Order Creation**: Multi-test orders with tracking and priority settings.
+3. **Sample Collection**: Barcode generation and phlebotomy workflow.
+4. **Sample Receiving**: Lab acceptance and rejection workflow.
+5. **Result Entry**: Technologist interface for entering results.
+6. **Result Verification**: Pathologist review and verification of results.
+7. **Result Publishing**: Final authorization and publishing of results.
+8. **PDF Reports**: Automated generation of PDF reports with Al Shifa branding and digital signatures.
+9. **Report Download**: Secure delivery and download of reports.
 
 ## 📊 Test Coverage
 
-- **Backend**: 99.1% coverage (106 tests passing)
-- **Frontend**: 60 tests passing (Vitest + React Testing Library)
-- **CI/CD**: Automated testing on all PRs and commits
+- **Backend**: 99.1% coverage with 106 tests passing.
+- **Frontend**: 60 tests passing (Vitest + React Testing Library).
+- **CI/CD**: Automated testing on all pull requests and commits to the `main` branch.
 
 | Module | Tests | Coverage |
 |--------|-------|----------|
@@ -218,8 +185,6 @@ cp .env.example .env
 
 # 2. Start with Docker (recommended)
 cd infra && docker-compose up
-
-# OR run services individually:
 ```
 
 ### Backend Development
@@ -240,10 +205,18 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
+### Code Quality and Linting
+
+This project uses `pre-commit` to enforce code quality and consistency. To set up the pre-commit hooks, run:
+```bash
+pip install pre-commit
+pre-commit install
+```
+
 ## 🧪 Testing
 
 ```bash
-# Backend tests (97% coverage)
+# Backend tests (99% coverage)
 cd backend
 pytest -v --cov=. --cov-report=term-missing
 
@@ -273,10 +246,10 @@ curl http://localhost:8000/api/health/
 ## 🔐 Security
 
 - JWT authentication with token blacklisting
-- Role-based access control (5 roles)
+- Role-based access control (5 roles) with granular permissions
 - Input validation (CNIC, phone, DOB)
 - Zero dependency vulnerabilities
-- State machine workflow enforcement
+- State machine workflow enforcement to prevent unauthorized state transitions
 
 ## 🎯 API Endpoints
 
@@ -307,10 +280,10 @@ See [docs/API.md](docs/API.md) for complete documentation.
 
 ## 📊 Project Stats
 
-- **80 tests passing** (100% pass rate)
-- **97% code coverage**
-- **7 complete modules**
-- **30+ API endpoints**
+- **166 tests passing** (100% pass rate)
+- **99% backend code coverage**
+- **10 complete modules**
+- **40+ API endpoints**
 - **Zero security vulnerabilities**
 - **Production-ready**
 

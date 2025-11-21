@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { settingsService, type UserPermissions } from '../services/settings'
 
+/**
+ * Custom hook for fetching and managing user permissions.
+ * @returns {object} An object containing the user's permissions, loading state, error state, and a refresh function.
+ */
 export function useUserPermissions() {
   const [permissions, setPermissions] = useState<UserPermissions | null>(null)
   const [loading, setLoading] = useState(true)
@@ -25,11 +29,13 @@ export function useUserPermissions() {
     }
   }
 
+  /**
+   * Refreshes the user's permissions.
+   */
   const refresh = () => {
     fetchPermissions()
   }
 
-  // Helper functions
   const canRegister = permissions?.permissions.can_register ?? false
   const canCollect = permissions?.permissions.can_collect ?? false
   const canEnterResult = permissions?.permissions.can_enter_result ?? false
@@ -43,7 +49,6 @@ export function useUserPermissions() {
     loading,
     error,
     refresh,
-    // Permission flags
     canRegister,
     canCollect,
     canEnterResult,

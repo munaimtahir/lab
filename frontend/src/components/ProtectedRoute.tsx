@@ -2,11 +2,19 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { ROUTES } from '../utils/constants'
 
+/**
+ * Interface for the props of the ProtectedRoute component.
+ */
 interface ProtectedRouteProps {
   children: React.ReactNode
   allowedRoles?: string[]
 }
 
+/**
+ * A component that protects a route from unauthenticated or unauthorized users.
+ * @param {ProtectedRouteProps} props - The component props.
+ * @returns {JSX.Element} The rendered component.
+ */
 export function ProtectedRoute({
   children,
   allowedRoles,
@@ -28,7 +36,6 @@ export function ProtectedRoute({
     return <Navigate to={ROUTES.LOGIN} replace />
   }
 
-  // Check role-based access
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return (
       <div className="min-h-screen flex items-center justify-center">

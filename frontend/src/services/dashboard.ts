@@ -2,7 +2,17 @@ import { apiClient } from './api'
 import { DASHBOARD_ENDPOINTS } from '../utils/constants'
 import type { DashboardAnalytics } from '../types'
 
+/**
+ * Service for handling dashboard-related API calls.
+ */
 export const dashboardService = {
+  /**
+   * Retrieves dashboard analytics.
+   * @param {object} [params] - The parameters for filtering the analytics.
+   * @param {string} [params.start_date] - The start date for the analytics.
+   * @param {string} [params.end_date] - The end date for the analytics.
+   * @returns {Promise<DashboardAnalytics>} A promise that resolves with the dashboard analytics.
+   */
   async getAnalytics(params?: {
     start_date?: string
     end_date?: string

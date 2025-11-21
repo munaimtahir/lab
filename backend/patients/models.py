@@ -7,7 +7,30 @@ from core.models import LabTerminal
 
 
 class Patient(models.Model):
-    """Patient model with demographics."""
+    """
+    Represents a patient's demographic and contact information.
+
+    Attributes:
+        SEX_CHOICES (list): Choices for the sex field.
+        cnic_validator (RegexValidator): Validator for the CNIC field.
+        phone_validator (RegexValidator): Validator for the phone field.
+        mrn (CharField): Medical Record Number, auto-generated and unique.
+        full_name (CharField): The patient's full name.
+        father_name (CharField): The patient's father's name.
+        dob (DateField): The patient's date of birth.
+        sex (CharField): The patient's sex.
+        phone (CharField): The patient's phone number.
+        cnic (CharField): The patient's Computerized National Identity Card number.
+        address (TextField): The patient's address.
+        age_years (IntegerField): The patient's age in years (alternative to DOB).
+        age_months (IntegerField): The patient's age in months (alternative to DOB).
+        age_days (IntegerField): The patient's age in days (alternative to DOB).
+        origin_terminal (ForeignKey): The terminal where the patient was registered.
+        is_offline_entry (BooleanField): Flag for offline registrations.
+        synced_at (DateTimeField): Timestamp for when an offline record was synced.
+        created_at (DateTimeField): The timestamp when the patient was created.
+        updated_at (DateTimeField): The timestamp when the patient was last updated.
+    """
 
     SEX_CHOICES = [
         ("M", "Male"),
@@ -82,10 +105,15 @@ class Patient(models.Model):
         ]
 
     def __str__(self):
+        """Returns a string representation of the patient."""
         return f"{self.mrn} - {self.full_name}"
 
     def save(self, *args, **kwargs):
-        """Generate MRN on first save."""
+        """
+        Overrides the default save method to generate a Medical Record Number (MRN).
+
+        The MRN is generated based on the current date and a sequential number.
+        """
         if not self.mrn:
             # Generate MRN: PAT-YYYYMMDD-NNNN
             from django.utils import timezone

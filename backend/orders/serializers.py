@@ -12,7 +12,9 @@ from .models import Order, OrderItem
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    """Order item serializer."""
+    """
+    Serializer for the OrderItem model.
+    """
 
     test_detail = TestCatalogSerializer(source="test", read_only=True)
 
@@ -23,7 +25,12 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    """Order serializer."""
+    """
+    Serializer for the Order model.
+
+    Handles the serialization and deserialization of Order objects, including
+    the creation of associated OrderItems and Samples.
+    """
 
     items = OrderItemSerializer(many=True, read_only=True)
     patient_detail = PatientSerializer(source="patient", read_only=True)
@@ -51,7 +58,19 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "order_no", "status", "created_at", "updated_at"]
 
     def create(self, validated_data):
-        """Create order with order items and samples."""
+        """
+        Creates an order with its associated order items and samples.
+
+        This method also handles the automatic creation of samples and sets their
+        status based on the current workflow settings (e.g., skipping sample
+        collection or reception).
+
+        Args:
+            validated_data (dict): The validated data for the order.
+
+        Returns:
+            Order: The newly created order instance.
+        """
         test_ids = validated_data.pop("test_ids")
         order = Order.objects.create(**validated_data)
 

@@ -2,6 +2,12 @@ import { API_BASE_URL, STORAGE_KEYS } from '../utils/constants'
 
 export { API_BASE_URL }
 
+/**
+ * Custom error class for API-related errors.
+ * @param {string} message - The error message.
+ * @param {number} [status] - The HTTP status code of the response.
+ * @param {unknown} [data] - The response data.
+ */
 export class ApiError extends Error {
   status?: number
   data?: unknown
@@ -14,21 +20,36 @@ export class ApiError extends Error {
   }
 }
 
+/**
+ * A client for interacting with the API.
+ * Handles token storage, token refreshing, and request signing.
+ */
 class ApiClient {
   private baseURL: string
   private accessToken: string | null = null
   private refreshToken: string | null = null
 
+  /**
+   * @param {string} baseURL - The base URL of the API.
+   */
   constructor(baseURL: string) {
     this.baseURL = baseURL
     this.loadTokens()
   }
 
+  /**
+   * Loads access and refresh tokens from local storage.
+   */
   private loadTokens() {
     this.accessToken = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
     this.refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
   }
 
+  /**
+   * Sets and stores the access and refresh tokens.
+   * @param {string} access - The access token.
+   * @param {string} refresh - The refresh token.
+   */
   public setTokens(access: string, refresh: string) {
     this.accessToken = access
     this.refreshToken = refresh
@@ -36,6 +57,9 @@ class ApiClient {
     localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refresh)
   }
 
+  /**
+   * Clears the stored tokens and user data.
+   */
   public clearTokens() {
     this.accessToken = null
     this.refreshToken = null
@@ -44,10 +68,18 @@ class ApiClient {
     localStorage.removeItem(STORAGE_KEYS.USER)
   }
 
+  /**
+   * Returns the current access token.
+   * @returns {string | null} The access token, or null if not set.
+   */
   public getAccessToken() {
     return this.accessToken
   }
 
+  /**
+   * Refreshes the access token using the refresh token.
+   * @returns {Promise<string>} A promise that resolves with the new access token.
+   */
   private async refreshAccessToken(): Promise<string> {
     if (!this.refreshToken) {
       throw new ApiError('No refresh token available', 401)
@@ -72,6 +104,13 @@ class ApiClient {
     return data.access
   }
 
+  /**
+   * Makes a request to the API.
+   * Handles token refreshing and retries on 401 errors.
+   * @param {string} path - The path of the API endpoint.
+   * @param {RequestInit} [options] - The request options.
+   * @returns {Promise<T>} A promise that resolves with the response data.
+   */
   public async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${path}`
     const headers: Record<string, string> = {
@@ -88,7 +127,6 @@ class ApiClient {
       headers,
     })
 
-    // If 401, try to refresh token and retry once
     if (
       response.status === 401 &&
       this.refreshToken &&
@@ -116,7 +154,6 @@ class ApiClient {
       )
     }
 
-    // Handle empty responses
     const contentType = response.headers.get('content-type')
     if (contentType && contentType.includes('application/json')) {
       return response.json()
@@ -125,10 +162,23 @@ class ApiClient {
     return {} as T
   }
 
+  /**
+   * Makes a GET request to the API.
+   * @param {string} path - The path of the API endpoint.
+   * @param {RequestInit} [options] - The request options.
+   * @returns {Promise<T>} A promise that resolves with the response data.
+   */
   public async get<T>(path: string, options?: RequestInit): Promise<T> {
     return this.request<T>(path, { ...options, method: 'GET' })
   }
 
+  /**
+   * Makes a POST request to the API.
+   * @param {string} path - The path of the API endpoint.
+   * @param {unknown} [data] - The request data.
+   * @param {RequestInit} [options] - The request options.
+   * @returns {Promise<T>} A promise that resolves with the response data.
+   */
   public async post<T>(
     path: string,
     data?: unknown,
@@ -141,6 +191,13 @@ class ApiClient {
     })
   }
 
+  /**
+   * Makes a PUT request to the API.
+   * @param {string} path - The path of the API endpoint.
+   * @param {unknown} [data] - The request data.
+   * @param {RequestInit} [options] - The request options.
+   * @returns {Promise<T>} A promise that resolves with the response data.
+   */
   public async put<T>(
     path: string,
     data?: unknown,
@@ -153,6 +210,13 @@ class ApiClient {
     })
   }
 
+  /**
+   * Makes a PATCH request to the API.
+   * @param {string} path - The path of the API endpoint.
+   * @param {unknown} [data] - The request data.
+   * @param {RequestInit} [options] - The request options.
+   * @returns {Promise<T>} A promise that resolves with the response data.
+   */
   public async patch<T>(
     path: string,
     data?: unknown,
@@ -165,6 +229,12 @@ class ApiClient {
     })
   }
 
+  /**
+   * Makes a DELETE request to the API.
+   * @param {string} path - The path of the API endpoint.
+   * @param {RequestInit} [options] - The request options.
+   * @returns {Promise<T>} A promise that resolves with the response data.
+   */
   public async delete<T>(path: string, options?: RequestInit): Promise<T> {
     return this.request<T>(path, { ...options, method: 'DELETE' })
   }

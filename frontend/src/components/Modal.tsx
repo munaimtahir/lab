@@ -1,5 +1,8 @@
 import { useEffect, useRef } from 'react'
 
+/**
+ * Interface for the props of the Modal component.
+ */
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
@@ -7,6 +10,11 @@ interface ModalProps {
   children: React.ReactNode
 }
 
+/**
+ * A reusable modal component.
+ * @param {ModalProps} props - The component props.
+ * @returns {JSX.Element | null} The rendered modal, or null if it's not open.
+ */
 export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
 
