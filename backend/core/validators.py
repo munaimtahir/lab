@@ -5,17 +5,18 @@ from rest_framework import serializers
 
 def validate_alphanumeric_code(value: str, field_name: str = "code") -> str:
     """
-    Validate that a code is alphanumeric (allowing dashes and underscores).
+    Validates that a code is alphanumeric, allowing dashes and underscores.
 
     Args:
-        value: The code to validate
-        field_name: The name of the field (for error messages)
+        value: The code string to validate.
+        field_name: The name of the field being validated, used in the error message.
 
     Returns:
-        The uppercase version of the code
+        The validated code, converted to uppercase.
 
     Raises:
-        ValidationError: If the code contains invalid characters
+        serializers.ValidationError: If the code contains characters other than
+            alphanumerics, dashes, or underscores.
     """
     if not value.replace("-", "").replace("_", "").isalnum():
         raise serializers.ValidationError(

@@ -6,11 +6,26 @@ from django.db import models, transaction
 
 class LabTerminal(models.Model):
     """
-    Represents a physical workstation/terminal in the lab.
+    Represents a physical workstation or terminal within the laboratory.
 
-    Each terminal has a reserved numeric range for offline patient registrations.
-    When a terminal is offline, it allocates MRNs from its range without
-    needing to contact the central server.
+    Each terminal is assigned a reserved numeric range for offline patient
+    registrations. When a terminal is operating offline, it can allocate
+    Medical Record Numbers (MRNs) from this range without needing to contact
+    the central server, ensuring uninterrupted service.
+
+    Attributes:
+        code (CharField): A short, unique identifier for the terminal
+            (e.g., 'RECEP-1').
+        name (CharField): A human-readable name for the terminal.
+        offline_range_start (PositiveIntegerField): The inclusive start of
+            the offline MRN range.
+        offline_range_end (PositiveIntegerField): The inclusive end of the
+            offline MRN range.
+        offline_current (PositiveIntegerField): The last used MRN in the
+            offline range.
+        is_active (BooleanField): A flag indicating if the terminal is currently in use.
+        created_at (DateTimeField): The timestamp of when the terminal was created.
+        updated_at (DateTimeField): The timestamp of the last update to the terminal.
     """
 
     code = models.CharField(
@@ -48,10 +63,15 @@ class LabTerminal(models.Model):
         ]
 
     def __str__(self):
+        """Returns a string representation of the lab terminal."""
         return f"{self.code} - {self.name}"
 
     def clean(self):
-        """Validate that range_start < range_end."""
+        """
+        Validates the model's data.
+
+        Ensures that `offline_range_start` is less than `offline_range_end`.
+        """
         if self.offline_range_start >= self.offline_range_end:
             raise ValidationError(
                 "offline_range_start must be less than offline_range_end"
@@ -60,13 +80,19 @@ class LabTerminal(models.Model):
     @transaction.atomic
     def get_next_offline_mrn(self) -> int:
         """
-        Atomically allocate the next offline MRN from this terminal's range.
+        Atomically allocates and returns the next offline MRN from this
+        terminal's range.
+
+        This method uses a pessimistic lock (`select_for_update`) to prevent
+        race conditions when multiple processes might be requesting an MRN
+        simultaneously.
 
         Returns:
-            The next available MRN number.
+            int: The next available offline MRN.
 
         Raises:
-            ValidationError: If the terminal has exhausted its range.
+            ValidationError: If the terminal has exhausted its allocated
+                offline MRN range.
         """
         # Use select_for_update to prevent race conditions
         terminal = LabTerminal.objects.select_for_update().get(pk=self.pk)

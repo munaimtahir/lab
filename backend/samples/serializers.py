@@ -6,7 +6,9 @@ from .models import Sample
 
 
 class SampleSerializer(serializers.ModelSerializer):
-    """Sample serializer."""
+    """
+    Serializer for the Sample model.
+    """
 
     class Meta:
         model = Sample

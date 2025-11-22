@@ -3,9 +3,15 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { OrderDetailPage } from './OrderDetailPage'
 import { orderService } from '../../services/orders'
+import { sampleService } from '../../services/samples'
+import { resultService } from '../../services/results'
+import { reportService } from '../../services/reports'
 import { AuthProvider } from '../../hooks/useAuth'
 
 vi.mock('../../services/orders')
+vi.mock('../../services/samples')
+vi.mock('../../services/results')
+vi.mock('../../services/reports')
 vi.mock('../../services/auth', () => ({
   authService: {
     getCurrentUser: () => ({ id: 1, username: 'admin', role: 'ADMIN' }),
@@ -61,6 +67,10 @@ const mockOrder = {
 describe('OrderDetailPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(orderService.getById).mockResolvedValue(mockOrder)
+    vi.mocked(sampleService.getAll).mockResolvedValue([])
+    vi.mocked(resultService.getAll).mockResolvedValue([])
+    vi.mocked(reportService.getAll).mockResolvedValue([])
   })
 
   it('shows loading state', () => {
@@ -82,8 +92,6 @@ describe('OrderDetailPage', () => {
   })
 
   it('renders page with tabs', async () => {
-    vi.mocked(orderService.getById).mockResolvedValue(mockOrder)
-
     render(
       <MemoryRouter initialEntries={['/lab/orders/1']}>
         <AuthProvider>

@@ -8,7 +8,12 @@ from .models import LabTerminal
 
 
 class LabTerminalSerializer(serializers.ModelSerializer):
-    """Lab terminal serializer."""
+    """
+    Serializer for the LabTerminal model.
+
+    Handles the serialization and deserialization of LabTerminal objects,
+    validating the input data, including checking for overlapping offline MRN ranges.
+    """
 
     class Meta:
         model = LabTerminal
@@ -26,11 +31,31 @@ class LabTerminalSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "offline_current", "created_at", "updated_at"]
 
     def validate_code(self, value):
-        """Validate terminal code format."""
+        """
+        Validate that the terminal code is alphanumeric.
+
+        Args:
+            value (str): The terminal code to validate.
+
+        Returns:
+            str: The validated terminal code.
+        """
         return validate_alphanumeric_code(value, "terminal code")
 
     def validate(self, data):
-        """Validate range and check for overlaps."""
+        """
+        Validate the offline MRN range and check for overlaps.
+
+        Args:
+            data (dict): The data to validate.
+
+        Returns:
+            dict: The validated data.
+
+        Raises:
+            serializers.ValidationError: If the range is invalid or overlaps
+                with another terminal.
+        """
         start = data.get("offline_range_start")
         end = data.get("offline_range_end")
 

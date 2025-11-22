@@ -5,8 +5,20 @@ from django.http import JsonResponse
 
 def health_check(request):
     """
-    Health check endpoint with database and cache probes.
-    Returns 200 if all services are healthy, 503 otherwise.
+    Performs a health check on the application and its connected services.
+
+    This endpoint verifies the status of the database and cache connections.
+    It returns a JSON response with the status of each service.
+
+    Args:
+        request: The HttpRequest object.
+
+    Returns:
+        JsonResponse: A JSON response containing the health status.
+            - "status": "healthy" if all services are responsive,
+              "unhealthy" or "degraded" otherwise.
+            - "database": "healthy" or an error message.
+            - "cache": "healthy" or an error message.
     """
     status_code = 200
     health_status = {

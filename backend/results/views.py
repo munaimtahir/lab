@@ -18,7 +18,9 @@ from .serializers import ResultSerializer
 
 
 class ResultListCreateView(generics.ListCreateAPIView):
-    """List or create results."""
+    """
+    Lists and creates results.
+    """
 
     queryset = Result.objects.all().select_related(
         "order_item", "entered_by", "verified_by"
@@ -28,7 +30,9 @@ class ResultListCreateView(generics.ListCreateAPIView):
 
 
 class ResultDetailView(generics.RetrieveUpdateAPIView):
-    """Retrieve or update result."""
+    """
+    Retrieves and updates a specific result.
+    """
 
     queryset = Result.objects.all().select_related(
         "order_item", "entered_by", "verified_by"
@@ -40,13 +44,23 @@ class ResultDetailView(generics.RetrieveUpdateAPIView):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def enter_result(request, pk):
-    """Enter result (technologist)."""
+    """
+    Marks a result as entered.
+
+    This action is typically performed by a technologist.
+
+    Args:
+        request: The request object.
+        pk (int): The primary key of the result to enter.
+
+    Returns:
+        Response: A response object with the updated result data or an error message.
+    """
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
         return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Check permission using role-based permission system
     if not user_can_enter_result(request.user):
         return Response(
             {"error": "You do not have permission to enter results"},
@@ -65,13 +79,23 @@ def enter_result(request, pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def verify_result(request, pk):
-    """Verify result (pathologist)."""
+    """
+    Marks a result as verified.
+
+    This action is typically performed by a pathologist.
+
+    Args:
+        request: The request object.
+        pk (int): The primary key of the result to verify.
+
+    Returns:
+        Response: A response object with the updated result data or an error message.
+    """
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
         return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Check permission using role-based permission system
     if not user_can_verify(request.user):
         return Response(
             {"error": "You do not have permission to verify results"},
@@ -96,35 +120,40 @@ def verify_result(request, pk):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def publish_result(request, pk):
-    """Publish result (pathologist)."""
+    """
+    Marks a result as published.
+
+    This action is typically performed by a pathologist and is the final step
+    in the result workflow.
+
+    Args:
+        request: The request object.
+        pk (int): The primary key of the result to publish.
+
+    Returns:
+        Response: A response object with the updated result data or an error message.
+    """
     try:
         result = Result.objects.get(pk=pk)
     except Result.DoesNotExist:
         return Response({"error": "Result not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    # Check permission using role-based permission system
     if not user_can_publish(request.user):
         return Response(
             {"error": "You do not have permission to publish results"},
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    # Check workflow settings - if verification is disabled,
-    # allow publishing from ENTERED status
     skip_verification = should_skip_verification()
     required_status = "ENTERED" if skip_verification else "VERIFIED"
 
     if result.status != required_status:
-        if skip_verification:
-            return Response(
-                {"error": "Result must be entered before publishing"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        else:
-            return Response(
-                {"error": "Result must be verified before publishing"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        error_message = (
+            "Result must be verified before publishing"
+            if not skip_verification
+            else "Result must be entered before publishing"
+        )
+        return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
     result.status = "PUBLISHED"
     result.published_at = timezone.now()

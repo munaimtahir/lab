@@ -13,9 +13,13 @@ from .services import allocate_patient_mrn
 
 
 class PatientSerializer(serializers.ModelSerializer):
-    """Patient serializer with validation and offline registration support."""
+    """
+    Serializer for the Patient model.
 
-    # Write-only fields for offline registration
+    Handles the serialization and deserialization of Patient objects, including
+    validation of patient data and support for offline registration.
+    """
+
     origin_terminal_code = serializers.CharField(
         write_only=True,
         required=False,
@@ -47,7 +51,6 @@ class PatientSerializer(serializers.ModelSerializer):
             "synced_at",
             "created_at",
             "updated_at",
-            # Write-only fields
             "origin_terminal_code",
             "offline",
         ]
@@ -62,25 +65,46 @@ class PatientSerializer(serializers.ModelSerializer):
         ]
 
     def validate_dob(self, value):
-        """Validate that date of birth is not in the future."""
+        """
+        Validates that the date of birth is not in the future.
+
+        Args:
+            value (date): The date of birth to validate.
+
+        Returns:
+            date: The validated date of birth.
+        """
         if value and value > date.today():
             raise serializers.ValidationError("Date of birth cannot be in the future.")
         return value
 
     def validate_phone(self, value):
-        """Normalize phone number."""
-        # Remove spaces and hyphens
+        """
+        Normalizes and validates the phone number.
+
+        Args:
+            value (str): The phone number to validate.
+
+        Returns:
+            str: The normalized phone number.
+        """
         phone = value.replace(" ", "").replace("-", "")
-        # Ensure it starts with +92 or 0
         if not phone.startswith(("+92", "0")):
             raise serializers.ValidationError("Phone must start with +92 or 0.")
         return phone
 
     def validate_cnic(self, value):
-        """Validate CNIC format."""
+        """
+        Validates the CNIC format.
+
+        Args:
+            value (str): The CNIC to validate.
+
+        Returns:
+            str: The validated CNIC.
+        """
         import re
 
-        # Allow None or empty string (optional field)
         if not value:
             return None
 
@@ -89,13 +113,23 @@ class PatientSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, attrs):
-        """Validate that either DOB or at least one age field is provided."""
+        """
+        Ensures that either a date of birth or age is provided.
+
+        If age is provided instead of DOB, it calculates the DOB.
+        If DOB is provided, it calculates the age.
+
+        Args:
+            attrs (dict): The attributes to validate.
+
+        Returns:
+            dict: The validated attributes.
+        """
         dob = attrs.get("dob")
         age_years = attrs.get("age_years")
         age_months = attrs.get("age_months")
         age_days = attrs.get("age_days")
 
-        # Check if either DOB or at least one age field is provided
         has_dob = dob is not None
         has_age = any(
             [age_years is not None, age_months is not None, age_days is not None]
@@ -107,7 +141,6 @@ class PatientSerializer(serializers.ModelSerializer):
                 "(years, months, days) must be provided."
             )
 
-        # If age fields provided but no DOB, calculate DOB
         if has_age and not has_dob:
             years = age_years or 0
             months = age_months or 0
@@ -115,7 +148,6 @@ class PatientSerializer(serializers.ModelSerializer):
 
             today = date.today()
             try:
-                # Calculate DOB from age
                 attrs["dob"] = today - relativedelta(
                     years=years, months=months, days=days
                 )
@@ -124,12 +156,10 @@ class PatientSerializer(serializers.ModelSerializer):
                     f"Invalid age values: {str(e)}"
                 ) from e
 
-        # If DOB provided but no age fields, calculate age
         if has_dob and not has_age:
             dob_date = attrs["dob"]
             today = date.today()
 
-            # Calculate age components
             delta = relativedelta(today, dob_date)
             attrs["age_years"] = delta.years
             attrs["age_months"] = delta.months
@@ -138,83 +168,71 @@ class PatientSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        """Create a patient with offline registration support."""
-        # Extract offline-specific fields
+        """
+        Creates a patient, handling both online and offline registration.
+
+        This method allocates a Medical Record Number (MRN) using the
+        `allocate_patient_mrn` service, which supports offline MRN generation
+        from a terminal's range.
+
+        Args:
+            validated_data (dict): The validated data for the patient.
+
+        Returns:
+            Patient: The newly created patient instance.
+        """
         origin_terminal_code = validated_data.pop("origin_terminal_code", None)
         offline = validated_data.pop("offline", False)
 
-        # Allocate MRN using the service
         try:
             mrn, origin_terminal, is_offline_entry = allocate_patient_mrn(
                 origin_terminal_code=origin_terminal_code,
                 offline=offline,
             )
         except ValidationError as e:
-            # Handle expected validation errors from the service
-            # Use safe, user-facing error messages without exposing system details
             error_messages = e.messages if hasattr(e, "messages") else [str(e)]
-
-            # Provide appropriate user-facing messages based on the error content
             for msg in error_messages:
                 msg_lower = msg.lower()
                 if "required" in msg_lower and "terminal" in msg_lower:
                     raise serializers.ValidationError(
                         {
                             "detail": (
-                                "Terminal code is required for offline registration."
+                                "Terminal code is required for offline " "registration."
                             )
                         }
                     ) from e
                 elif "not found" in msg_lower or "not active" in msg_lower:
                     raise serializers.ValidationError(
-                        {
-                            "detail": (
-                                "Invalid or inactive terminal. "
-                                "Please verify the terminal configuration."
-                            )
-                        }
+                        {"detail": "Invalid or inactive terminal."}
                     ) from e
                 elif "exhausted" in msg_lower:
                     raise serializers.ValidationError(
                         {
                             "detail": (
-                                "Terminal has exhausted its offline registration "
-                                "range. Please contact administrator."
+                                "Terminal has exhausted its offline "
+                                "registration range."
                             )
                         }
                     ) from e
-
-            # Generic error for any other validation issues
             raise serializers.ValidationError(
-                {
-                    "detail": (
-                        "Invalid registration parameters. "
-                        "Please check your input and try again."
-                    )
-                }
+                {"detail": "Invalid registration parameters."}
             ) from e
 
-        # Set offline-related fields
         if mrn is not None:
             validated_data["mrn"] = mrn
         if origin_terminal is not None:
             validated_data["origin_terminal"] = origin_terminal
         validated_data["is_offline_entry"] = is_offline_entry
 
-        # For offline sync, set synced_at to now
         if offline and is_offline_entry:
             validated_data["synced_at"] = timezone.now()
 
-        # Create the patient
         try:
             patient = Patient.objects.create(**validated_data)
         except IntegrityError as e:
             if "mrn" in str(e).lower() or "unique" in str(e).lower():
                 raise serializers.ValidationError(
-                    {
-                        "detail": "Registration number already exists. "
-                        "Please check offline ranges or contact admin."
-                    }
+                    {"detail": "Registration number already exists."}
                 ) from e
             raise
 

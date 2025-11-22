@@ -6,7 +6,9 @@ from .models import Result
 
 
 class ResultSerializer(serializers.ModelSerializer):
-    """Result serializer."""
+    """
+    Serializer for the Result model.
+    """
 
     class Meta:
         model = Result

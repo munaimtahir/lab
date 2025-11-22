@@ -1,14 +1,20 @@
-// CNIC validation (Pakistani format: #####-#######-#)
+/**
+ * Validates a CNIC string.
+ * @param {string} cnic - The CNIC to validate.
+ * @returns {boolean} True if the CNIC is valid, false otherwise.
+ */
 export function validateCNIC(cnic: string): boolean {
   const cnicRegex = /^\d{5}-\d{7}-\d$/
   return cnicRegex.test(cnic)
 }
 
+/**
+ * Formats a CNIC string.
+ * @param {string} value - The CNIC string to format.
+ * @returns {string} The formatted CNIC string.
+ */
 export function formatCNIC(value: string): string {
-  // Remove all non-digit characters
   const digits = value.replace(/\D/g, '')
-
-  // Format as #####-#######-#
   if (digits.length <= 5) {
     return digits
   } else if (digits.length <= 12) {
@@ -18,17 +24,23 @@ export function formatCNIC(value: string): string {
   }
 }
 
-// Phone validation (Pakistani format)
+/**
+ * Validates a phone number.
+ * @param {string} phone - The phone number to validate.
+ * @returns {boolean} True if the phone number is valid, false otherwise.
+ */
 export function validatePhone(phone: string): boolean {
   const phoneRegex = /^(\+92|0)?3\d{9}$/
   return phoneRegex.test(phone.replace(/\s|-/g, ''))
 }
 
+/**
+ * Formats a phone number.
+ * @param {string} value - The phone number to format.
+ * @returns {string} The formatted phone number.
+ */
 export function formatPhone(value: string): string {
-  // Remove all non-digit and non-plus characters
   const cleaned = value.replace(/[^\d+]/g, '')
-
-  // Basic formatting
   if (cleaned.startsWith('+92')) {
     return cleaned.slice(0, 13)
   } else if (cleaned.startsWith('0')) {
@@ -37,7 +49,11 @@ export function formatPhone(value: string): string {
   return cleaned.slice(0, 11)
 }
 
-// Date of Birth validation
+/**
+ * Validates a date of birth.
+ * @param {string} dob - The date of birth to validate.
+ * @returns {boolean} True if the date of birth is valid, false otherwise.
+ */
 export function validateDOB(dob: string): boolean {
   if (!dob) return false
   const date = new Date(dob)
@@ -45,7 +61,11 @@ export function validateDOB(dob: string): boolean {
   return date <= today && !isNaN(date.getTime())
 }
 
-// Age calculation from DOB
+/**
+ * Calculates the age from a date of birth.
+ * @param {string} dob - The date of birth.
+ * @returns {{ years: number; months: number; days: number }} An object with the age in years, months, and days.
+ */
 export function calculateAgeFromDOB(dob: string): {
   years: number
   months: number
@@ -58,14 +78,12 @@ export function calculateAgeFromDOB(dob: string): {
   let months = today.getMonth() - birthDate.getMonth()
   let days = today.getDate() - birthDate.getDate()
 
-  // Adjust for negative days
   if (days < 0) {
     months--
     const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0)
     days += lastMonth.getDate()
   }
 
-  // Adjust for negative months
   if (months < 0) {
     years--
     months += 12
@@ -78,7 +96,13 @@ export function calculateAgeFromDOB(dob: string): {
   }
 }
 
-// Calculate DOB from age
+/**
+ * Calculates the date of birth from an age.
+ * @param {number} years - The age in years.
+ * @param {number} months - The age in months.
+ * @param {number} days - The age in days.
+ * @returns {string} The date of birth in 'YYYY-MM-DD' format.
+ */
 export function calculateDOBFromAge(
   years: number,
   months: number,
@@ -86,12 +110,10 @@ export function calculateDOBFromAge(
 ): string {
   const today = new Date()
   
-  // Treat empty/null values as 0
   const y = years || 0
   const m = months || 0
   const d = days || 0
   
-  // Calculate the date
   const dob = new Date(today)
   dob.setFullYear(today.getFullYear() - y)
   dob.setMonth(today.getMonth() - m)
@@ -100,7 +122,11 @@ export function calculateDOBFromAge(
   return dob.toISOString().split('T')[0]
 }
 
-// Legacy function for backward compatibility
+/**
+ * Calculates the age from a date of birth (legacy function).
+ * @param {string} dob - The date of birth.
+ * @returns {{ age: number; unit: 'years' | 'months' | 'days' }} An object with the age and unit.
+ */
 export function calculateAge(dob: string): {
   age: number
   unit: 'years' | 'months' | 'days'
@@ -116,7 +142,11 @@ export function calculateAge(dob: string): {
   }
 }
 
-// Format currency
+/**
+ * Formats a number as currency.
+ * @param {number} amount - The amount to format.
+ * @returns {string} The formatted currency string.
+ */
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-PK', {
     style: 'currency',
@@ -124,7 +154,11 @@ export function formatCurrency(amount: number): string {
   }).format(amount)
 }
 
-// Date/Time formatting
+/**
+ * Formats a date string.
+ * @param {string | Date} date - The date to format.
+ * @returns {string} The formatted date string.
+ */
 export function formatDate(date: string | Date): string {
   return new Date(date).toLocaleDateString('en-PK', {
     year: 'numeric',
@@ -133,6 +167,11 @@ export function formatDate(date: string | Date): string {
   })
 }
 
+/**
+ * Formats a time string.
+ * @param {string | Date} date - The date to format.
+ * @returns {string} The formatted time string.
+ */
 export function formatTime(date: string | Date): string {
   return new Date(date).toLocaleTimeString('en-PK', {
     hour: '2-digit',
@@ -141,6 +180,11 @@ export function formatTime(date: string | Date): string {
   })
 }
 
+/**
+ * Formats a date and time string.
+ * @param {string | Date} date - The date to format.
+ * @returns {string} The formatted date and time string.
+ */
 export function formatDateTime(date: string | Date): string {
   return `${formatDate(date)} ${formatTime(date)}`
 }

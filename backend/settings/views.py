@@ -12,20 +12,35 @@ from .serializers import RolePermissionSerializer, WorkflowSettingsSerializer
 
 class WorkflowSettingsView(APIView):
     """
-    View for workflow settings (singleton).
+    Manages the singleton WorkflowSettings object.
 
-    GET: Return current workflow settings
-    PUT: Update workflow settings
+    Provides endpoints for retrieving and updating the workflow settings.
     """
 
     def get(self, request):
-        """Get current workflow settings."""
+        """
+        Retrieves the current workflow settings.
+
+        Args:
+            request: The request object.
+
+        Returns:
+            Response: A response object with the workflow settings data.
+        """
         settings = WorkflowSettings.load()
         serializer = WorkflowSettingsSerializer(settings)
         return Response(serializer.data)
 
     def put(self, request):
-        """Update workflow settings."""
+        """
+        Updates the workflow settings.
+
+        Args:
+            request: The request object with the new settings data.
+
+        Returns:
+            Response: A response object with the updated settings or an error message.
+        """
         settings = WorkflowSettings.load()
         serializer = WorkflowSettingsSerializer(settings, data=request.data)
         if serializer.is_valid():
@@ -35,7 +50,9 @@ class WorkflowSettingsView(APIView):
 
 
 class RolePermissionListView(generics.ListAPIView):
-    """List all role permissions."""
+    """
+    Lists all role permissions.
+    """
 
     queryset = RolePermission.objects.all()
     serializer_class = RolePermissionSerializer
@@ -43,13 +60,22 @@ class RolePermissionListView(generics.ListAPIView):
 
 class RolePermissionUpdateView(APIView):
     """
-    Bulk update role permissions.
+    Performs a bulk update of role permissions.
 
-    Accepts a list of role permission objects and updates them.
+    Accepts a list of role permission objects and updates them accordingly.
     """
 
     def put(self, request):
-        """Bulk update role permissions."""
+        """
+        Handles the bulk update of role permissions.
+
+        Args:
+            request: The request object, containing a list of permissions data.
+
+        Returns:
+            Response: A response object with the updated permissions or an
+                error message.
+        """
         permissions_data = request.data
         if not isinstance(permissions_data, list):
             return Response(
@@ -80,15 +106,18 @@ class RolePermissionUpdateView(APIView):
 @permission_classes([IsAuthenticated])
 def get_user_permissions(request):
     """
-    Get permissions for the current user based on their role.
+    Retrieves the permissions for the currently authenticated user.
+
+    The permissions are determined by the user's role.
+
+    Args:
+        request: The request object.
 
     Returns:
-        - role: User's role
-        - permissions: Dictionary of all permissions for the role
+        Response: A response object containing the user's role and permissions.
     """
     user = request.user
 
-    # Default permissions (all False except for admin)
     default_perms = {
         "can_register": False,
         "can_collect": False,
@@ -99,7 +128,6 @@ def get_user_permissions(request):
         "can_edit_settings": False,
     }
 
-    # Admin has all permissions
     if user.role == "ADMIN":
         default_perms = dict.fromkeys(default_perms, True)
     else:
@@ -115,7 +143,7 @@ def get_user_permissions(request):
                 "can_edit_settings": role_perm.can_edit_settings,
             }
         except RolePermission.DoesNotExist:
-            pass  # Use default_perms (all False)
+            pass
 
     return Response(
         {

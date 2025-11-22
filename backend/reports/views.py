@@ -16,7 +16,9 @@ from .serializers import ReportSerializer
 
 
 class ReportListView(generics.ListAPIView):
-    """List all reports."""
+    """
+    Lists all generated reports.
+    """
 
     queryset = Report.objects.all().select_related("order", "generated_by")
     serializer_class = ReportSerializer
@@ -24,7 +26,9 @@ class ReportListView(generics.ListAPIView):
 
 
 class ReportDetailView(generics.RetrieveAPIView):
-    """Retrieve a specific report."""
+    """
+    Retrieves the details of a specific report.
+    """
 
     queryset = Report.objects.all().select_related("order", "generated_by")
     serializer_class = ReportSerializer
@@ -34,7 +38,19 @@ class ReportDetailView(generics.RetrieveAPIView):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def generate_report(request, order_id):
-    """Generate PDF report for an order."""
+    """
+    Generates a PDF report for a given order.
+
+    This endpoint is restricted to pathologists and admins. It checks if all
+    results for the order are published before generating the report.
+
+    Args:
+        request: The request object.
+        order_id (int): The ID of the order to generate a report for.
+
+    Returns:
+        Response: A response object with the report data or an error message.
+    """
     try:
         order = Order.objects.get(pk=order_id)
     except Order.DoesNotExist:
@@ -46,18 +62,15 @@ def generate_report(request, order_id):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    # Check if all results are published
     for item in order.items.all():
         if not item.results.filter(status="PUBLISHED").exists():
             return Response(
-                {"error": "All results must be published before report"},
+                {"error": "All results must be published before generating a report"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    # Generate PDF
     pdf_buffer = generate_report_pdf(order)
 
-    # Create or update report
     report, created = Report.objects.get_or_create(order=order)
     report.generated_by = request.user
     report.pdf_file.save(
@@ -74,7 +87,16 @@ def generate_report(request, order_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def download_report(request, pk):
-    """Download report PDF."""
+    """
+    Downloads the PDF file for a specific report.
+
+    Args:
+        request: The request object.
+        pk (int): The primary key of the report to download.
+
+    Returns:
+        FileResponse: A file response with the PDF report, or a 404 error.
+    """
     try:
         report = Report.objects.get(pk=pk)
     except Report.DoesNotExist:

@@ -7,7 +7,9 @@ from patients.models import Patient
 
 
 class OrderStatus(models.TextChoices):
-    """Order status choices."""
+    """
+    Enumeration for the status of an order or order item.
+    """
 
     NEW = "NEW", "New"
     COLLECTED = "COLLECTED", "Collected"
@@ -18,7 +20,9 @@ class OrderStatus(models.TextChoices):
 
 
 class OrderPriority(models.TextChoices):
-    """Order priority choices."""
+    """
+    Enumeration for the priority of an order.
+    """
 
     ROUTINE = "ROUTINE", "Routine"
     URGENT = "URGENT", "Urgent"
@@ -26,7 +30,18 @@ class OrderPriority(models.TextChoices):
 
 
 class Order(models.Model):
-    """Order model."""
+    """
+    Represents a patient's order for one or more lab tests.
+
+    Attributes:
+        order_no (CharField): A unique, system-generated order number.
+        patient (ForeignKey): The patient associated with the order.
+        priority (CharField): The priority of the order (e.g., Routine, Urgent).
+        status (CharField): The current status of the order.
+        notes (TextField): Any notes or comments related to the order.
+        created_at (DateTimeField): The timestamp when the order was created.
+        updated_at (DateTimeField): The timestamp when the order was last updated.
+    """
 
     order_no = models.CharField(max_length=20, unique=True)
     patient = models.ForeignKey(
@@ -56,10 +71,16 @@ class Order(models.Model):
         ]
 
     def __str__(self):
+        """Returns a string representation of the order."""
         return f"{self.order_no} - {self.patient.full_name}"
 
     def save(self, *args, **kwargs):
-        """Generate order number on first save."""
+        """
+        Overrides the default save method to generate an order number.
+
+        The order number is generated based on the current date and a
+        sequential number for that day.
+        """
         if not self.order_no:
             from django.utils import timezone
 
@@ -79,7 +100,16 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    """Order item model representing a test in an order."""
+    """
+    Represents a single test item within an order.
+
+    Attributes:
+        order (ForeignKey): The order this item belongs to.
+        test (ForeignKey): The test from the catalog for this item.
+        status (CharField): The current status of this specific test.
+        created_at (DateTimeField): The timestamp when the item was created.
+        updated_at (DateTimeField): The timestamp when the item was last updated.
+    """
 
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     test = models.ForeignKey(TestCatalog, on_delete=models.PROTECT)
@@ -96,4 +126,5 @@ class OrderItem(models.Model):
         ordering = ["id"]
 
     def __str__(self):
+        """Returns a string representation of the order item."""
         return f"{self.order.order_no} - {self.test.name}"

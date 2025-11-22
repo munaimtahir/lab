@@ -11,17 +11,27 @@ from .serializers import PatientSerializer
 
 class PatientListCreateView(generics.ListCreateAPIView):
     """
-    List patients with search or create a new patient.
+    Lists and creates patients.
 
-    GET /api/patients?query= - Search patients by name, phone, or CNIC prefix
-    POST /api/patients/ - Create a new patient
+    Provides endpoints for listing patients with optional search functionality,
+    and for creating new patients. Access is restricted to admin and reception users.
+
+    Filtering:
+    - `query` (string): Searches for patients by name, phone, or CNIC prefix.
     """
 
     serializer_class = PatientSerializer
     permission_classes = [IsAdminOrReception]
 
     def get_queryset(self):
-        """Filter patients by search query."""
+        """
+        Optionally filters the queryset by a search `query`.
+
+        The query searches against the `full_name`, `phone`, and `cnic` fields.
+
+        Returns:
+            QuerySet: The filtered queryset of `Patient` objects.
+        """
         queryset = Patient.objects.all()
         query = self.request.query_params.get("query", "").strip()
 
@@ -35,7 +45,17 @@ class PatientListCreateView(generics.ListCreateAPIView):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        """Create a new patient."""
+        """
+        Creates a new patient.
+
+        Args:
+            request: The request object.
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            Response: The response object with the created patient data.
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -47,9 +67,7 @@ class PatientListCreateView(generics.ListCreateAPIView):
 
 class PatientDetailView(generics.RetrieveAPIView):
     """
-    Retrieve a patient by ID.
-
-    GET /api/patients/:id/ - Get patient details
+    Retrieves the details of a specific patient.
     """
 
     queryset = Patient.objects.all()

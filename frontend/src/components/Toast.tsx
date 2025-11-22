@@ -1,5 +1,8 @@
 import { useEffect } from 'react'
 
+/**
+ * Interface for the props of the Toast component.
+ */
 interface ToastProps {
   message: string
   type: 'success' | 'error' | 'info'
@@ -25,6 +28,11 @@ const TOAST_CONFIG = {
   },
 }
 
+/**
+ * A toast notification component.
+ * @param {ToastProps} props - The component props.
+ * @returns {JSX.Element} The rendered toast.
+ */
 export function Toast({ message, type, onClose, duration = 5000 }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {

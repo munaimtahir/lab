@@ -9,7 +9,12 @@ from .serializers import LabTerminalSerializer
 
 
 class LabTerminalListCreateView(generics.ListCreateAPIView):
-    """List all terminals or create a new terminal (Admin only)."""
+    """
+    List all lab terminals or create a new one.
+
+    This view allows for the retrieval of a list of all lab terminals and the
+    creation of new terminals. Access is restricted to admin users.
+    """
 
     queryset = LabTerminal.objects.all().order_by("code")
     serializer_class = LabTerminalSerializer
@@ -17,7 +22,13 @@ class LabTerminalListCreateView(generics.ListCreateAPIView):
 
 
 class LabTerminalDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """Retrieve, update, or delete a terminal (Admin only)."""
+    """
+    Retrieve, update, or delete a lab terminal.
+
+    This view provides endpoints for retrieving the details of a specific lab
+    terminal, as well as updating or deleting it. Access is restricted to
+    admin users.
+    """
 
     queryset = LabTerminal.objects.all()
     serializer_class = LabTerminalSerializer
