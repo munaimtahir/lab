@@ -26,7 +26,7 @@ cd infra && docker-compose up
 
 **📋 For complete production deployment instructions, see [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)**
 
-Quick deployment on VPS (172.235.33.181):
+Quick deployment on VPS (172.237.71.40):
 
 ```bash
 # 1. Clone the repository
@@ -51,9 +51,9 @@ sleep 30
 ./scripts/smoke_test.sh
 
 # 7. Access the application
-# Frontend: http://172.235.33.181 (served via nginx on port 80)
-# Backend API: http://172.235.33.181/api/ (proxied through nginx)
-# Health Check: http://172.235.33.181/api/health/
+# Frontend: http://172.237.71.40 (served via nginx on port 80)
+# Backend API: http://172.237.71.40/api/ (proxied through nginx)
+# Health Check: http://172.237.71.40/api/health/
 ```
 
 ### Import LIMS Master Data

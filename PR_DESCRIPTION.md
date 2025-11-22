@@ -187,11 +187,11 @@ sleep 30
 docker compose ps
 ```
 
-### Access URLs (VPS: 172.235.33.181)
-- Frontend: http://172.235.33.181/
-- Backend API: http://172.235.33.181/api/
-- Health Check: http://172.235.33.181/api/health/
-- Django Admin: http://172.235.33.181/admin/
+### Access URLs (VPS: 172.237.71.40)
+- Frontend: http://172.237.71.40/
+- Backend API: http://172.237.71.40/api/
+- Health Check: http://172.237.71.40/api/health/
+- Django Admin: http://172.237.71.40/admin/
 
 ### Default Credentials
 - Username: `admin`
@@ -205,7 +205,7 @@ docker compose ps
 ```
 User Browser
     ↓
-http://172.235.33.181:80 (nginx)
+http://172.237.71.40:80 (nginx)
     ├─→ Frontend static files (React SPA)
     └─→ /api/* → http://backend:8000/api/* (Django REST API)
             ├─→ db:5432 (PostgreSQL database)

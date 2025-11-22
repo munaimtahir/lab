@@ -11,7 +11,7 @@
 
 **Example Error:**
 ```
-Request URL: http://172.235.33.181/api/api/auth/login/
+Request URL: http://172.237.71.40/api/api/auth/login/
 Status: 404 Not Found
 ```
 
@@ -162,7 +162,7 @@ export const AUTH_ENDPOINTS = {
 
 1. **SSH into server:**
    ```bash
-   ssh root@172.235.33.181
+   ssh root@172.237.71.40
    cd /opt/lab  # or your repo location
    ```
 
@@ -189,11 +189,11 @@ export const AUTH_ENDPOINTS = {
    ```
 
 6. **Verify in browser:**
-   - Open: http://172.235.33.181
+   - Open: http://172.237.71.40
    - Login with: admin / admin123
    - Check Browser DevTools → Network tab
-   - Login request URL should be: `http://172.235.33.181/api/auth/login/`
-   - Should NOT be: `http://172.235.33.181/api/api/auth/login/`
+   - Login request URL should be: `http://172.237.71.40/api/auth/login/`
+   - Should NOT be: `http://172.237.71.40/api/api/auth/login/`
 
 ### For Local Development
 
@@ -217,11 +217,11 @@ Open http://localhost:5173 and verify login works.
 
 ### Manual Testing on Production
 
-- [ ] Frontend loads: http://172.235.33.181
-- [ ] Login page accessible: http://172.235.33.181/login
+- [ ] Frontend loads: http://172.237.71.40
+- [ ] Login page accessible: http://172.237.71.40/login
 - [ ] Login succeeds with valid credentials
 - [ ] Dashboard loads after login
-- [ ] Health endpoint works: http://172.235.33.181/api/health/
+- [ ] Health endpoint works: http://172.237.71.40/api/health/
 - [ ] No `/api/api/` in browser Network tab
 - [ ] No console errors in browser DevTools
 
@@ -248,7 +248,7 @@ cd frontend
 pnpm test
 
 # Run smoke tests on deployed instance
-./scripts/smoke_test.sh http://172.235.33.181
+./scripts/smoke_test.sh http://172.237.71.40
 ```
 
 ---
@@ -261,7 +261,7 @@ pnpm test
 └─────────────────────────────────────────────────────────────────┘
 
 1. User Action
-   └─> Browser: POST http://172.235.33.181/api/auth/login/
+   └─> Browser: POST http://172.237.71.40/api/auth/login/
 
 2. Frontend Code
    ├─> constants.ts: AUTH_ENDPOINTS.LOGIN = '/auth/login/'
@@ -269,7 +269,7 @@ pnpm test
    └─> Final URL: '/api' + '/auth/login/' = '/api/auth/login/'
 
 3. Browser Request
-   └─> URL: http://172.235.33.181/api/auth/login/
+   └─> URL: http://172.237.71.40/api/auth/login/
 
 4. Nginx (port 80)
    ├─> Receives: /api/auth/login/
@@ -388,7 +388,7 @@ docker compose up -d
 **Solution:**
 ```bash
 # Check if nginx is serving files
-curl -I http://172.235.33.181
+curl -I http://172.237.71.40
 # Should return: HTTP/1.1 200 OK
 
 # Check nginx container
@@ -401,7 +401,7 @@ docker compose logs nginx
 ```bash
 # Verify CORS settings in backend
 docker compose exec backend env | grep CORS
-# Should include: CORS_ALLOWED_ORIGINS=http://172.235.33.181
+# Should include: CORS_ALLOWED_ORIGINS=http://172.237.71.40
 ```
 
 ### Getting Help
@@ -417,7 +417,7 @@ docker compose exec backend env | grep CORS
    docker compose ps
    
    # Health check
-   curl http://172.235.33.181/api/health/
+   curl http://172.237.71.40/api/health/
    
    # Smoke tests
    ./scripts/smoke_test.sh
@@ -518,7 +518,7 @@ docker compose exec backend env | grep CORS
 
 **Last Updated:** 2025-11-12
 
-**Deployed To:** Production VPS (172.235.33.181)
+**Deployed To:** Production VPS (172.237.71.40)
 
 **Verified By:** Automated tests, smoke tests, and manual verification
 

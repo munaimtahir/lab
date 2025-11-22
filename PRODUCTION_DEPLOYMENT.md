@@ -1,8 +1,8 @@
-# Production Deployment Guide for VPS (172.235.33.181)
+# Production Deployment Guide for VPS (172.237.71.40)
 
 ## Overview
 
-This document provides comprehensive instructions for deploying the Al Shifa LIMS application to the VPS with IP address **172.235.33.181**.
+This document provides comprehensive instructions for deploying the Al Shifa LIMS application to the VPS with IP address **172.237.71.40**.
 
 ## ✅ Pre-Deployment Checklist
 
@@ -33,7 +33,7 @@ All configuration files have been optimized for production deployment:
 ```
 User Browser
     ↓
-http://172.235.33.181:80 (nginx)
+http://172.237.71.40:80 (nginx)
     ├─→ Frontend static files (/, /login, /lab, etc.)
     └─→ /api/* → http://backend:8000 (Django API)
             ├─→ postgres:5432 (database)
@@ -45,7 +45,7 @@ http://172.235.33.181:80 (nginx)
 ### 1. Clone Repository on VPS
 
 ```bash
-ssh user@172.235.33.181
+ssh user@172.237.71.40
 cd /opt  # or your preferred directory
 git clone https://github.com/munaimtahir/lab.git
 cd lab
@@ -53,7 +53,7 @@ cd lab
 
 ### 2. Configure Environment
 
-The `.env` file is already configured for production with VPS IP 172.235.33.181. **IMPORTANT: Update security credentials before deployment!**
+The `.env` file is already configured for production with VPS IP 172.237.71.40. **IMPORTANT: Update security credentials before deployment!**
 
 ```bash
 # Generate secure Django secret key
@@ -106,17 +106,17 @@ docker compose logs -f
 
 ```bash
 # Health check
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 
 # Expected response:
 # {"status":"healthy","timestamp":"...","database":"ok","redis":"ok"}
 
 # Test frontend
-curl -I http://172.235.33.181
+curl -I http://172.237.71.40
 # Expected: HTTP/1.1 200 OK
 
 # Access frontend
-# Open browser: http://172.235.33.181
+# Open browser: http://172.237.71.40
 
 # Default credentials
 # Username: admin
@@ -131,9 +131,9 @@ All configuration files are set for production:
 
 1. **`.env`**:
    - `VITE_API_URL=/api` (uses nginx proxy)
-   - `ALLOWED_HOSTS=172.235.33.181` (VPS IP only)
-   - `CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80`
-   - `CSRF_TRUSTED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80`
+   - `ALLOWED_HOSTS=172.237.71.40` (VPS IP only)
+   - `CORS_ALLOWED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80`
+   - `CSRF_TRUSTED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80`
    - `DEBUG=False`
 
 2. **`backend/.env`**:
@@ -231,24 +231,24 @@ docker compose exec backend python manage.py migrate
 
 ```bash
 # Health check
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 
 # Login
-curl -X POST http://172.235.33.181/api/auth/login/ \
+curl -X POST http://172.237.71.40/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 
 # Get patients (requires authentication)
-curl http://172.235.33.181/api/patients/ \
+curl http://172.237.71.40/api/patients/ \
   -H "Authorization: Bearer <access_token>"
 ```
 
 ### Frontend
 
-- Main page: http://172.235.33.181/
-- Login page: http://172.235.33.181/login
-- Lab page: http://172.235.33.181/lab
-- Admin panel: http://172.235.33.181/admin
+- Main page: http://172.237.71.40/
+- Login page: http://172.237.71.40/login
+- Lab page: http://172.237.71.40/lab
+- Admin panel: http://172.237.71.40/admin
 
 ## 📊 Monitoring
 
@@ -318,10 +318,10 @@ docker compose exec backend env | grep CORS
 
 ### URLs
 
-- **Frontend**: http://172.235.33.181
-- **Backend API**: http://172.235.33.181/api
-- **Backend Direct**: http://172.235.33.181:8000 (optional)
-- **Admin Panel**: http://172.235.33.181/admin
+- **Frontend**: http://172.237.71.40
+- **Backend API**: http://172.237.71.40/api
+- **Backend Direct**: http://172.237.71.40:8000 (optional)
+- **Admin Panel**: http://172.237.71.40/admin
 
 ### Default Credentials
 
@@ -338,4 +338,4 @@ docker compose exec backend env | grep CORS
 
 ---
 
-**Note**: This configuration is optimized for production deployment on VPS with IP 172.235.33.181. No localhost or development port references exist in production configuration files.
+**Note**: This configuration is optimized for production deployment on VPS with IP 172.237.71.40. No localhost or development port references exist in production configuration files.

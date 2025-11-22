@@ -20,15 +20,15 @@ All production configuration files are free of development-specific references. 
 #### Root `.env` - Production Configuration
 ```bash
 VITE_API_URL=/api  # ✅ Relative path, no localhost
-ALLOWED_HOSTS=172.235.33.181  # ✅ VPS IP only
-CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80  # ✅ VPS IP only
+ALLOWED_HOSTS=172.237.71.40  # ✅ VPS IP only
+CORS_ALLOWED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80  # ✅ VPS IP only
 DEBUG=False  # ✅ Production mode
 ```
 
 #### `backend/.env` - Production Configuration
 ```bash
-ALLOWED_HOSTS=172.235.33.181  # ✅ VPS IP only
-CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80  # ✅ VPS IP only
+ALLOWED_HOSTS=172.237.71.40  # ✅ VPS IP only
+CORS_ALLOWED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80  # ✅ VPS IP only
 DEBUG=False  # ✅ Production mode
 ```
 
@@ -50,7 +50,7 @@ VITE_API_URL=/api  # ✅ Relative path, no localhost
 
 #### `nginx/nginx.conf` - Production Nginx Configuration
 - ✅ No localhost references
-- ✅ Server name: `172.235.33.181`
+- ✅ Server name: `172.237.71.40`
 - ✅ Proxies `/api/` to `http://backend:8000`
 - ✅ Listens on port 80
 
@@ -144,13 +144,13 @@ const getApiBaseUrl = (): string => {
 
 #### Frontend Source Code
 ```bash
-$ grep -r "172.235.33.181" frontend/src/
+$ grep -r "172.237.71.40" frontend/src/
 # Result: No matches ✅
 ```
 
 #### Backend Source Code
 ```bash
-$ grep -r "172.235.33.181" backend/ --exclude-dir=venv
+$ grep -r "172.237.71.40" backend/ --exclude-dir=venv
 # Result: Only in .env files (expected) ✅
 ```
 
@@ -223,7 +223,7 @@ RUN pnpm build  # Uses --mode production from package.json
 ✅ **All production configurations are clean and correct**
 
 The codebase properly separates development and production configurations:
-- Production uses VPS IP (172.235.33.181) or relative paths (/api)
+- Production uses VPS IP (172.237.71.40) or relative paths (/api)
 - Development uses localhost and port 5173
 - No accidental localhost references in production paths
 - Docker healthchecks correctly use container-local localhost

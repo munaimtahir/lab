@@ -16,11 +16,11 @@ When you run the application on your computer for development:
 2. **Backend** runs on: `http://localhost:8000` (Django server)
 3. **How they connect**: Frontend makes requests directly to `http://localhost:8000/auth/login/`, etc.
 
-### Production Mode (VPS Server at 172.235.33.181)
+### Production Mode (VPS Server at 172.237.71.40)
 
 When the application runs on the production server:
 
-1. **Frontend** is served by nginx on: `http://172.235.33.181`
+1. **Frontend** is served by nginx on: `http://172.237.71.40`
 2. **Backend** runs inside Docker on: `http://backend:8000` (internal)
 3. **How they connect**: 
    - Frontend makes requests to `/api/auth/login/`
@@ -78,7 +78,7 @@ The frontend combines the base URL with the endpoint path:
 ### Step 1: Log Into the Server
 
 ```bash
-ssh root@172.235.33.181
+ssh root@172.237.71.40
 ```
 
 ### Step 2: Go to the Project Folder
@@ -141,7 +141,7 @@ All should show "Up" status.
 ### Step 8: Test the Health Endpoint
 
 ```bash
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 ```
 
 You should see something like:
@@ -155,14 +155,14 @@ If you see this, the backend is working! ✅
 
 Open your web browser and go to:
 ```
-http://172.235.33.181
+http://172.237.71.40
 ```
 
 You should see the login page.
 
 ### Step 10: Test Login
 
-1. Open the login page: `http://172.235.33.181/login`
+1. Open the login page: `http://172.237.71.40/login`
 2. Enter username: `admin`
 3. Enter password: `admin123` (or whatever password you set)
 4. Click "Login"
@@ -177,7 +177,7 @@ You should see the login page.
 
 ### How to Check in Browser
 
-1. Open the login page: `http://172.235.33.181/login`
+1. Open the login page: `http://172.237.71.40/login`
 2. Press F12 to open Developer Tools
 3. Click on the "Network" tab
 4. Try to log in
@@ -187,8 +187,8 @@ Find the request that says "login" and click on it.
 
 Check the "Request URL" - it should look like:
 ```
-✅ CORRECT: http://172.235.33.181/api/auth/login/
-❌ WRONG:   http://172.235.33.181/api/api/auth/login/
+✅ CORRECT: http://172.237.71.40/api/auth/login/
+❌ WRONG:   http://172.237.71.40/api/api/auth/login/
 ```
 
 If you see `/api/api/`, that's the double API bug.
@@ -248,7 +248,7 @@ API Request Flow:
   Development: 'http://localhost:8000' + '/auth/login/' = 'http://localhost:8000/auth/login/'
   
   Browser → sends request
-  Production: http://172.235.33.181/api/auth/login/
+  Production: http://172.237.71.40/api/auth/login/
   
   Nginx → receives request, sees /api prefix
   Forwards to: http://backend:8000/api/auth/login/
@@ -299,12 +299,12 @@ After deployment, verify these work:
 
 ### 1. Health Check
 ```bash
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 ```
 Expected: `{"status":"healthy",...}`
 
 ### 2. Frontend Loads
-Open browser: `http://172.235.33.181`
+Open browser: `http://172.237.71.40`
 Expected: See the login page
 
 ### 3. Login Works
@@ -363,10 +363,10 @@ Open `http://localhost:5173` in your browser.
 - Full URL: `http://localhost:8000/auth/login/`
 
 **Production:**
-- Frontend: `http://172.235.33.181`
+- Frontend: `http://172.237.71.40`
 - Backend: internal, accessed through nginx
 - Endpoints: `/auth/login/`, `/patients/`, etc.
-- Full URL: `http://172.235.33.181/api/auth/login/`
+- Full URL: `http://172.237.71.40/api/auth/login/`
 - Nginx forwards `/api/*` to backend
 
 **The Fix:**

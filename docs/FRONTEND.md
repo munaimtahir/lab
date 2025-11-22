@@ -227,10 +227,10 @@ Or use the provided `.env.development` file which is automatically loaded in dev
 
 ### Production Deployment
 
-For production on the VPS (172.235.33.181) with nginx:
+For production on the VPS (172.237.71.40) with nginx:
 
 ```env
-# Production - Frontend served by nginx on http://172.235.33.181
+# Production - Frontend served by nginx on http://172.237.71.40
 # Nginx proxies /api/* to backend:8000 internally
 VITE_API_URL=/api
 ```

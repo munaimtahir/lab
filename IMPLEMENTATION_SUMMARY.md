@@ -56,7 +56,7 @@ The Excel file contains:
 
 1. **SSH into your VPS:**
    ```bash
-   ssh root@172.235.33.181
+   ssh root@172.237.71.40
    cd /path/to/lab
    ```
 
@@ -131,7 +131,7 @@ To update the master data in the future:
 After import, you can verify the data in:
 
 1. **Django Admin Interface:**
-   - Go to http://172.235.33.181/admin/
+   - Go to http://172.237.71.40/admin/
    - Login with admin credentials
    - Navigate to "Catalog" section
    - View Tests, Parameters, Reference Ranges, etc.

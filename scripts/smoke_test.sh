@@ -9,8 +9,8 @@
 #   ./scripts/smoke_test.sh [BASE_URL]
 #
 # Example:
-#   ./scripts/smoke_test.sh http://172.235.33.181
-#   ./scripts/smoke_test.sh  # defaults to http://172.235.33.181
+#   ./scripts/smoke_test.sh http://172.237.71.40
+#   ./scripts/smoke_test.sh  # defaults to http://172.237.71.40
 # ==============================================================================
 
 set -euo pipefail
@@ -23,7 +23,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-BASE_URL="${1:-http://172.235.33.181}"
+BASE_URL="${1:-http://172.237.71.40}"
 TIMEOUT=10
 
 echo -e "${BLUE}=========================================="

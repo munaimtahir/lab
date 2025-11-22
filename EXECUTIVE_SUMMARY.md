@@ -3,7 +3,7 @@
 **Date:** 2025-11-12  
 **Project:** Al Shifa Laboratory Information Management System (LIMS)  
 **Status:** ✅ **READY FOR COMMERCIAL DEPLOYMENT**  
-**Deployment Target:** VPS at 172.235.33.181
+**Deployment Target:** VPS at 172.237.71.40
 
 ---
 
@@ -21,7 +21,7 @@ The Al Shifa Laboratory LIMS is a comprehensive web-based laboratory information
 - **Issue:** Login and all API calls failing in production with 404 errors
 - **Root Cause:** Double `/api/api/` prefix in API URLs
 - **Impact:** Application completely non-functional on production server
-- **Discovery:** Browser Network tab showed `http://172.235.33.181/api/api/auth/login/` returning 404
+- **Discovery:** Browser Network tab showed `http://172.237.71.40/api/api/auth/login/` returning 404
 
 ### The Solution
 - **Fix:** Removed `/api` prefix from all frontend endpoint constants
@@ -246,7 +246,7 @@ After Fix:  /api + /auth/login/     = /api/auth/login/     ✅ Works!
 
 ```bash
 # 1. Connect to server
-ssh root@172.235.33.181
+ssh root@172.237.71.40
 
 # 2. Navigate to application
 cd /opt/lab
@@ -530,7 +530,7 @@ The Al Shifa Laboratory LIMS application is **production-ready** and suitable fo
 **Technical Lead:** Available via GitHub Issues  
 **Documentation:** See `/docs` directory  
 **Repository:** https://github.com/munaimtahir/lab  
-**Health Check:** http://172.235.33.181/api/health/
+**Health Check:** http://172.237.71.40/api/health/
 
 ---
 

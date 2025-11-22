@@ -1,4 +1,4 @@
-# Production Deployment Checklist for VPS (172.235.33.181)
+# Production Deployment Checklist for VPS (172.237.71.40)
 
 ## ✅ Pre-Deployment Verification
 
@@ -21,7 +21,7 @@ This script validates all production configurations and ensures:
 ### Step 1: Pre-Deployment ☐
 
 - [ ] Read [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) completely
-- [ ] SSH access to VPS (172.235.33.181) is working
+- [ ] SSH access to VPS (172.237.71.40) is working
 - [ ] Docker and Docker Compose are installed on VPS
 - [ ] Ports 80 and 8000 are available on VPS
 - [ ] Firewall is configured to allow HTTP traffic on port 80
@@ -52,7 +52,7 @@ Edit `.env` and update:
 - [ ] DJANGO_SECRET_KEY updated with generated key
 - [ ] POSTGRES_PASSWORD updated with generated password
 - [ ] DEBUG=False (verify, should already be set)
-- [ ] ALLOWED_HOSTS=172.235.33.181 (verify, should already be set)
+- [ ] ALLOWED_HOSTS=172.237.71.40 (verify, should already be set)
 - [ ] VITE_API_URL=/api (verify, should already be set)
 
 ### Step 4: Build and Deploy ☐
@@ -76,7 +76,7 @@ docker compose ps
 
 ```bash
 # Health check
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 
 # Check logs
 docker compose logs -f
@@ -84,7 +84,7 @@ docker compose logs -f
 
 - [ ] Health check returns healthy status
 - [ ] No errors in logs
-- [ ] Frontend accessible at http://172.235.33.181
+- [ ] Frontend accessible at http://172.237.71.40
 - [ ] Can login with admin/admin123
 - [ ] API endpoints working correctly
 
@@ -106,21 +106,21 @@ docker compose exec backend python manage.py changepassword admin
 
 Open in browser:
 
-- [ ] http://172.235.33.181 - Main page loads
-- [ ] http://172.235.33.181/login - Login page loads
+- [ ] http://172.237.71.40 - Main page loads
+- [ ] http://172.237.71.40/login - Login page loads
 - [ ] Login with admin credentials works
-- [ ] http://172.235.33.181/lab - Lab page accessible after login
-- [ ] http://172.235.33.181/admin - Django admin accessible
+- [ ] http://172.237.71.40/lab - Lab page accessible after login
+- [ ] http://172.237.71.40/admin - Django admin accessible
 
 ### API Tests
 
 ```bash
 # Health check
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 # Expected: {"status":"healthy",...}
 
 # Login
-curl -X POST http://172.235.33.181/api/auth/login/ \
+curl -X POST http://172.237.71.40/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 # Expected: {"access":"...","refresh":"..."}
@@ -157,11 +157,11 @@ docker compose exec redis redis-cli ping
 
 | Purpose | URL |
 |---------|-----|
-| Frontend | http://172.235.33.181 |
-| Backend API | http://172.235.33.181/api |
-| Backend Direct | http://172.235.33.181:8000 |
-| Django Admin | http://172.235.33.181/admin |
-| Health Check | http://172.235.33.181/api/health/ |
+| Frontend | http://172.237.71.40 |
+| Backend API | http://172.237.71.40/api |
+| Backend Direct | http://172.237.71.40:8000 |
+| Django Admin | http://172.237.71.40/admin |
+| Health Check | http://172.237.71.40/api/health/ |
 
 ### Services
 
