@@ -2,9 +2,11 @@
 
 import os
 from io import StringIO
-from django.core.management import call_command, CommandError
+
+from django.core.management import CommandError, call_command
 from django.test import TestCase
-from catalog.models import Parameter, Test, TestParameter, ReferenceRange
+
+from catalog.models import Parameter, ReferenceRange, Test, TestParameter
 
 
 class ImportLIMSMasterCommandTest(TestCase):
@@ -13,6 +15,7 @@ class ImportLIMSMasterCommandTest(TestCase):
     def test_command_exists(self):
         """Test that the command can be imported."""
         from catalog.management.commands.import_lims_master import Command
+
         self.assertIsNotNone(Command)
 
     def test_command_help(self):
@@ -38,19 +41,21 @@ class ImportLIMSMasterCommandTest(TestCase):
     def test_dry_run_with_real_file(self):
         """Test dry-run mode with the actual Excel file."""
         excel_file = "seed_data/AlShifa_LIMS_Master.xlsx"
-        
+
         # Skip test if file doesn't exist (e.g., in CI environment)
         if not os.path.exists(excel_file):
             self.skipTest("Excel file not found")
-        
+
         out = StringIO()
         # Dry run should fail with CommandError but not crash
         with self.assertRaises(CommandError) as context:
-            call_command("import_lims_master", "--dry-run", "--file", excel_file, stdout=out)
-        
+            call_command(
+                "import_lims_master", "--dry-run", "--file", excel_file, stdout=out
+            )
+
         # Check that it's the expected "Dry-run complete" error
         self.assertIn("Dry-run complete", str(context.exception))
-        
+
         # Verify no data was actually saved
         self.assertEqual(Parameter.objects.count(), 0)
         self.assertEqual(Test.objects.count(), 0)

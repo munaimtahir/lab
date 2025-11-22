@@ -46,10 +46,10 @@ test.describe('LIMS Complete Workflow', () => {
     // 3. Get test catalog
     const catalogResponse = await request.get(`${API_URL}/catalog/`, { headers });
     expect(catalogResponse.ok()).toBeTruthy();
-    const catalog = await catalogResponse.json();
-    expect(catalog.length).toBeGreaterThan(0);
-    const testId = catalog[0].id;
-    console.log('Using test:', catalog[0].name);
+    const catalogData = await catalogResponse.json();
+    expect(catalogData.results.length).toBeGreaterThan(0);
+    const testId = catalogData.results[0].id;
+    console.log('Using test:', catalogData.results[0].name);
 
     // 4. Create an order
     const orderResponse = await request.post(`${API_URL}/orders/`, {

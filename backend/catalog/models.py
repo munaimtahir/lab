@@ -185,16 +185,45 @@ class TestParameter(models.Model):
         updated_at (DateTimeField): The timestamp when the relationship was last updated.
     """
 
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="test_parameters")
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="test_parameters")
+    This model maps to the 'Test_Parameters' sheet in the LIMS master data Excel file,
+    linking tests to their constituent parameters.
+
+    Attributes:
+        test (ForeignKey): The test in the relationship.
+        parameter (ForeignKey): The parameter in the relationship.
+        display_order (IntegerField): The order in which the parameter is displayed.
+        section_header (CharField): A header for a section of parameters.
+        is_mandatory (BooleanField): Whether the parameter is mandatory for the test.
+        show_on_report (BooleanField): Whether the parameter is shown on the report.
+        default_reference_profile_id (CharField): The default reference profile ID.
+        delta_check_enabled (BooleanField): Whether delta check is enabled.
+        panic_low_override (DecimalField): An override for the panic low value.
+        panic_high_override (DecimalField): An override for the panic high value.
+        comment_template_id (CharField): The ID of a comment template.
+        created_at (DateTimeField): The timestamp when the relationship was
+            created.
+        updated_at (DateTimeField): The timestamp when the relationship was
+            last updated.
+    """
+
+    test = models.ForeignKey(
+        Test, on_delete=models.CASCADE, related_name="test_parameters"
+    )
+    parameter = models.ForeignKey(
+        Parameter, on_delete=models.CASCADE, related_name="test_parameters"
+    )
     display_order = models.IntegerField(default=0)
     section_header = models.CharField(max_length=255, blank=True)
     is_mandatory = models.BooleanField(default=True)
     show_on_report = models.BooleanField(default=True)
     default_reference_profile_id = models.CharField(max_length=50, blank=True)
     delta_check_enabled = models.BooleanField(default=False)
-    panic_low_override = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    panic_high_override = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    panic_low_override = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    panic_high_override = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
     comment_template_id = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -238,7 +267,29 @@ class ReferenceRange(models.Model):
         updated_at (DateTimeField): The timestamp when the range was last updated.
     """
 
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="reference_ranges")
+    Attributes:
+        parameter (ForeignKey): The parameter the reference range belongs to.
+        method_code (CharField): The code for the method used.
+        sex (CharField): The sex the reference range applies to.
+        age_min (IntegerField): The minimum age for the reference range.
+        age_max (IntegerField): The maximum age for the reference range.
+        age_unit (CharField): The unit for the age range (e.g., "Years").
+        population_group (CharField): The population group for the range.
+        unit (CharField): The unit of measurement for the range values.
+        normal_low (DecimalField): The normal low value.
+        normal_high (DecimalField): The normal high value.
+        critical_low (DecimalField): The critical low value.
+        critical_high (DecimalField): The critical high value.
+        reference_text (TextField): A textual representation of the reference range.
+        effective_from (DateField): The date the range becomes effective.
+        effective_to (DateField): The date the range ceases to be effective.
+        created_at (DateTimeField): The timestamp when the range was created.
+        updated_at (DateTimeField): The timestamp when the range was last updated.
+    """
+
+    parameter = models.ForeignKey(
+        Parameter, on_delete=models.CASCADE, related_name="reference_ranges"
+    )
     method_code = models.CharField(max_length=50, blank=True)
     sex = models.CharField(max_length=20, default="All")
     age_min = models.IntegerField(default=0)
@@ -246,10 +297,18 @@ class ReferenceRange(models.Model):
     age_unit = models.CharField(max_length=20, default="Years")
     population_group = models.CharField(max_length=50, default="Adult")
     unit = models.CharField(max_length=50, blank=True)
-    normal_low = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
-    normal_high = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
-    critical_low = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
-    critical_high = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
+    normal_low = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    normal_high = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    critical_low = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    critical_high = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
     reference_text = models.TextField(blank=True)
     effective_from = models.DateField(null=True, blank=True)
     effective_to = models.DateField(null=True, blank=True)
@@ -285,7 +344,9 @@ class ParameterQuickText(models.Model):
         updated_at (DateTimeField): The timestamp when the template was last updated.
     """
 
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="quick_texts")
+    parameter = models.ForeignKey(
+        Parameter, on_delete=models.CASCADE, related_name="quick_texts"
+    )
     template_title = models.CharField(max_length=255)
     template_body = models.TextField()
     language = models.CharField(max_length=10, default="EN")

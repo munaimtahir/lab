@@ -128,7 +128,7 @@ def get_user_permissions(request):
     }
 
     if user.role == "ADMIN":
-        default_perms = {k: True for k in default_perms}
+        default_perms = dict.fromkeys(default_perms, True)
     else:
         try:
             role_perm = RolePermission.objects.get(role=user.role)

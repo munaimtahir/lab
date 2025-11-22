@@ -1,13 +1,14 @@
 """Admin configuration for catalog models."""
 
 from django.contrib import admin
+
 from .models import (
-    TestCatalog,
     Parameter,
-    Test,
-    TestParameter,
-    ReferenceRange,
     ParameterQuickText,
+    ReferenceRange,
+    Test,
+    TestCatalog,
+    TestParameter,
 )
 
 
@@ -33,7 +34,14 @@ class ParameterAdmin(admin.ModelAdmin):
 class TestAdmin(admin.ModelAdmin):
     """Admin for Test model."""
 
-    list_display = ["code", "name", "test_type", "department", "default_charge", "active"]
+    list_display = [
+        "code",
+        "name",
+        "test_type",
+        "department",
+        "default_charge",
+        "active",
+    ]
     list_filter = ["test_type", "department", "active"]
     search_fields = ["code", "name", "short_name"]
 
@@ -50,7 +58,13 @@ class TestParameterInline(admin.TabularInline):
 class TestParameterAdmin(admin.ModelAdmin):
     """Admin for TestParameter model."""
 
-    list_display = ["test", "parameter", "display_order", "is_mandatory", "show_on_report"]
+    list_display = [
+        "test",
+        "parameter",
+        "display_order",
+        "is_mandatory",
+        "show_on_report",
+    ]
     list_filter = ["is_mandatory", "show_on_report"]
     search_fields = ["test__code", "test__name", "parameter__code", "parameter__name"]
 
@@ -78,4 +92,9 @@ class ParameterQuickTextAdmin(admin.ModelAdmin):
 
     list_display = ["parameter", "template_title", "language", "is_default", "active"]
     list_filter = ["language", "is_default", "active"]
-    search_fields = ["parameter__code", "parameter__name", "template_title", "template_body"]
+    search_fields = [
+        "parameter__code",
+        "parameter__name",
+        "template_title",
+        "template_body",
+    ]

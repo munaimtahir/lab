@@ -131,11 +131,9 @@ class PatientSerializer(serializers.ModelSerializer):
         age_days = attrs.get('age_days')
 
         has_dob = dob is not None
-        has_age = any([
-            age_years is not None,
-            age_months is not None,
-            age_days is not None
-        ])
+        has_age = any(
+            [age_years is not None, age_months is not None, age_days is not None]
+        )
 
         if not has_dob and not has_age:
             raise serializers.ValidationError(
@@ -159,13 +157,13 @@ class PatientSerializer(serializers.ModelSerializer):
                 ) from e
 
         if has_dob and not has_age:
-            dob_date = attrs['dob']
+            dob_date = attrs["dob"]
             today = date.today()
 
             delta = relativedelta(today, dob_date)
-            attrs['age_years'] = delta.years
-            attrs['age_months'] = delta.months
-            attrs['age_days'] = delta.days
+            attrs["age_years"] = delta.years
+            attrs["age_months"] = delta.months
+            attrs["age_days"] = delta.days
 
         return attrs
 
