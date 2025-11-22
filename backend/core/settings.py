@@ -33,7 +33,7 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 # Parse ALLOWED_HOSTS from environment variable or use production default
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get("ALLOWED_HOSTS", "172.235.33.181").split(",")
+    for host in os.environ.get("ALLOWED_HOSTS", "172.237.71.40").split(",")
 ]
 
 
@@ -215,7 +215,7 @@ CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "CORS_ALLOWED_ORIGINS",
-        "http://172.235.33.181,http://172.235.33.181:80",
+        "http://172.237.71.40,http://172.237.71.40:80",
     ).split(",")
     if origin.strip()
 ]
@@ -225,7 +225,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "CSRF_TRUSTED_ORIGINS",
-        "http://172.235.33.181,http://172.235.33.181:80",
+        "http://172.237.71.40,http://172.237.71.40:80",
     ).split(",")
     if origin.strip()
 ]

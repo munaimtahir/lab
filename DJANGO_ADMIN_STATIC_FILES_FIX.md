@@ -206,7 +206,7 @@ curl -I http://localhost/static/admin/css/base.css
 ```
 
 ### Production Verification:
-1. Access: `http://172.235.33.181/admin/`
+1. Access: `http://172.237.71.40/admin/`
 2. Check browser DevTools Network tab
 3. Verify `/static/admin/css/base.css` returns HTTP 200
 4. Verify `/static/admin/css/responsive.css` returns HTTP 200

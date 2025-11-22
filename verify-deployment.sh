@@ -4,7 +4,7 @@
 # Production Deployment Verification Script
 # ==============================================================================
 # This script verifies that the LIMS application is correctly configured
-# for production deployment on VPS with IP 172.235.33.181
+# for production deployment on VPS with IP 172.237.71.40
 # ==============================================================================
 
 set -e
@@ -153,7 +153,7 @@ if [ -f nginx/nginx.conf ]; then
         check "Nginx listens on port 80"
     fi
     
-    if grep -q "server_name 172.235.33.181" nginx/nginx.conf; then
+    if grep -q "server_name 172.237.71.40" nginx/nginx.conf; then
         check "Nginx server_name is set to VPS IP"
     else
         warn "Nginx server_name may not be configured correctly"
@@ -236,10 +236,10 @@ echo "----------------------------------------"
 
 echo ""
 info "Expected URLs after deployment:"
-echo "  Frontend:      http://172.235.33.181"
-echo "  Backend API:   http://172.235.33.181/api"
-echo "  Backend Direct: http://172.235.33.181:8000 (optional)"
-echo "  Admin Panel:   http://172.235.33.181/admin"
+echo "  Frontend:      http://172.237.71.40"
+echo "  Backend API:   http://172.237.71.40/api"
+echo "  Backend Direct: http://172.237.71.40:8000 (optional)"
+echo "  Admin Panel:   http://172.237.71.40/admin"
 echo ""
 
 info "Network Architecture:"
@@ -263,7 +263,7 @@ if [ $ERRORS -eq 0 ] && [ $WARNINGS -eq 0 ]; then
     echo "  1. Update .env with secure credentials (see PRODUCTION_DEPLOYMENT.md)"
     echo "  2. Run: docker compose build"
     echo "  3. Run: docker compose up -d"
-    echo "  4. Access: http://172.235.33.181"
+    echo "  4. Access: http://172.237.71.40"
     exit 0
 elif [ $ERRORS -eq 0 ]; then
     echo -e "${YELLOW}⚠ Verification passed with $WARNINGS warning(s)${NC}"

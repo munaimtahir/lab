@@ -58,7 +58,7 @@ This audit confirms that the Al Shifa Laboratory LIMS application is **productio
 **Verification:**
 ```bash
 # Searched for hardcoded API paths
-grep -r "http://172.235.33.181" frontend/src/ --exclude-dir=node_modules
+grep -r "http://172.237.71.40" frontend/src/ --exclude-dir=node_modules
 # Result: 0 matches (except in comments) ✅
 
 grep -r '"/api/' frontend/src/ --exclude="*.test.ts" --exclude-dir=node_modules
@@ -216,9 +216,9 @@ Analysis Result for 'javascript':
 ```python
 # .env production settings
 DEBUG=False                                      ✅
-ALLOWED_HOSTS=172.235.33.181                    ✅
-CORS_ALLOWED_ORIGINS=http://172.235.33.181      ✅
-CSRF_TRUSTED_ORIGINS=http://172.235.33.181      ✅
+ALLOWED_HOSTS=172.237.71.40                    ✅
+CORS_ALLOWED_ORIGINS=http://172.237.71.40      ✅
+CSRF_TRUSTED_ORIGINS=http://172.237.71.40      ✅
 ```
 
 #### API Security ✅
@@ -317,8 +317,8 @@ services:
 **Production (.env):**
 ```bash
 VITE_API_URL=/api                               ✅
-ALLOWED_HOSTS=172.235.33.181                    ✅
-CORS_ALLOWED_ORIGINS=http://172.235.33.181      ✅
+ALLOWED_HOSTS=172.237.71.40                    ✅
+CORS_ALLOWED_ORIGINS=http://172.237.71.40      ✅
 DEBUG=False                                     ✅
 DJANGO_SECRET_KEY=replace-me                    ⚠️ (documented to change)
 POSTGRES_PASSWORD=lims                          ⚠️ (documented to change)
@@ -351,7 +351,7 @@ location /api/ {
 ```
 
 **Expected Behavior:**
-- Request: `http://172.235.33.181/api/auth/login/`
+- Request: `http://172.237.71.40/api/auth/login/`
 - Nginx forwards: `http://backend:8000/api/auth/login/`
 - Backend receives: `/api/auth/login/`
 - Result: ✅ Works correctly
@@ -732,7 +732,7 @@ docker compose logs -f backend   # Backend only
 **Process Verified:**
 ```bash
 # 1. SSH to server
-ssh root@172.235.33.181                 ✅ Documented
+ssh root@172.237.71.40                 ✅ Documented
 
 # 2. Navigate to repo
 cd /opt/lab                             ✅ Documented

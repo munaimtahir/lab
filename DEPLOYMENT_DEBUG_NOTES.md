@@ -24,7 +24,7 @@ Successfully fixed Docker deployment for the Lab LIMS application. All services 
 ```
 User Browser
     ↓
-http://172.235.33.181:80 (nginx)
+http://172.237.71.40:80 (nginx)
     ├─→ Frontend static files (React SPA)
     └─→ /api/* → http://backend:8000/api/* (Django REST API)
             ├─→ db:5432 (PostgreSQL database)
@@ -125,7 +125,7 @@ Fixed type imports in 4 files:
 ```
 
 **Root Cause:**
-- Django's `ALLOWED_HOSTS` setting only included `172.235.33.181` (the VPS IP)
+- Django's `ALLOWED_HOSTS` setting only included `172.237.71.40` (the VPS IP)
 - Health check from inside the container uses `localhost` as the Host header
 - Django was rejecting requests with `localhost` as it wasn't in ALLOWED_HOSTS
 
@@ -134,12 +134,12 @@ Updated `ALLOWED_HOSTS` to include localhost and 127.0.0.1 for internal health c
 
 - **docker-compose.yml**:
   ```yaml
-  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-172.235.33.181,localhost,127.0.0.1}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-172.237.71.40,localhost,127.0.0.1}
   ```
 
 - **.env**:
   ```
-  ALLOWED_HOSTS=172.235.33.181,localhost,127.0.0.1
+  ALLOWED_HOSTS=172.237.71.40,localhost,127.0.0.1
   ```
 
 **Impact:** Backend health check now passes consistently
@@ -280,9 +280,9 @@ The deployment uses the following key environment variables (defined in `.env` a
 - `POSTGRES_PASSWORD=lims` - Database password (⚠️ Change in production!)
 - `REDIS_URL=redis://redis:6379/0` - Redis connection string
 - `DEBUG=False` - Django debug mode (disabled for production)
-- `ALLOWED_HOSTS=172.235.33.181,localhost,127.0.0.1` - Allowed hosts for Django
-- `CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80` - CORS origins
-- `CSRF_TRUSTED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80` - CSRF origins
+- `ALLOWED_HOSTS=172.237.71.40,localhost,127.0.0.1` - Allowed hosts for Django
+- `CORS_ALLOWED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80` - CORS origins
+- `CSRF_TRUSTED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80` - CSRF origins
 
 #### Frontend
 - `VITE_API_URL=/api` - Frontend uses nginx proxy (relative path)
@@ -351,7 +351,7 @@ The deployment uses the following key environment variables (defined in `.env` a
 2. **Update .env File:**
    - Replace `DJANGO_SECRET_KEY` with generated value
    - Replace `POSTGRES_PASSWORD` with generated password
-   - Update IP address if different from `172.235.33.181`
+   - Update IP address if different from `172.237.71.40`
 
 3. **Configure SSL/HTTPS:**
    - Obtain SSL certificate (Let's Encrypt recommended)
@@ -392,13 +392,13 @@ The deployment uses the following key environment variables (defined in `.env` a
 
 ## Testing URLs
 
-Once deployed on VPS (assuming IP 172.235.33.181):
+Once deployed on VPS (assuming IP 172.237.71.40):
 
-- **Frontend:** http://172.235.33.181/
-- **Backend API:** http://172.235.33.181/api/
-- **Health Check:** http://172.235.33.181/api/health/
-- **Django Admin:** http://172.235.33.181/admin/
-- **API Documentation:** http://172.235.33.181/api/docs/ (if configured)
+- **Frontend:** http://172.237.71.40/
+- **Backend API:** http://172.237.71.40/api/
+- **Health Check:** http://172.237.71.40/api/health/
+- **Django Admin:** http://172.237.71.40/admin/
+- **API Documentation:** http://172.237.71.40/api/docs/ (if configured)
 
 ### Login Credentials (Default)
 - **Username:** admin
@@ -506,7 +506,7 @@ The Lab LIMS Docker deployment is now fully operational. All critical issues hav
 3. Backend health check configuration
 4. Nginx health check reliability
 
-The application is production-ready for deployment to the VPS at 172.235.33.181, with appropriate security hardening (change default passwords, configure SSL, etc.).
+The application is production-ready for deployment to the VPS at 172.237.71.40, with appropriate security hardening (change default passwords, configure SSL, etc.).
 
 ---
 

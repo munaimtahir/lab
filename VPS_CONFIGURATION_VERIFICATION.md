@@ -1,5 +1,5 @@
 # VPS Configuration Verification Report
-**VPS IP:** 172.235.33.181  
+**VPS IP:** 172.237.71.40  
 **Date:** 2025-11-13  
 **Status:** ✅ **VERIFIED - ALL CONFIGURATIONS CORRECT**
 
@@ -7,13 +7,13 @@
 
 ## Executive Summary
 
-All configuration files have been verified and are correctly set for production deployment on VPS IP **172.235.33.181**. The repository supports both:
+All configuration files have been verified and are correctly set for production deployment on VPS IP **172.237.71.40**. The repository supports both:
 1. **Dockerized deployment** (recommended for production)
 2. **Separate frontend/backend installation** (for development flexibility)
 
 ---
 
-## ✅ Production Configuration Verification (VPS: 172.235.33.181)
+## ✅ Production Configuration Verification (VPS: 172.237.71.40)
 
 ### 1. Root Environment File (`.env`)
 
@@ -23,9 +23,9 @@ All configuration files have been verified and are correctly set for production 
 
 ```bash
 # VPS Production Configuration
-ALLOWED_HOSTS=172.235.33.181
-CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80
-CSRF_TRUSTED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80
+ALLOWED_HOSTS=172.237.71.40
+CORS_ALLOWED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80
+CSRF_TRUSTED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80
 VITE_API_URL=/api
 DEBUG=False
 ```
@@ -47,9 +47,9 @@ DEBUG=False
 **Status:** ✅ **CORRECTLY CONFIGURED**
 
 ```bash
-ALLOWED_HOSTS=172.235.33.181
-CORS_ALLOWED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80
-CSRF_TRUSTED_ORIGINS=http://172.235.33.181,http://172.235.33.181:80
+ALLOWED_HOSTS=172.237.71.40
+CORS_ALLOWED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80
+CSRF_TRUSTED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80
 DEBUG=False
 ```
 
@@ -58,14 +58,14 @@ DEBUG=False
 # backend/core/settings.py
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.environ.get("ALLOWED_HOSTS", "172.235.33.181").split(",")
+    for host in os.environ.get("ALLOWED_HOSTS", "172.237.71.40").split(",")
 ]
 
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "CORS_ALLOWED_ORIGINS",
-        "http://172.235.33.181,http://172.235.33.181:80",
+        "http://172.237.71.40,http://172.237.71.40:80",
     ).split(",")
 ]
 
@@ -73,13 +73,13 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "CSRF_TRUSTED_ORIGINS",
-        "http://172.235.33.181,http://172.235.33.181:80",
+        "http://172.237.71.40,http://172.237.71.40:80",
     ).split(",")
 ]
 ```
 
 **Verification:**
-- ✅ Django ALLOWED_HOSTS defaults to `172.235.33.181`
+- ✅ Django ALLOWED_HOSTS defaults to `172.237.71.40`
 - ✅ CORS defaults to VPS IP
 - ✅ CSRF defaults to VPS IP
 - ✅ All settings read from environment variables
@@ -95,8 +95,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 ```bash
 # VPS Production Environment Configuration
-# Frontend: http://172.235.33.181 (served via nginx on port 80)
-# Backend: http://172.235.33.181/api (proxied through nginx)
+# Frontend: http://172.237.71.40 (served via nginx on port 80)
+# Backend: http://172.237.71.40/api (proxied through nginx)
 
 VITE_API_URL=/api
 ```
@@ -107,8 +107,8 @@ VITE_API_URL=/api
 
 ```bash
 # Production Environment Configuration
-# Frontend: http://172.235.33.181
-# Backend proxied through: http://172.235.33.181/api
+# Frontend: http://172.237.71.40
+# Backend proxied through: http://172.237.71.40/api
 
 VITE_API_URL=/api
 ```
@@ -130,9 +130,9 @@ VITE_API_URL=/api
 services:
   backend:
     environment:
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-172.235.33.181}
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://172.235.33.181,http://172.235.33.181:80}
-      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://172.235.33.181,http://172.235.33.181:80}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-172.237.71.40}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://172.237.71.40,http://172.237.71.40:80}
+      CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-http://172.237.71.40,http://172.237.71.40:80}
       DEBUG: ${DEBUG:-False}
     ports:
       - "8000:8000"
@@ -162,7 +162,7 @@ services:
 ```nginx
 server {
     listen 80;
-    server_name 172.235.33.181;
+    server_name 172.237.71.40;
 
     # Frontend static files
     location / {
@@ -189,7 +189,7 @@ server {
 ```
 
 **Verification:**
-- ✅ server_name set to `172.235.33.181`
+- ✅ server_name set to `172.237.71.40`
 - ✅ Listens on port 80
 - ✅ Serves frontend from `/usr/share/nginx/html`
 - ✅ Proxies `/api/` to `http://backend:8000`
@@ -199,7 +199,7 @@ server {
 
 **URL Flow:**
 ```
-http://172.235.33.181/api/auth/login/
+http://172.237.71.40/api/auth/login/
    ↓ (nginx receives)
 http://backend:8000/api/auth/login/
    ↓ (Django processes)
@@ -305,10 +305,10 @@ docker compose up -d
 10. ✅ All services on internal network
 
 **Accessible URLs:**
-- Frontend: `http://172.235.33.181`
-- Backend API: `http://172.235.33.181/api/`
-- Django Admin: `http://172.235.33.181/admin/`
-- Direct Backend: `http://172.235.33.181:8000/` (optional)
+- Frontend: `http://172.237.71.40`
+- Backend API: `http://172.237.71.40/api/`
+- Django Admin: `http://172.237.71.40/admin/`
+- Direct Backend: `http://172.237.71.40:8000/` (optional)
 
 ---
 
@@ -326,9 +326,9 @@ docker compose up -d
 **Steps:**
 ```bash
 # 1. Set environment variables
-export ALLOWED_HOSTS=172.235.33.181
-export CORS_ALLOWED_ORIGINS=http://172.235.33.181
-export CSRF_TRUSTED_ORIGINS=http://172.235.33.181
+export ALLOWED_HOSTS=172.237.71.40
+export CORS_ALLOWED_ORIGINS=http://172.237.71.40
+export CSRF_TRUSTED_ORIGINS=http://172.237.71.40
 export DEBUG=False
 export POSTGRES_HOST=localhost
 export POSTGRES_DB=lims
@@ -382,7 +382,7 @@ pnpm build
 ```bash
 # 1. Set environment
 cd frontend
-echo "VITE_API_URL=http://172.235.33.181:8000" > .env
+echo "VITE_API_URL=http://172.237.71.40:8000" > .env
 
 # 2. Start dev server
 pnpm install
@@ -403,7 +403,7 @@ pnpm dev --host 0.0.0.0 --port 80
 
 | Setting | Root .env | backend/.env | frontend/.env | nginx.conf | docker-compose.yml |
 |---------|-----------|--------------|---------------|------------|-------------------|
-| VPS IP | ✅ 172.235.33.181 | ✅ 172.235.33.181 | ✅ (in comments) | ✅ server_name | ✅ defaults |
+| VPS IP | ✅ 172.237.71.40 | ✅ 172.237.71.40 | ✅ (in comments) | ✅ server_name | ✅ defaults |
 | ALLOWED_HOSTS | ✅ | ✅ | N/A | N/A | ✅ |
 | CORS_ORIGINS | ✅ | ✅ | N/A | N/A | ✅ |
 | CSRF_ORIGINS | ✅ | ✅ | N/A | N/A | ✅ |
@@ -438,7 +438,7 @@ pnpm dev --host 0.0.0.0 --port 80
 ## 📋 Deployment Verification Checklist
 
 ### Pre-Deployment
-- [x] All .env files configured for VPS IP 172.235.33.181
+- [x] All .env files configured for VPS IP 172.237.71.40
 - [x] ALLOWED_HOSTS set correctly
 - [x] CORS_ALLOWED_ORIGINS set correctly
 - [x] CSRF_TRUSTED_ORIGINS set correctly
@@ -454,15 +454,15 @@ pnpm dev --host 0.0.0.0 --port 80
 docker compose ps
 
 # 2. Test frontend
-curl -I http://172.235.33.181
+curl -I http://172.237.71.40
 # Expected: HTTP/1.1 200 OK
 
 # 3. Test backend API (through nginx)
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 # Expected: {"status":"healthy",...}
 
 # 4. Test backend API (direct)
-curl http://172.235.33.181:8000/api/health/
+curl http://172.237.71.40:8000/api/health/
 # Expected: {"status":"healthy",...}
 
 # 5. Run smoke tests
@@ -474,13 +474,13 @@ curl http://172.235.33.181:8000/api/health/
 
 ## 📊 Configuration Summary
 
-### Production (VPS: 172.235.33.181)
+### Production (VPS: 172.237.71.40)
 
 **Access Points:**
-- Frontend: `http://172.235.33.181` (port 80)
-- Backend API: `http://172.235.33.181/api/` (via nginx proxy)
-- Django Admin: `http://172.235.33.181/admin/` (via nginx proxy)
-- Direct Backend: `http://172.235.33.181:8000/` (optional, for debugging)
+- Frontend: `http://172.237.71.40` (port 80)
+- Backend API: `http://172.237.71.40/api/` (via nginx proxy)
+- Django Admin: `http://172.237.71.40/admin/` (via nginx proxy)
+- Direct Backend: `http://172.237.71.40:8000/` (optional, for debugging)
 
 **Environment Files:**
 - `.env` - Main production config
@@ -541,7 +541,7 @@ Internet → VPS:80 → Nginx Container
 
 ## 🚀 Quick Deployment Guide
 
-### For VPS Production (172.235.33.181)
+### For VPS Production (172.237.71.40)
 
 ```bash
 # 1. Clone repository on VPS
@@ -561,7 +561,7 @@ docker compose up -d
 ./scripts/smoke_test.sh
 
 # 5. Access application
-# Open browser: http://172.235.33.181
+# Open browser: http://172.237.71.40
 # Login: admin / admin123 (change after first login)
 ```
 
@@ -587,4 +587,4 @@ docker compose up -d
 
 **Report Generated:** 2025-11-13  
 **Verified By:** Automated Configuration Audit System  
-**Status:** ✅ PRODUCTION READY FOR VPS IP 172.235.33.181
+**Status:** ✅ PRODUCTION READY FOR VPS IP 172.237.71.40

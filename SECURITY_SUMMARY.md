@@ -95,7 +95,7 @@ docker compose exec backend python manage.py changepassword admin
 
 ### 2. ALLOWED_HOSTS Configuration
 ✅ **Status**: Properly configured
-- Includes VPS IP: `172.235.33.181`
+- Includes VPS IP: `172.237.71.40`
 - Includes localhost for internal health checks: `localhost, 127.0.0.1`
 - Does not allow all hosts (no `*`)
 

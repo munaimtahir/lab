@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document summarizes the changes made to fix and harden the Dockerized Vite frontend + backend application for production deployment on VPS (172.235.33.181).
+This document summarizes the changes made to fix and harden the Dockerized Vite frontend + backend application for production deployment on VPS (172.237.71.40).
 
 ## Changes Made
 
@@ -95,8 +95,8 @@ pnpm dev
 ### Production (VPS)
 
 **Setup:**
-- Frontend served at: `http://172.235.33.181` (nginx on port 80)
-- Backend at: `http://172.235.33.181/api` (nginx proxies to backend:8000)
+- Frontend served at: `http://172.237.71.40` (nginx on port 80)
+- Backend at: `http://172.237.71.40/api` (nginx proxies to backend:8000)
 
 **Configuration:**
 - File: `frontend/.env.production` (auto-loaded in production builds)
@@ -105,7 +105,7 @@ pnpm dev
 
 **Network Flow:**
 ```
-Browser → http://172.235.33.181/
+Browser → http://172.237.71.40/
           ↓
        [nginx:80]
           ↓
@@ -156,11 +156,11 @@ docker compose logs -f
 
 | Purpose | URL | Notes |
 |---------|-----|-------|
-| Frontend | http://172.235.33.181 | Main application UI |
-| Backend API | http://172.235.33.181/api | Via nginx proxy |
-| Backend Direct | http://172.235.33.181:8000 | Optional, for debugging |
-| Admin Panel | http://172.235.33.181/admin | Django admin |
-| Health Check | http://172.235.33.181/api/health/ | Verify backend is running |
+| Frontend | http://172.237.71.40 | Main application UI |
+| Backend API | http://172.237.71.40/api | Via nginx proxy |
+| Backend Direct | http://172.237.71.40:8000 | Optional, for debugging |
+| Admin Panel | http://172.237.71.40/admin | Django admin |
+| Health Check | http://172.237.71.40/api/health/ | Verify backend is running |
 
 ## Architecture Verification
 
@@ -175,7 +175,7 @@ The configuration ensures:
 - Production uses nginx on port 80
 
 ✅ **No localhost references in production configs**
-- All production files use VPS IP (172.235.33.181) or relative paths
+- All production files use VPS IP (172.237.71.40) or relative paths
 - Docker internal networking uses service names (backend:8000)
 
 ✅ **Proper nginx proxying**
@@ -215,15 +215,15 @@ The configuration ensures:
 
 ```bash
 # Test backend health
-curl http://172.235.33.181/api/health/
+curl http://172.237.71.40/api/health/
 # Expected: {"status":"healthy",...}
 
 # Test frontend
-curl http://172.235.33.181
+curl http://172.237.71.40
 # Expected: HTML content
 
 # Test login
-curl -X POST http://172.235.33.181/api/auth/login/ \
+curl -X POST http://172.237.71.40/api/auth/login/ \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"admin123"}'
 # Expected: {"access":"...","refresh":"..."}
@@ -231,7 +231,7 @@ curl -X POST http://172.235.33.181/api/auth/login/ \
 
 ### Browser Testing
 
-1. Navigate to http://172.235.33.181
+1. Navigate to http://172.237.71.40
 2. Login page should load
 3. Login with default credentials (admin/admin123)
 4. Application should work normally
@@ -292,10 +292,10 @@ Then update `.env`:
 
 ### API requests fail with 502
 - Check backend logs: `docker compose logs backend`
-- Verify backend is healthy: `curl http://172.235.33.181/api/health/`
+- Verify backend is healthy: `curl http://172.237.71.40/api/health/`
 
 ### CORS errors in browser console
-- Verify `CORS_ALLOWED_ORIGINS` in `.env` includes `http://172.235.33.181`
+- Verify `CORS_ALLOWED_ORIGINS` in `.env` includes `http://172.237.71.40`
 - Check backend logs for CORS-related errors
 
 ### Cannot login
