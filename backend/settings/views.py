@@ -13,7 +13,7 @@ from .serializers import RolePermissionSerializer, WorkflowSettingsSerializer
 class WorkflowSettingsView(APIView):
     """
     View for workflow settings (singleton).
-    
+
     GET: Return current workflow settings
     PUT: Update workflow settings
     """
@@ -44,7 +44,7 @@ class RolePermissionListView(generics.ListAPIView):
 class RolePermissionUpdateView(APIView):
     """
     Bulk update role permissions.
-    
+
     Accepts a list of role permission objects and updates them.
     """
 
@@ -81,13 +81,13 @@ class RolePermissionUpdateView(APIView):
 def get_user_permissions(request):
     """
     Get permissions for the current user based on their role.
-    
+
     Returns:
         - role: User's role
         - permissions: Dictionary of all permissions for the role
     """
     user = request.user
-    
+
     # Default permissions (all False except for admin)
     default_perms = {
         "can_register": False,
@@ -98,10 +98,10 @@ def get_user_permissions(request):
         "can_edit_catalog": False,
         "can_edit_settings": False,
     }
-    
+
     # Admin has all permissions
     if user.role == "ADMIN":
-        default_perms = {k: True for k in default_perms}
+        default_perms = dict.fromkeys(default_perms, True)
     else:
         try:
             role_perm = RolePermission.objects.get(role=user.role)
@@ -116,7 +116,7 @@ def get_user_permissions(request):
             }
         except RolePermission.DoesNotExist:
             pass  # Use default_perms (all False)
-    
+
     return Response(
         {
             "role": user.role,

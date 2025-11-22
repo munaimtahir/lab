@@ -6,21 +6,22 @@ from .models import RolePermission
 def check_permission(user, permission_field: str) -> bool:
     """
     Check if a user has a specific permission.
-    
+
     Args:
         user: The user object with a 'role' attribute
-        permission_field: The permission field to check (e.g., 'can_register', 'can_collect')
-    
+        permission_field: The permission field to check
+            (e.g., 'can_register', 'can_collect')
+
     Returns:
         bool: True if user has the permission, False otherwise
     """
     if not user or not user.is_authenticated:
         return False
-    
+
     # Admin always has all permissions
     if user.role == "ADMIN":
         return True
-    
+
     try:
         role_perm = RolePermission.objects.get(role=user.role)
         return getattr(role_perm, permission_field, False)

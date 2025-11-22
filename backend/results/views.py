@@ -109,7 +109,8 @@ def publish_result(request, pk):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    # Check workflow settings - if verification is disabled, allow publishing from ENTERED status
+    # Check workflow settings - if verification is disabled,
+    # allow publishing from ENTERED status
     skip_verification = should_skip_verification()
     required_status = "ENTERED" if skip_verification else "VERIFIED"
 

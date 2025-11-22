@@ -100,16 +100,24 @@ class Test(models.Model):
 class TestParameter(models.Model):
     """Test-Parameter relationship model - maps to Excel 'Test_Parameters' sheet."""
 
-    test = models.ForeignKey(Test, on_delete=models.CASCADE, related_name="test_parameters")
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="test_parameters")
+    test = models.ForeignKey(
+        Test, on_delete=models.CASCADE, related_name="test_parameters"
+    )
+    parameter = models.ForeignKey(
+        Parameter, on_delete=models.CASCADE, related_name="test_parameters"
+    )
     display_order = models.IntegerField(default=0)
     section_header = models.CharField(max_length=255, blank=True)
     is_mandatory = models.BooleanField(default=True)
     show_on_report = models.BooleanField(default=True)
     default_reference_profile_id = models.CharField(max_length=50, blank=True)
     delta_check_enabled = models.BooleanField(default=False)
-    panic_low_override = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    panic_high_override = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    panic_low_override = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    panic_high_override = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
     comment_template_id = models.CharField(max_length=50, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -129,7 +137,9 @@ class TestParameter(models.Model):
 class ReferenceRange(models.Model):
     """Reference range model - maps to Excel 'Reference_Ranges' sheet."""
 
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="reference_ranges")
+    parameter = models.ForeignKey(
+        Parameter, on_delete=models.CASCADE, related_name="reference_ranges"
+    )
     method_code = models.CharField(max_length=50, blank=True)
     sex = models.CharField(max_length=20, default="All")
     age_min = models.IntegerField(default=0)
@@ -137,10 +147,18 @@ class ReferenceRange(models.Model):
     age_unit = models.CharField(max_length=20, default="Years")
     population_group = models.CharField(max_length=50, default="Adult")
     unit = models.CharField(max_length=50, blank=True)
-    normal_low = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
-    normal_high = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
-    critical_low = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
-    critical_high = models.DecimalField(max_digits=12, decimal_places=4, null=True, blank=True)
+    normal_low = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    normal_high = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    critical_low = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
+    critical_high = models.DecimalField(
+        max_digits=12, decimal_places=4, null=True, blank=True
+    )
     reference_text = models.TextField(blank=True)
     effective_from = models.DateField(null=True, blank=True)
     effective_to = models.DateField(null=True, blank=True)
@@ -155,13 +173,22 @@ class ReferenceRange(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.parameter.code} - {self.sex} ({self.age_min}-{self.age_max} {self.age_unit})"
+        return (
+            f"{self.parameter.code} - {self.sex} "
+            f"({self.age_min}-{self.age_max} {self.age_unit})"
+        )
 
 
 class ParameterQuickText(models.Model):
-    """Parameter quick text templates model - maps to Excel 'Parameter_Quick_Text' sheet."""
+    """
+    Parameter quick text templates model.
 
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, related_name="quick_texts")
+    Maps to Excel 'Parameter_Quick_Text' sheet.
+    """
+
+    parameter = models.ForeignKey(
+        Parameter, on_delete=models.CASCADE, related_name="quick_texts"
+    )
     template_title = models.CharField(max_length=255)
     template_body = models.TextField()
     language = models.CharField(max_length=10, default="EN")

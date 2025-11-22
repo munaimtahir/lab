@@ -1,23 +1,28 @@
 """Django management command to import LIMS master data from Excel file."""
 
-import pandas as pd
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
+
+import pandas as pd
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+
 from catalog.models import (
     Parameter,
+    ParameterQuickText,
+    ReferenceRange,
     Test,
     TestParameter,
-    ReferenceRange,
-    ParameterQuickText,
 )
 
 
 class Command(BaseCommand):
     """Import LIMS master data from Excel file."""
 
-    help = "Import LIMS master data (Tests, Parameters, Reference Ranges, etc.) from Excel file"
+    help = (
+        "Import LIMS master data (Tests, Parameters, Reference Ranges, "
+        "etc.) from Excel file"
+    )
 
     def add_arguments(self, parser):
         """Add command line arguments."""
@@ -39,7 +44,9 @@ class Command(BaseCommand):
         dry_run = options["dry_run"]
 
         if dry_run:
-            self.stdout.write(self.style.WARNING("DRY RUN MODE - No data will be saved"))
+            self.stdout.write(
+                self.style.WARNING("DRY RUN MODE - No data will be saved")
+            )
 
         try:
             # Read Excel file
@@ -55,8 +62,10 @@ class Command(BaseCommand):
 
             self.stdout.write(
                 self.style.SUCCESS(
-                    f"Loaded sheets: Parameters({len(df_params)}), Tests({len(df_tests)}), "
-                    f"Test_Parameters({len(df_tp)}), Reference_Ranges({len(df_rr)}), "
+                    f"Loaded sheets: Parameters({len(df_params)}), "
+                    f"Tests({len(df_tests)}), "
+                    f"Test_Parameters({len(df_tp)}), "
+                    f"Reference_Ranges({len(df_rr)}), "
                     f"Parameter_Quick_Text({len(df_qt)})"
                 )
             )
@@ -70,7 +79,8 @@ class Command(BaseCommand):
 
             # Start transaction
             with transaction.atomic():
-                # Import in order: Parameters -> Tests -> Reference Ranges -> Quick Text -> Test Parameters
+                # Import in order: Parameters -> Tests -> Reference Ranges
+                # -> Quick Text -> Test Parameters
                 params_created, params_updated = self.import_parameters(df_params)
                 tests_created, tests_updated = self.import_tests(df_tests)
                 rr_created, rr_updated = self.import_reference_ranges(df_rr)
@@ -81,10 +91,12 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS("\n" + "=" * 80))
                 self.stdout.write(self.style.SUCCESS("IMPORT SUMMARY:"))
                 self.stdout.write(
-                    f"  Parameters:       {params_created} created, {params_updated} updated"
+                    f"  Parameters:       {params_created} created, "
+                    f"{params_updated} updated"
                 )
                 self.stdout.write(
-                    f"  Tests:            {tests_created} created, {tests_updated} updated"
+                    f"  Tests:            {tests_created} created, "
+                    f"{tests_updated} updated"
                 )
                 self.stdout.write(
                     f"  Reference Ranges: {rr_created} created, {rr_updated} updated"
@@ -109,7 +121,7 @@ class Command(BaseCommand):
                 )
             raise
         except Exception as e:
-            raise CommandError(f"Error during import: {str(e)}")
+            raise CommandError(f"Error during import: {str(e)}") from e
 
     def import_parameters(self, df):
         """Import parameters from DataFrame."""
@@ -223,7 +235,8 @@ class Command(BaseCommand):
             except Parameter.DoesNotExist:
                 self.stdout.write(
                     self.style.WARNING(
-                        f"  WARNING: Parameter {param_code} not found, skipping reference range"
+                        f"  WARNING: Parameter {param_code} not found, "
+                        f"skipping reference range"
                     )
                 )
                 skipped += 1
@@ -273,7 +286,9 @@ class Command(BaseCommand):
 
         if skipped > 0:
             self.stdout.write(
-                self.style.WARNING(f"  Skipped {skipped} reference ranges due to missing parameters")
+                self.style.WARNING(
+                    f"  Skipped {skipped} reference ranges due to missing parameters"
+                )
             )
 
         return created, updated
@@ -296,7 +311,8 @@ class Command(BaseCommand):
             except Parameter.DoesNotExist:
                 self.stdout.write(
                     self.style.WARNING(
-                        f"  WARNING: Parameter {param_code} not found, skipping quick text"
+                        f"  WARNING: Parameter {param_code} not found, "
+                        f"skipping quick text"
                     )
                 )
                 skipped += 1
@@ -327,7 +343,9 @@ class Command(BaseCommand):
 
         if skipped > 0:
             self.stdout.write(
-                self.style.WARNING(f"  Skipped {skipped} quick texts due to missing parameters")
+                self.style.WARNING(
+                    f"  Skipped {skipped} quick texts due to missing parameters"
+                )
             )
 
         return created, updated
@@ -352,7 +370,8 @@ class Command(BaseCommand):
             except Test.DoesNotExist:
                 self.stdout.write(
                     self.style.WARNING(
-                        f"  WARNING: Test {test_code} not found, skipping test-parameter mapping"
+                        f"  WARNING: Test {test_code} not found, "
+                        f"skipping test-parameter mapping"
                     )
                 )
                 skipped += 1
@@ -363,7 +382,8 @@ class Command(BaseCommand):
             except Parameter.DoesNotExist:
                 self.stdout.write(
                     self.style.WARNING(
-                        f"  WARNING: Parameter {param_code} not found, skipping test-parameter mapping"
+                        f"  WARNING: Parameter {param_code} not found, "
+                        f"skipping test-parameter mapping"
                     )
                 )
                 skipped += 1
@@ -387,7 +407,10 @@ class Command(BaseCommand):
                     "section_header": row.get("Section_Header") or "",
                     "is_mandatory": is_mandatory,
                     "show_on_report": show_on_report,
-                    "default_reference_profile_id": row.get("Default_Reference_Profile_ID") or "",
+                    "default_reference_profile_id": row.get(
+                        "Default_Reference_Profile_ID"
+                    )
+                    or "",
                     "delta_check_enabled": delta_check,
                     "panic_low_override": panic_low,
                     "panic_high_override": panic_high,
@@ -403,7 +426,8 @@ class Command(BaseCommand):
         if skipped > 0:
             self.stdout.write(
                 self.style.WARNING(
-                    f"  Skipped {skipped} test-parameter mappings due to missing tests or parameters"
+                    f"  Skipped {skipped} test-parameter mappings due to "
+                    f"missing tests or parameters"
                 )
             )
 

@@ -6,7 +6,7 @@ from django.db import models
 class WorkflowSettings(models.Model):
     """
     Workflow configuration settings (singleton pattern).
-    
+
     Controls which workflow steps are enabled:
     - Sample collection step
     - Sample receive step
@@ -50,7 +50,7 @@ class WorkflowSettings(models.Model):
 class RolePermission(models.Model):
     """
     Role-based permissions matrix.
-    
+
     Maps each role to specific capabilities in the system.
     """
 
