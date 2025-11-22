@@ -8,7 +8,6 @@ class UserRole(models.TextChoices):
     """
     Enumeration for user roles.
     """
-
     ADMIN = "ADMIN", "Admin"
     RECEPTION = "RECEPTION", "Reception"
     PHLEBOTOMY = "PHLEBOTOMY", "Phlebotomy"

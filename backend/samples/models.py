@@ -9,7 +9,6 @@ class SampleStatus(models.TextChoices):
     """
     Enumeration for the status of a lab sample.
     """
-
     PENDING = "PENDING", "Pending Collection"
     COLLECTED = "COLLECTED", "Collected"
     RECEIVED = "RECEIVED", "Received in Lab"
@@ -26,8 +25,7 @@ class Sample(models.Model):
         barcode (CharField): A unique, system-generated barcode for the sample.
         collected_at (DateTimeField): The timestamp when the sample was collected.
         collected_by (ForeignKey): The user who collected the sample.
-        received_at (DateTimeField): The timestamp when the sample was
-            received in the lab.
+        received_at (DateTimeField): The timestamp when the sample was received in the lab.
         received_by (ForeignKey): The user who received the sample.
         status (CharField): The current status of the sample in the workflow.
         rejection_reason (TextField): The reason for sample rejection, if applicable.

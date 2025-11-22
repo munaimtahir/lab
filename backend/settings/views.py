@@ -73,8 +73,7 @@ class RolePermissionUpdateView(APIView):
             request: The request object, containing a list of permissions data.
 
         Returns:
-            Response: A response object with the updated permissions or an
-                error message.
+            Response: A response object with the updated permissions or an error message.
         """
         permissions_data = request.data
         if not isinstance(permissions_data, list):

@@ -125,10 +125,10 @@ class PatientSerializer(serializers.ModelSerializer):
         Returns:
             dict: The validated attributes.
         """
-        dob = attrs.get("dob")
-        age_years = attrs.get("age_years")
-        age_months = attrs.get("age_months")
-        age_days = attrs.get("age_days")
+        dob = attrs.get('dob')
+        age_years = attrs.get('age_years')
+        age_months = attrs.get('age_months')
+        age_days = attrs.get('age_days')
 
         has_dob = dob is not None
         has_age = any(
@@ -194,29 +194,20 @@ class PatientSerializer(serializers.ModelSerializer):
             for msg in error_messages:
                 msg_lower = msg.lower()
                 if "required" in msg_lower and "terminal" in msg_lower:
-                    raise serializers.ValidationError(
-                        {
-                            "detail": (
-                                "Terminal code is required for offline " "registration."
-                            )
-                        }
-                    ) from e
+                    raise serializers.ValidationError({
+                        "detail": "Terminal code is required for offline registration."
+                    }) from e
                 elif "not found" in msg_lower or "not active" in msg_lower:
-                    raise serializers.ValidationError(
-                        {"detail": "Invalid or inactive terminal."}
-                    ) from e
+                    raise serializers.ValidationError({
+                        "detail": "Invalid or inactive terminal."
+                    }) from e
                 elif "exhausted" in msg_lower:
-                    raise serializers.ValidationError(
-                        {
-                            "detail": (
-                                "Terminal has exhausted its offline "
-                                "registration range."
-                            )
-                        }
-                    ) from e
-            raise serializers.ValidationError(
-                {"detail": "Invalid registration parameters."}
-            ) from e
+                    raise serializers.ValidationError({
+                        "detail": "Terminal has exhausted its offline registration range."
+                    }) from e
+            raise serializers.ValidationError({
+                "detail": "Invalid registration parameters."
+            }) from e
 
         if mrn is not None:
             validated_data["mrn"] = mrn
@@ -231,9 +222,9 @@ class PatientSerializer(serializers.ModelSerializer):
             patient = Patient.objects.create(**validated_data)
         except IntegrityError as e:
             if "mrn" in str(e).lower() or "unique" in str(e).lower():
-                raise serializers.ValidationError(
-                    {"detail": "Registration number already exists."}
-                ) from e
+                raise serializers.ValidationError({
+                    "detail": "Registration number already exists."
+                }) from e
             raise
 
         return patient

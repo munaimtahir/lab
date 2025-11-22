@@ -14,15 +14,11 @@ class LabTerminal(models.Model):
     the central server, ensuring uninterrupted service.
 
     Attributes:
-        code (CharField): A short, unique identifier for the terminal
-            (e.g., 'RECEP-1').
+        code (CharField): A short, unique identifier for the terminal (e.g., 'RECEP-1').
         name (CharField): A human-readable name for the terminal.
-        offline_range_start (PositiveIntegerField): The inclusive start of
-            the offline MRN range.
-        offline_range_end (PositiveIntegerField): The inclusive end of the
-            offline MRN range.
-        offline_current (PositiveIntegerField): The last used MRN in the
-            offline range.
+        offline_range_start (PositiveIntegerField): The inclusive start of the offline MRN range.
+        offline_range_end (PositiveIntegerField): The inclusive end of the offline MRN range.
+        offline_current (PositiveIntegerField): The last used MRN in the offline range.
         is_active (BooleanField): A flag indicating if the terminal is currently in use.
         created_at (DateTimeField): The timestamp of when the terminal was created.
         updated_at (DateTimeField): The timestamp of the last update to the terminal.
@@ -80,19 +76,16 @@ class LabTerminal(models.Model):
     @transaction.atomic
     def get_next_offline_mrn(self) -> int:
         """
-        Atomically allocates and returns the next offline MRN from this
-        terminal's range.
+        Atomically allocates and returns the next offline MRN from this terminal's range.
 
-        This method uses a pessimistic lock (`select_for_update`) to prevent
-        race conditions when multiple processes might be requesting an MRN
-        simultaneously.
+        This method uses a pessimistic lock (`select_for_update`) to prevent race
+        conditions when multiple processes might be requesting an MRN simultaneously.
 
         Returns:
             int: The next available offline MRN.
 
         Raises:
-            ValidationError: If the terminal has exhausted its allocated
-                offline MRN range.
+            ValidationError: If the terminal has exhausted its allocated offline MRN range.
         """
         # Use select_for_update to prevent race conditions
         terminal = LabTerminal.objects.select_for_update().get(pk=self.pk)

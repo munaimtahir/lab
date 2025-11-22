@@ -15,8 +15,7 @@ def health_check(request):
 
     Returns:
         JsonResponse: A JSON response containing the health status.
-            - "status": "healthy" if all services are responsive,
-              "unhealthy" or "degraded" otherwise.
+            - "status": "healthy" if all services are responsive, "unhealthy" or "degraded" otherwise.
             - "database": "healthy" or an error message.
             - "cache": "healthy" or an error message.
     """

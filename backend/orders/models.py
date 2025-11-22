@@ -10,7 +10,6 @@ class OrderStatus(models.TextChoices):
     """
     Enumeration for the status of an order or order item.
     """
-
     NEW = "NEW", "New"
     COLLECTED = "COLLECTED", "Collected"
     IN_PROCESS = "IN_PROCESS", "In Process"
@@ -23,7 +22,6 @@ class OrderPriority(models.TextChoices):
     """
     Enumeration for the priority of an order.
     """
-
     ROUTINE = "ROUTINE", "Routine"
     URGENT = "URGENT", "Urgent"
     STAT = "STAT", "STAT"
