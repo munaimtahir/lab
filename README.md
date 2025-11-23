@@ -19,7 +19,7 @@ cd infra && docker-compose up
 # Backend API: http://localhost:8000
 # Health Check: http://localhost:8000/api/health/
 
-# Default credentials: admin / admin123
+# Development demo credentials: admin / admin123 (for local testing only)
 ```
 
 ### VPS/Production Deployment
@@ -33,24 +33,25 @@ Quick deployment on VPS (172.237.71.40):
 git clone https://github.com/munaimtahir/lab.git
 cd lab
 
-# 2. Verify deployment configuration
-./verify-deployment.sh
+# 2. Copy .env.example to .env and configure with secure credentials
+cp .env.example .env
+# Edit .env and update:
+# - DJANGO_SECRET_KEY (generate with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
+# - POSTGRES_PASSWORD (generate with: openssl rand -base64 32)
+# - Verify DEBUG=False
 
-# 3. Update .env with secure credentials
-# Generate secret key: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
-# Generate password: openssl rand -base64 32
-
-# 4. Build and start services
+# 3. Build and start services
 docker compose build
 docker compose up -d
 
-# 5. Wait for services to be ready
-sleep 30
+# 4. Create secure admin user (REQUIRED - do NOT use default demo credentials)
+docker compose exec backend python manage.py createsuperuser
 
-# 6. Run smoke tests to verify deployment
-./scripts/smoke_test.sh
+# 5. Import master data (tests, parameters, reference ranges)
+docker compose exec backend python manage.py import_lims_master --dry-run  # Test first
+docker compose exec backend python manage.py import_lims_master             # Actual import
 
-# 7. Access the application
+# 6. Access the application
 # Frontend: http://172.237.71.40 (served via nginx on port 80)
 # Backend API: http://172.237.71.40/api/ (proxied through nginx)
 # Health Check: http://172.237.71.40/api/health/
@@ -72,13 +73,15 @@ This imports 987 tests, 1161 parameters, and reference ranges from the Excel fil
 
 **📖 For detailed instructions, see [LIMS Master Data Import Guide](backend/LIMS_IMPORT.md)**
 
-> **✅ Production Ready**: This repository is configured for production deployment on a VPS. All localhost and development port references have been removed from production configurations.
+> **✅ Production Ready**: This repository is configured for production deployment on VPS IP **172.237.71.40**.
 > 
-> **Security Note**: Before deploying:
-> 1. Generate strong passwords: `POSTGRES_PASSWORD=$(openssl rand -base64 32)`
-> 2. Generate secret key: `DJANGO_SECRET_KEY=$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')`
-> 3. Verify `DEBUG=False` in production (already set)
-> 4. Never commit `.env` to version control
+> **⚠️ Security Requirements for Production**:
+> 1. **NEVER use default demo credentials** (admin/admin123 is for development only)
+> 2. Always create secure admin users with `python manage.py createsuperuser`
+> 3. Generate strong passwords: `openssl rand -base64 32`
+> 4. Generate secret key: `python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'`
+> 5. Verify `DEBUG=False` in production `.env` file
+> 6. Never commit `.env` to version control (already in .gitignore)
 
 ## 🌐 Deployment Configuration
 
