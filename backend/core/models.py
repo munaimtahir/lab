@@ -14,11 +14,14 @@ class LabTerminal(models.Model):
     the central server, ensuring uninterrupted service.
 
     Attributes:
-        code (CharField): A short, unique identifier for the terminal (e.g., 'RECEP-1').
+        code (CharField): A short, unique identifier (e.g., 'RECEP-1').
         name (CharField): A human-readable name for the terminal.
-        offline_range_start (PositiveIntegerField): The inclusive start of the offline MRN range.
-        offline_range_end (PositiveIntegerField): The inclusive end of the offline MRN range.
-        offline_current (PositiveIntegerField): The last used MRN in the offline range.
+        offline_range_start (PositiveIntegerField): Inclusive start of
+            the offline MRN range.
+        offline_range_end (PositiveIntegerField): Inclusive end of the
+            offline MRN range.
+        offline_current (PositiveIntegerField): The last used MRN in
+            the offline range.
         is_active (BooleanField): A flag indicating if the terminal is currently in use.
         created_at (DateTimeField): The timestamp of when the terminal was created.
         updated_at (DateTimeField): The timestamp of the last update to the terminal.

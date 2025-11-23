@@ -148,9 +148,11 @@ def publish_result(request, pk):
     required_status = "ENTERED" if skip_verification else "VERIFIED"
 
     if result.status != required_status:
-        error_message = ("Result must be verified before publishing"
-                         if not skip_verification
-                         else "Result must be entered before publishing")
+        error_message = (
+            "Result must be verified before publishing"
+            if not skip_verification
+            else "Result must be entered before publishing"
+        )
         return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
 
     result.status = "PUBLISHED"

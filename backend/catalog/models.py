@@ -181,8 +181,10 @@ class TestParameter(models.Model):
         panic_low_override (DecimalField): An override for the panic low value.
         panic_high_override (DecimalField): An override for the panic high value.
         comment_template_id (CharField): The ID of a comment template.
-        created_at (DateTimeField): The timestamp when the relationship was created.
-        updated_at (DateTimeField): The timestamp when the relationship was last updated.
+        created_at (DateTimeField): The timestamp when the relationship
+            was created.
+        updated_at (DateTimeField): The timestamp when the relationship
+            was last updated.
     """
 
     test = models.ForeignKey(
@@ -283,14 +285,18 @@ class ReferenceRange(models.Model):
 
     def __str__(self):
         """Returns a string representation of the reference range."""
-        return f"{self.parameter.code} - {self.sex} ({self.age_min}-{self.age_max} {self.age_unit})"
+        return (
+            f"{self.parameter.code} - {self.sex} "
+            f"({self.age_min}-{self.age_max} {self.age_unit})"
+        )
 
 
 class ParameterQuickText(models.Model):
     """Represents quick text templates for parameter results.
 
-    This model maps to the 'Parameter_Quick_Text' sheet in the LIMS master data Excel file,
-    providing predefined text templates for result entry.
+    This model maps to the 'Parameter_Quick_Text' sheet in the LIMS
+    master data Excel file, providing predefined text templates for
+    result entry.
 
     Attributes:
         parameter (ForeignKey): The parameter the quick text belongs to.
