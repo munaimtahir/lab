@@ -185,27 +185,6 @@ class TestParameter(models.Model):
         updated_at (DateTimeField): The timestamp when the relationship was last updated.
     """
 
-    This model maps to the 'Test_Parameters' sheet in the LIMS master data Excel file,
-    linking tests to their constituent parameters.
-
-    Attributes:
-        test (ForeignKey): The test in the relationship.
-        parameter (ForeignKey): The parameter in the relationship.
-        display_order (IntegerField): The order in which the parameter is displayed.
-        section_header (CharField): A header for a section of parameters.
-        is_mandatory (BooleanField): Whether the parameter is mandatory for the test.
-        show_on_report (BooleanField): Whether the parameter is shown on the report.
-        default_reference_profile_id (CharField): The default reference profile ID.
-        delta_check_enabled (BooleanField): Whether delta check is enabled.
-        panic_low_override (DecimalField): An override for the panic low value.
-        panic_high_override (DecimalField): An override for the panic high value.
-        comment_template_id (CharField): The ID of a comment template.
-        created_at (DateTimeField): The timestamp when the relationship was
-            created.
-        updated_at (DateTimeField): The timestamp when the relationship was
-            last updated.
-    """
-
     test = models.ForeignKey(
         Test, on_delete=models.CASCADE, related_name="test_parameters"
     )
@@ -246,26 +225,6 @@ class ReferenceRange(models.Model):
 
     This model maps to the 'Reference_Ranges' sheet in the LIMS master data Excel file,
     defining normal and critical ranges for parameters based on various factors.
-
-    Attributes:
-        parameter (ForeignKey): The parameter the reference range belongs to.
-        method_code (CharField): The code for the method used.
-        sex (CharField): The sex the reference range applies to.
-        age_min (IntegerField): The minimum age for the reference range.
-        age_max (IntegerField): The maximum age for the reference range.
-        age_unit (CharField): The unit for the age range (e.g., "Years").
-        population_group (CharField): The population group for the range.
-        unit (CharField): The unit of measurement for the range values.
-        normal_low (DecimalField): The normal low value.
-        normal_high (DecimalField): The normal high value.
-        critical_low (DecimalField): The critical low value.
-        critical_high (DecimalField): The critical high value.
-        reference_text (TextField): A textual representation of the reference range.
-        effective_from (DateField): The date the range becomes effective.
-        effective_to (DateField): The date the range ceases to be effective.
-        created_at (DateTimeField): The timestamp when the range was created.
-        updated_at (DateTimeField): The timestamp when the range was last updated.
-    """
 
     Attributes:
         parameter (ForeignKey): The parameter the reference range belongs to.
