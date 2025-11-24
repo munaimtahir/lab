@@ -4,7 +4,9 @@ import { ROUTES } from '../utils/constants'
 
 // TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
 // Set this to false to enable role-based route protection
-const TEMPORARY_FULL_ACCESS_MODE = true
+// Can also be controlled via VITE_TEMPORARY_FULL_ACCESS_MODE environment variable
+export const TEMPORARY_FULL_ACCESS_MODE = 
+  import.meta.env.VITE_TEMPORARY_FULL_ACCESS_MODE !== 'false'
 
 /**
  * Interface for the props of the ProtectedRoute component.

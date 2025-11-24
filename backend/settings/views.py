@@ -102,9 +102,8 @@ class RolePermissionUpdateView(APIView):
         return Response(updated_permissions)
 
 
-# TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
-# Set this to False to enable role-based permission checking
-TEMPORARY_FULL_ACCESS_MODE = True
+# Import from permissions module to maintain single source of truth
+from .permissions import TEMPORARY_FULL_ACCESS_MODE
 
 
 @api_view(["GET"])

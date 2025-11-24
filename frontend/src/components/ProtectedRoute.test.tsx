@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
-import { ProtectedRoute } from './ProtectedRoute'
+import { ProtectedRoute, TEMPORARY_FULL_ACCESS_MODE } from './ProtectedRoute'
 import { useAuth } from '../hooks/useAuth'
 import type { User } from '../types'
 
@@ -13,10 +13,6 @@ const mockUseAuth = vi.mocked(useAuth)
 function TestComponent() {
   return <div>Protected Content</div>
 }
-
-// TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
-// This must match the constant in ProtectedRoute.tsx
-const TEMPORARY_FULL_ACCESS_MODE = true
 
 describe('ProtectedRoute', () => {
   it('shows loading state while checking authentication', () => {
