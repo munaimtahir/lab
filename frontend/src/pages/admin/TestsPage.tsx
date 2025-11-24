@@ -3,6 +3,12 @@ import { limsTestService } from '../../services/lims'
 import { Modal } from '../../components/Modal'
 import type { LIMSTest, LIMSTestFormData } from '../../types'
 
+// Helper function to format currency values
+function formatCurrency(value: number | string): string {
+  const numValue = typeof value === 'number' ? value : parseFloat(value || '0')
+  return numValue.toFixed(2)
+}
+
 interface TestFormProps {
   test?: LIMSTest | null
   onSave: () => void
@@ -89,7 +95,9 @@ function TestForm({ test, onSave, onCancel }: TestFormProps) {
         type === 'checkbox'
           ? checked
           : type === 'number'
-            ? parseFloat(value) || 0
+            ? value === ''
+              ? 0
+              : parseFloat(value)
             : value,
     }))
   }
@@ -406,9 +414,7 @@ export function TestsPage() {
                     {test.department || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    Rs. {typeof test.default_charge === 'number' 
-                      ? test.default_charge.toFixed(2) 
-                      : parseFloat(test.default_charge || '0').toFixed(2)}
+                    Rs. {formatCurrency(test.default_charge)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span

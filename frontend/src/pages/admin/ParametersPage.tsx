@@ -77,16 +77,18 @@ function ParameterForm({ parameter, onSave, onCancel }: ParameterFormProps) {
   ) => {
     const { name, value, type } = e.target
     const checked = (e.target as HTMLInputElement).checked
+    let fieldValue: string | number | boolean | null
+    if (type === 'checkbox') {
+      fieldValue = checked
+    } else if (type === 'number') {
+      fieldValue = value === '' ? null : parseFloat(value)
+    } else {
+      fieldValue = value
+    }
+    
     setFormData(prev => ({
       ...prev,
-      [name]:
-        type === 'checkbox'
-          ? checked
-          : type === 'number'
-            ? value === ''
-              ? null
-              : parseFloat(value)
-            : value,
+      [name]: fieldValue,
     }))
   }
 
