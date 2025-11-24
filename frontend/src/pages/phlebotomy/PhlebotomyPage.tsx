@@ -250,8 +250,8 @@ export function PhlebotomyPage() {
                           Reject
                         </button>
                       )}
-                      {(sample.status === 'RECEIVED' || sample.status === 'REJECTED') && (
-                        <span className="text-gray-400 text-xs">No actions</span>
+                      {sample.status === 'REJECTED' && (
+                        <span className="text-gray-400 text-xs">No actions available</span>
                       )}
                     </td>
                   </tr>
