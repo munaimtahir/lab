@@ -235,3 +235,165 @@ export interface DashboardAnalytics {
   result_status: ResultStatusDistribution
   avg_tat_hours: number
 }
+
+// LIMS Master Data types
+export interface Parameter {
+  id: number
+  code: string
+  name: string
+  short_name?: string
+  unit?: string
+  data_type: string
+  editor_type: string
+  decimal_places?: number | null
+  allowed_values?: string
+  is_calculated: boolean
+  calculation_formula?: string
+  flag_direction: string
+  has_quick_text: boolean
+  external_code_type?: string
+  external_code_value?: string
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ParameterFormData {
+  code: string
+  name: string
+  short_name?: string
+  unit?: string
+  data_type: string
+  editor_type: string
+  decimal_places?: number | null
+  allowed_values?: string
+  is_calculated: boolean
+  calculation_formula?: string
+  flag_direction: string
+  has_quick_text: boolean
+  external_code_type?: string
+  external_code_value?: string
+  active: boolean
+}
+
+export interface LIMSTest {
+  id: number
+  code: string
+  name: string
+  short_name?: string
+  test_type: string
+  department?: string
+  specimen_type?: string
+  container_type?: string
+  result_scale?: string
+  default_method?: string
+  default_tat_minutes: number
+  default_print_group?: string
+  default_report_template?: string
+  default_printer_code?: string
+  billing_code?: string
+  default_charge: number
+  external_code_type?: string
+  external_code_value?: string
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface LIMSTestFormData {
+  code: string
+  name: string
+  short_name?: string
+  test_type: string
+  department?: string
+  specimen_type?: string
+  container_type?: string
+  result_scale?: string
+  default_method?: string
+  default_tat_minutes: number
+  default_print_group?: string
+  default_report_template?: string
+  default_printer_code?: string
+  billing_code?: string
+  default_charge: number
+  external_code_type?: string
+  external_code_value?: string
+  active: boolean
+}
+
+export interface TestParameter {
+  id: number
+  test: number
+  test_code?: string
+  test_name?: string
+  parameter: number
+  parameter_code?: string
+  parameter_name?: string
+  parameter_unit?: string
+  display_order: number
+  section_header?: string
+  is_mandatory: boolean
+  show_on_report: boolean
+  default_reference_profile_id?: string
+  delta_check_enabled: boolean
+  panic_low_override?: number | null
+  panic_high_override?: number | null
+  comment_template_id?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface TestParameterFormData {
+  test: number
+  parameter: number
+  display_order: number
+  section_header?: string
+  is_mandatory: boolean
+  show_on_report: boolean
+  default_reference_profile_id?: string
+  delta_check_enabled: boolean
+  panic_low_override?: number | null
+  panic_high_override?: number | null
+  comment_template_id?: string
+}
+
+export interface ReferenceRange {
+  id: number
+  parameter: number
+  parameter_code?: string
+  parameter_name?: string
+  method_code?: string
+  sex: string
+  age_min: number
+  age_max: number
+  age_unit: string
+  population_group: string
+  unit?: string
+  normal_low?: number | null
+  normal_high?: number | null
+  critical_low?: number | null
+  critical_high?: number | null
+  reference_text?: string
+  effective_from?: string | null
+  effective_to?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ReferenceRangeFormData {
+  parameter: number
+  method_code?: string
+  sex: string
+  age_min: number
+  age_max: number
+  age_unit: string
+  population_group: string
+  unit?: string
+  normal_low?: number | null
+  normal_high?: number | null
+  critical_low?: number | null
+  critical_high?: number | null
+  reference_text?: string
+  effective_from?: string | null
+  effective_to?: string | null
+}

@@ -72,6 +72,27 @@ export function SettingsPage() {
         />
 
         <SettingsTile
+          title="Tests Management"
+          description="Manage LIMS test definitions and configurations"
+          to="/admin/tests"
+          isImplemented={true}
+        />
+
+        <SettingsTile
+          title="Parameters Management"
+          description="Manage test parameters and analytes"
+          to="/admin/parameters"
+          isImplemented={true}
+        />
+
+        <SettingsTile
+          title="Test-Parameter Relationships"
+          description="Link parameters to tests and configure display"
+          to="/admin/test-parameters"
+          isImplemented={true}
+        />
+
+        <SettingsTile
           title="Workflow Customization"
           description="Configure which workflow steps are enabled"
           to="/settings/workflow"

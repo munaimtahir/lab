@@ -16,6 +16,9 @@ import { UserManagementPage } from './pages/admin/UserManagementPage'
 import { TestCatalogPage } from './pages/admin/TestCatalogPage'
 import { LabTerminalsPage } from './pages/admin/LabTerminalsPage'
 import { DashboardPage } from './pages/admin/DashboardPage'
+import { TestsPage } from './pages/admin/TestsPage'
+import { ParametersPage } from './pages/admin/ParametersPage'
+import { TestParametersPage } from './pages/admin/TestParametersPage'
 import { ROUTES } from './utils/constants'
 
 const queryClient = new QueryClient({
@@ -86,6 +89,30 @@ function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <TestCatalogPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/tests"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <TestsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/parameters"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <ParametersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/test-parameters"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <TestParametersPage />
               </ProtectedRoute>
             }
           />
