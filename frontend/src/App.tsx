@@ -9,6 +9,8 @@ import { LabHomePage } from './pages/lab/LabHomePage'
 import { NewLabSlipPage } from './pages/lab/NewLabSlipPage'
 import { LabWorklistPage } from './pages/lab/LabWorklistPage'
 import { OrderDetailPage } from './pages/lab/OrderDetailPage'
+import { PatientListPage } from './pages/patients/PatientListPage'
+import { PatientDetailPage } from './pages/patients/PatientDetailPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { WorkflowSettingsPage } from './pages/settings/WorkflowSettingsPage'
 import { RolePermissionsPage } from './pages/settings/RolePermissionsPage'
@@ -68,6 +70,8 @@ function AppRoutes() {
             }
           />
           <Route path={ROUTES.LAB_ORDER} element={<OrderDetailPage />} />
+          <Route path={ROUTES.PATIENTS} element={<PatientListPage />} />
+          <Route path="/patients/:id" element={<PatientDetailPage />} />
           <Route
             path={ROUTES.SETTINGS}
             element={

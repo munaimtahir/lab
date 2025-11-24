@@ -11,6 +11,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: ROUTES.HOME, label: 'Home' },
   { path: ROUTES.LAB, label: 'Lab' },
+  { path: ROUTES.PATIENTS, label: 'Patients', roles: ['ADMIN', 'RECEPTION'] },
   {
     path: ROUTES.LAB_WORKLIST,
     label: 'Worklist',
