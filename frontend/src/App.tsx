@@ -15,6 +15,8 @@ import { PhlebotomyPage } from './pages/phlebotomy/PhlebotomyPage'
 import { ResultEntryPage } from './pages/results/ResultEntryPage'
 import { ResultVerificationPage } from './pages/results/ResultVerificationPage'
 import { ResultPublishingPage } from './pages/results/ResultPublishingPage'
+import { ReportsPage } from './pages/reports/ReportsPage'
+import { CSVImportPage } from './pages/import/CSVImportPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { WorkflowSettingsPage } from './pages/settings/WorkflowSettingsPage'
 import { RolePermissionsPage } from './pages/settings/RolePermissionsPage'
@@ -107,6 +109,15 @@ function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN', 'PATHOLOGIST']}>
                 <ResultPublishingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path={ROUTES.REPORTS} element={<ReportsPage />} />
+          <Route
+            path={ROUTES.CSV_IMPORT}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <CSVImportPage />
               </ProtectedRoute>
             }
           />

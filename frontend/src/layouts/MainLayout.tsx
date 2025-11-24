@@ -37,6 +37,8 @@ const navItems: NavItem[] = [
     label: 'Publishing',
     roles: ['ADMIN', 'PATHOLOGIST'],
   },
+  { path: ROUTES.REPORTS, label: 'Reports' },
+  { path: ROUTES.CSV_IMPORT, label: 'Data Import', roles: ['ADMIN'] },
   { path: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', roles: ['ADMIN'] },
   { path: ROUTES.SETTINGS, label: 'Settings', roles: ['ADMIN'] },
 ]
