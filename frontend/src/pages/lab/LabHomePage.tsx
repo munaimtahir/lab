@@ -65,56 +65,92 @@ export function LabHomePage() {
             color="blue"
           />
           <Tile
-            title="Due Lab Slip"
+            title="Due Lab Slips"
             description="View pending orders"
+            to={ROUTES.LAB_WORKLIST}
             color="orange"
           />
           <Tile
-            title="Refund Lab Slip"
-            description="Process refunds"
-            color="red"
-          />
-          <Tile
-            title="Modify Lab Slip"
-            description="Edit existing orders"
-            color="purple"
-          />
-          <Tile
-            title="Test Results Saving"
-            description="Enter test results"
+            title="Sample Collection"
+            description="Collect and receive samples"
+            to={ROUTES.PHLEBOTOMY}
             color="green"
           />
           <Tile
-            title="Results Upload Bulk"
-            description="Bulk upload results"
+            title="Enter Results"
+            description="Enter test results"
+            to={ROUTES.RESULT_ENTRY}
+            color="purple"
+          />
+          <Tile
+            title="Verify Results"
+            description="Verify entered results"
+            to={ROUTES.RESULT_VERIFICATION}
             color="teal"
           />
           <Tile
+            title="Publish Results"
+            description="Publish verified results"
+            to={ROUTES.RESULT_PUBLISHING}
+            color="green"
+          />
+          <Tile
             title="Manage Lab Tests"
-            description="View test catalog"
+            description="View and edit test catalog"
+            to={ROUTES.ADMIN_CATALOG}
             color="blue"
           />
         </div>
       </section>
 
       {/* Reports Section */}
-      <section>
+      <section className="mb-8">
         <h2 className="text-xl font-semibold text-gray-700 mb-4">Reports</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Tile
-            title="Daily Reports"
-            description="View daily statistics"
+            title="Reports"
+            description="View and generate reports"
+            to={ROUTES.REPORTS}
             color="green"
           />
           <Tile
-            title="Monthly Summary"
-            description="Monthly overview"
+            title="Patient Records"
+            description="View patient history"
+            to={ROUTES.PATIENTS}
             color="blue"
           />
           <Tile
-            title="Department Wise"
-            description="Department statistics"
+            title="Dashboard Analytics"
+            description="View lab statistics"
+            to={ROUTES.HOME}
             color="purple"
+          />
+        </div>
+      </section>
+
+      {/* Settings Section */}
+      <section>
+        <h2 className="text-xl font-semibold text-gray-700 mb-4">
+          Settings & Admin
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Tile
+            title="Workflow Settings"
+            description="Configure lab workflow"
+            to="/settings/workflow"
+            color="purple"
+          />
+          <Tile
+            title="Role Permissions"
+            description="Manage user permissions"
+            to="/settings/permissions"
+            color="teal"
+          />
+          <Tile
+            title="User Management"
+            description="Manage system users"
+            to={ROUTES.ADMIN_USERS}
+            color="orange"
           />
         </div>
       </section>

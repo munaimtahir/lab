@@ -5,16 +5,16 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from core.permissions import IsAdminUser
 from orders.models import Order
 from results.models import Result, ResultStatus
 from samples.models import Sample, SampleStatus
 
 
 @api_view(["GET"])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def dashboard_analytics(request):
     """Get dashboard analytics and performance metrics.
 

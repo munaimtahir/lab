@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { patientService } from '../../services/patients'
 import { catalogService } from '../../services/catalog'
 import { orderService } from '../../services/orders'
+import { PatientSearchModal } from '../../components/PatientSearchModal'
 import type { Patient, TestCatalog } from '../../types'
 import {
   validateCNIC,
@@ -47,10 +48,15 @@ export function NewLabSlipPage() {
   const [existingPatient, setExistingPatient] = useState<Patient | null>(null)
   const [patientSuggestions, setPatientSuggestions] = useState<Patient[]>([])
 
+  // Patient search modal state
+  const [isPatientSearchOpen, setIsPatientSearchOpen] = useState(false)
+
   // Test selection state
   const [testSearch, setTestSearch] = useState('')
   const [testSuggestions, setTestSuggestions] = useState<TestCatalog[]>([])
   const [selectedTests, setSelectedTests] = useState<TestCatalog[]>([])
+  const [testSearchIndex, setTestSearchIndex] = useState(-1)
+  const testSearchInputRef = useRef<HTMLInputElement>(null)
 
   // Billing state
   const [discount, setDiscount] = useState(0)
@@ -93,21 +99,58 @@ export function NewLabSlipPage() {
       if (testSearch.length >= 1) {
         try {
           const tests = await catalogService.search(testSearch)
-          setTestSuggestions(
-            tests.filter(t => !selectedTests.find(s => s.id === t.id))
-          )
+          const filteredTests = tests.filter(t => !selectedTests.find(s => s.id === t.id))
+          setTestSuggestions(filteredTests)
+          // Reset selection index when results change
+          setTestSearchIndex(filteredTests.length > 0 ? 0 : -1)
         } catch (error) {
           console.error('Failed to search tests:', error)
           setTestSuggestions([])
+          setTestSearchIndex(-1)
         }
       } else {
         setTestSuggestions([])
+        setTestSearchIndex(-1)
       }
     }
 
     const debounce = setTimeout(searchTests, 200)
     return () => clearTimeout(debounce)
   }, [testSearch, selectedTests])
+
+  // Handle test search keyboard navigation
+  const handleTestSearchKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (testSuggestions.length === 0) return
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault()
+        setTestSearchIndex((prev) =>
+          prev < testSuggestions.length - 1 ? prev + 1 : prev
+        )
+        break
+      case 'ArrowUp':
+        event.preventDefault()
+        setTestSearchIndex((prev) => (prev > 0 ? prev - 1 : prev))
+        break
+      case 'Enter':
+        event.preventDefault()
+        if (testSearchIndex >= 0 && testSearchIndex < testSuggestions.length) {
+          addTest(testSuggestions[testSearchIndex])
+        }
+        break
+      case 'Escape':
+        setTestSuggestions([])
+        setTestSearchIndex(-1)
+        break
+    }
+  }, [testSuggestions, testSearchIndex])
+
+  // Handle patient selection from modal
+  const handlePatientSelect = useCallback((patient: Patient) => {
+    selectPatient(patient)
+    setIsPatientSearchOpen(false)
+  }, [])
 
   const handlePatientChange = (
     field: keyof PatientFormData,
@@ -196,6 +239,11 @@ export function NewLabSlipPage() {
     setSelectedTests(prev => [...prev, test])
     setTestSearch('')
     setTestSuggestions([])
+    setTestSearchIndex(-1)
+    // Focus back on the search input after selection
+    setTimeout(() => {
+      testSearchInputRef.current?.focus()
+    }, 50)
   }
 
   const removeTest = (testId: number) => {
@@ -319,9 +367,31 @@ export function NewLabSlipPage() {
 
       {/* Patient Information Section */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-blue-700 mb-4">
-          Patient Information
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold text-blue-700">
+            Patient Information
+          </h2>
+          <button
+            type="button"
+            onClick={() => setIsPatientSearchOpen(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            Search Patient
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* CNIC - Now Optional */}
@@ -547,12 +617,17 @@ export function NewLabSlipPage() {
         {/* Test Search */}
         <div className="mb-4 relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Search Tests
+            Search Tests{' '}
+            <span className="text-gray-400 text-xs">
+              (Use ↑↓ to navigate, Enter to select)
+            </span>
           </label>
           <input
+            ref={testSearchInputRef}
             type="text"
             value={testSearch}
             onChange={e => setTestSearch(e.target.value)}
+            onKeyDown={handleTestSearchKeyDown}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Search by test name or code"
           />
@@ -563,12 +638,17 @@ export function NewLabSlipPage() {
           {/* Test suggestions */}
           {testSuggestions.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-              {testSuggestions.map(test => (
+              {testSuggestions.map((test, index) => (
                 <button
                   key={test.id}
                   type="button"
                   onClick={() => addTest(test)}
-                  className="w-full px-3 py-2 text-left hover:bg-blue-50 border-b border-gray-100 last:border-0"
+                  onMouseEnter={() => setTestSearchIndex(index)}
+                  className={`w-full px-3 py-2 text-left border-b border-gray-100 last:border-0 ${
+                    testSearchIndex === index
+                      ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                      : 'hover:bg-gray-50'
+                  }`}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -754,6 +834,13 @@ export function NewLabSlipPage() {
           {isSubmitting ? 'Saving...' : 'Save & Print'}
         </button>
       </div>
+
+      {/* Patient Search Modal */}
+      <PatientSearchModal
+        isOpen={isPatientSearchOpen}
+        onClose={() => setIsPatientSearchOpen(false)}
+        onSelect={handlePatientSelect}
+      />
     </div>
   )
 }
