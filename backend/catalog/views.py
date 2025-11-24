@@ -4,7 +4,14 @@ from rest_framework import generics
 
 from core.permissions import IsAdminOrReadOnly
 
-from .models import Parameter, ParameterQuickText, ReferenceRange, Test, TestCatalog, TestParameter
+from .models import (
+    Parameter,
+    ParameterQuickText,
+    ReferenceRange,
+    Test,
+    TestCatalog,
+    TestParameter,
+)
 from .serializers import (
     ParameterQuickTextSerializer,
     ParameterSerializer,

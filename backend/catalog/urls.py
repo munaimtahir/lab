@@ -26,7 +26,9 @@ urlpatterns = [
     path("tests/<int:pk>/", TestDetailView.as_view(), name="test-detail"),
     # Parameters
     path("parameters/", ParameterListCreateView.as_view(), name="parameter-list"),
-    path("parameters/<int:pk>/", ParameterDetailView.as_view(), name="parameter-detail"),
+    path(
+        "parameters/<int:pk>/", ParameterDetailView.as_view(), name="parameter-detail"
+    ),
     # Test-Parameter Relationships
     path(
         "test-parameters/",

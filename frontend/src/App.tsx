@@ -9,6 +9,14 @@ import { LabHomePage } from './pages/lab/LabHomePage'
 import { NewLabSlipPage } from './pages/lab/NewLabSlipPage'
 import { LabWorklistPage } from './pages/lab/LabWorklistPage'
 import { OrderDetailPage } from './pages/lab/OrderDetailPage'
+import { PatientListPage } from './pages/patients/PatientListPage'
+import { PatientDetailPage } from './pages/patients/PatientDetailPage'
+import { PhlebotomyPage } from './pages/phlebotomy/PhlebotomyPage'
+import { ResultEntryPage } from './pages/results/ResultEntryPage'
+import { ResultVerificationPage } from './pages/results/ResultVerificationPage'
+import { ResultPublishingPage } from './pages/results/ResultPublishingPage'
+import { ReportsPage } from './pages/reports/ReportsPage'
+import { CSVImportPage } from './pages/import/CSVImportPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { WorkflowSettingsPage } from './pages/settings/WorkflowSettingsPage'
 import { RolePermissionsPage } from './pages/settings/RolePermissionsPage'
@@ -68,6 +76,51 @@ function AppRoutes() {
             }
           />
           <Route path={ROUTES.LAB_ORDER} element={<OrderDetailPage />} />
+          <Route path={ROUTES.PATIENTS} element={<PatientListPage />} />
+          <Route path="/patients/:id" element={<PatientDetailPage />} />
+          <Route
+            path={ROUTES.PHLEBOTOMY}
+            element={
+              <ProtectedRoute
+                allowedRoles={['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST']}
+              >
+                <PhlebotomyPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.RESULT_ENTRY}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'TECHNOLOGIST']}>
+                <ResultEntryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.RESULT_VERIFICATION}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'PATHOLOGIST']}>
+                <ResultVerificationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.RESULT_PUBLISHING}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN', 'PATHOLOGIST']}>
+                <ResultPublishingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path={ROUTES.REPORTS} element={<ReportsPage />} />
+          <Route
+            path={ROUTES.CSV_IMPORT}
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <CSVImportPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path={ROUTES.SETTINGS}
             element={

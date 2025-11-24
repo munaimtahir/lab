@@ -11,11 +11,34 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: ROUTES.HOME, label: 'Home' },
   { path: ROUTES.LAB, label: 'Lab' },
+  { path: ROUTES.PATIENTS, label: 'Patients', roles: ['ADMIN', 'RECEPTION'] },
   {
     path: ROUTES.LAB_WORKLIST,
     label: 'Worklist',
     roles: ['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST', 'PATHOLOGIST'],
   },
+  {
+    path: ROUTES.PHLEBOTOMY,
+    label: 'Phlebotomy',
+    roles: ['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST'],
+  },
+  {
+    path: ROUTES.RESULT_ENTRY,
+    label: 'Result Entry',
+    roles: ['ADMIN', 'TECHNOLOGIST'],
+  },
+  {
+    path: ROUTES.RESULT_VERIFICATION,
+    label: 'Verification',
+    roles: ['ADMIN', 'PATHOLOGIST'],
+  },
+  {
+    path: ROUTES.RESULT_PUBLISHING,
+    label: 'Publishing',
+    roles: ['ADMIN', 'PATHOLOGIST'],
+  },
+  { path: ROUTES.REPORTS, label: 'Reports' },
+  { path: ROUTES.CSV_IMPORT, label: 'Data Import', roles: ['ADMIN'] },
   { path: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', roles: ['ADMIN'] },
   { path: ROUTES.SETTINGS, label: 'Settings', roles: ['ADMIN'] },
 ]

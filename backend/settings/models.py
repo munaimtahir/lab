@@ -10,9 +10,12 @@ class WorkflowSettings(models.Model):
     This model controls which steps are enabled in the laboratory workflow.
 
     Attributes:
-        enable_sample_collection (BooleanField): If true, manual sample collection is required.
-        enable_sample_receive (BooleanField): If true, manual sample reception is required.
-        enable_verification (BooleanField): If true, result verification is required before publishing.
+        enable_sample_collection (BooleanField): If true, manual sample
+            collection is required.
+        enable_sample_receive (BooleanField): If true, manual sample
+            reception is required.
+        enable_verification (BooleanField): If true, result verification
+            is required before publishing.
         updated_at (DateTimeField): The timestamp of the last update.
     """
 

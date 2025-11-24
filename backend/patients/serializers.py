@@ -196,7 +196,9 @@ class PatientSerializer(serializers.ModelSerializer):
                 if "required" in msg_lower and "terminal" in msg_lower:
                     raise serializers.ValidationError(
                         {
-                            "detail": "Terminal code is required for offline registration."
+                            "detail": (
+                                "Terminal code is required for offline " "registration."
+                            )
                         }
                     ) from e
                 elif "not found" in msg_lower or "not active" in msg_lower:
@@ -206,7 +208,10 @@ class PatientSerializer(serializers.ModelSerializer):
                 elif "exhausted" in msg_lower:
                     raise serializers.ValidationError(
                         {
-                            "detail": "Terminal has exhausted its offline registration range."
+                            "detail": (
+                                "Terminal has exhausted its offline "
+                                "registration range."
+                            )
                         }
                     ) from e
             raise serializers.ValidationError(
