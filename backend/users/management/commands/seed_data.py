@@ -91,7 +91,8 @@ class Command(BaseCommand):
         pathologist.save()
 
         # Multi-role user for reception, phlebotomy, and result entry
-        # This user has RECEPTION role but can perform multiple tasks through permissions
+        # This user has RECEPTION role but can perform multiple tasks
+        # through permissions
         multi_role, _ = User.objects.get_or_create(
             username="staff",
             defaults={
@@ -218,7 +219,9 @@ class Command(BaseCommand):
         self.stdout.write("\n👥 Multi-Role Staff (Reception/Phlebotomy/Entry):")
         self.stdout.write("   Username: staff")
         self.stdout.write("   Password: staff123")
-        self.stdout.write("   Role: RECEPTION (Can perform registration, collection, entry)")
+        self.stdout.write(
+            "   Role: RECEPTION (Can perform registration, collection, entry)"
+        )
         self.stdout.write("\n✅ Verification User:")
         self.stdout.write("   Username: verifier")
         self.stdout.write("   Password: verify123")

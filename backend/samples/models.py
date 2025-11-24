@@ -23,10 +23,13 @@ class Sample(models.Model):
     Attributes:
         order_item (ForeignKey): The order item this sample is for.
         sample_type (CharField): The type of sample (e.g., 'Blood', 'Urine').
-        barcode (CharField): A unique, system-generated barcode for the sample.
-        collected_at (DateTimeField): The timestamp when the sample was collected.
+        barcode (CharField): A unique, system-generated barcode for the
+            sample.
+        collected_at (DateTimeField): The timestamp when the sample was
+            collected.
         collected_by (ForeignKey): The user who collected the sample.
-        received_at (DateTimeField): The timestamp when the sample was received in the lab.
+        received_at (DateTimeField): The timestamp when the sample was
+            received in the lab.
         received_by (ForeignKey): The user who received the sample.
         status (CharField): The current status of the sample in the workflow.
         rejection_reason (TextField): The reason for sample rejection, if applicable.

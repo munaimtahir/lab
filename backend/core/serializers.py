@@ -53,7 +53,8 @@ class LabTerminalSerializer(serializers.ModelSerializer):
             dict: The validated data.
 
         Raises:
-            serializers.ValidationError: If the range is invalid or overlaps with another terminal.
+            serializers.ValidationError: If the range is invalid or
+            overlaps with another terminal.
         """
         start = data.get("offline_range_start")
         end = data.get("offline_range_end")
