@@ -9,6 +9,7 @@ class SampleStatus(models.TextChoices):
     """
     Enumeration for the status of a lab sample.
     """
+
     PENDING = "PENDING", "Pending Collection"
     COLLECTED = "COLLECTED", "Collected"
     RECEIVED = "RECEIVED", "Received in Lab"

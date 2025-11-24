@@ -9,6 +9,7 @@ class ResultStatus(models.TextChoices):
     """
     Enumeration for the status of a test result.
     """
+
     DRAFT = "DRAFT", "Draft"
     ENTERED = "ENTERED", "Entered"
     VERIFIED = "VERIFIED", "Verified"

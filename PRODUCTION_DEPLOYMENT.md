@@ -53,7 +53,13 @@ cd lab
 
 ### 2. Configure Environment
 
-The `.env` file is already configured for production with VPS IP 172.237.71.40. **IMPORTANT: Update security credentials before deployment!**
+Copy `.env.example` to `.env` and update with secure production values:
+
+```bash
+cp .env.example .env
+```
+
+**⚠️ CRITICAL SECURITY STEP: Generate secure credentials before deployment!**
 
 ```bash
 # Generate secure Django secret key
@@ -63,11 +69,14 @@ python3 -c 'from django.core.management.utils import get_random_secret_key; prin
 openssl rand -base64 32
 ```
 
-Edit `.env` and update:
+Edit `.env` and update these critical values:
 ```bash
 DJANGO_SECRET_KEY=<generated-secret-key>
 POSTGRES_PASSWORD=<generated-password>
-DEBUG=False  # Already set, verify it's False
+DEBUG=False  # MUST be False in production
+ALLOWED_HOSTS=172.237.71.40,localhost,127.0.0.1
+CORS_ALLOWED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80
+CSRF_TRUSTED_ORIGINS=http://172.237.71.40,http://172.237.71.40:80
 ```
 
 ### 3. Build and Deploy
@@ -89,7 +98,28 @@ docker compose ps
 docker compose logs -f
 ```
 
-### 4. Verify Deployment
+### 4. Initialize Database and Create Admin User
+
+**⚠️ IMPORTANT: Do NOT use default credentials in production!**
+
+```bash
+# Optional: Seed master data (tests, parameters, reference ranges)
+# from the Excel file if needed
+docker compose exec backend python manage.py import_lims_master --dry-run
+docker compose exec backend python manage.py import_lims_master
+
+# Create a secure admin user (REQUIRED)
+docker compose exec backend python manage.py createsuperuser
+
+# Follow prompts to create admin with secure password
+# Username: admin (or your choice)
+# Email: your-email@example.com
+# Password: <use a strong password, NOT admin123>
+```
+
+**Note**: The application includes a `seed_data` command that creates demo users with default passwords (admin/admin123, etc.). These are for development ONLY and should NEVER be used in production. The production Dockerfile does not run this command automatically.
+
+### 5. Verify Deployment
 
 #### Automated Smoke Tests (Recommended)
 
@@ -118,9 +148,7 @@ curl -I http://172.237.71.40
 # Access frontend
 # Open browser: http://172.237.71.40
 
-# Default credentials
-# Username: admin
-# Password: admin123
+# Login with your secure admin credentials (created in step 4)
 ```
 
 ## 🔒 Security Configuration
@@ -152,10 +180,22 @@ All configuration files are set for production:
 
 ### Security Recommendations
 
-1. **Change Default Credentials**:
-   ```bash
-   docker compose exec backend python manage.py changepassword admin
-   ```
+1. **⚠️ NEVER Use Default Demo Credentials in Production**:
+   - The `seed_data` command creates demo users (admin/admin123, reception/reception123, etc.)
+   - These are for development and testing ONLY
+   - Always create secure admin users using `createsuperuser` command
+   - If you accidentally ran `seed_data` in production:
+     ```bash
+     # Change password for admin user immediately
+     docker compose exec backend python manage.py changepassword admin
+     
+     # Or delete demo users and create secure ones
+     docker compose exec backend python manage.py shell
+     >>> from users.models import User
+     >>> User.objects.filter(username__in=['admin', 'reception', 'tech', 'pathologist']).delete()
+     >>> exit()
+     docker compose exec backend python manage.py createsuperuser
+     ```
 
 2. **Enable HTTPS** (Recommended for production):
    - Obtain SSL certificate (Let's Encrypt)
@@ -323,10 +363,10 @@ docker compose exec backend env | grep CORS
 - **Backend Direct**: http://172.237.71.40:8000 (optional)
 - **Admin Panel**: http://172.237.71.40/admin
 
-### Default Credentials
+### Admin Access
 
-- **Username**: admin
-- **Password**: admin123
+- Use the secure admin credentials you created during deployment (step 4)
+- **⚠️ NEVER use default demo credentials (admin/admin123) in production**
 
 ### Key Files
 

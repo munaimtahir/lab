@@ -101,9 +101,7 @@ def cancel_order(request, pk):
     # Check if any samples have been collected
     has_collected_samples = False
     for item in order.items.all():
-        if item.samples.filter(
-            status__in=["COLLECTED", "RECEIVED"]
-        ).exists():
+        if item.samples.filter(status__in=["COLLECTED", "RECEIVED"]).exists():
             has_collected_samples = True
             break
 

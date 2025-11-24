@@ -1,9 +1,20 @@
-# Stage 1: Build the frontend
+# ==============================================================================
+# Frontend Dockerfile - For Development Use
+# ==============================================================================
+# This Dockerfile is used by infra/docker-compose.yml for local development.
+# The build creates a production-ready image, but the dev docker-compose
+# overrides the CMD to run `pnpm dev --host` with volume mounts for hot reload.
+#
+# For production deployment, use nginx/Dockerfile which builds a multi-stage
+# image that includes both frontend and backend static files.
+# ==============================================================================
+
+# Stage 1: Build the frontend (also used as base for dev with command override)
 FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Install pnpm
+# Install pnpm (matching version from package.json)
 RUN npm install -g pnpm@8.15.9
 
 # Copy package files
@@ -16,9 +27,10 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build the application (creates dist directory)
+# NOTE: For dev usage, this is skipped as the command is overridden
 RUN pnpm build
 
-# Stage 2: Serve with nginx
+# Stage 2: Serve with nginx (production image - not used in dev)
 FROM nginx:alpine
 
 # Copy built files from builder stage
