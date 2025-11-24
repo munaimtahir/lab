@@ -53,6 +53,19 @@ class Command(BaseCommand):
         reception.set_password("reception123")
         reception.save()
 
+        # Phlebotomy user (also used for sample collection)
+        phlebotomy, _ = User.objects.get_or_create(
+            username="phlebotomy",
+            defaults={
+                "email": "phlebotomy@alshifa.com",
+                "role": "PHLEBOTOMY",
+                "first_name": "Phlebotomy",
+                "last_name": "User",
+            },
+        )
+        phlebotomy.set_password("phlebotomy123")
+        phlebotomy.save()
+
         tech, _ = User.objects.get_or_create(
             username="tech",
             defaults={
@@ -76,6 +89,33 @@ class Command(BaseCommand):
         )
         pathologist.set_password("path123")
         pathologist.save()
+
+        # Multi-role user for reception, phlebotomy, and result entry
+        # This user has RECEPTION role but can perform multiple tasks through permissions
+        multi_role, _ = User.objects.get_or_create(
+            username="staff",
+            defaults={
+                "email": "staff@alshifa.com",
+                "role": "RECEPTION",  # Primary role
+                "first_name": "Staff",
+                "last_name": "User",
+            },
+        )
+        multi_role.set_password("staff123")
+        multi_role.save()
+
+        # Verification user (pathologist role)
+        verifier, _ = User.objects.get_or_create(
+            username="verifier",
+            defaults={
+                "email": "verifier@alshifa.com",
+                "role": "PATHOLOGIST",
+                "first_name": "Verification",
+                "last_name": "User",
+            },
+        )
+        verifier.set_password("verify123")
+        verifier.save()
 
         self.stdout.write(self.style.SUCCESS("✓ Created users"))
 
@@ -168,8 +208,26 @@ class Command(BaseCommand):
             self.style.SUCCESS(f"✓ Created {len(patients_data)} sample patients")
         )
         self.stdout.write(self.style.SUCCESS("\nDemo data seeded successfully! 🎉"))
-        self.stdout.write("\nDefault users:")
-        self.stdout.write("  admin / admin123 (Admin)")
-        self.stdout.write("  reception / reception123 (Reception)")
-        self.stdout.write("  tech / tech123 (Technologist)")
-        self.stdout.write("  pathologist / path123 (Pathologist)")
+        self.stdout.write("\n" + "=" * 60)
+        self.stdout.write("DEMO LOGIN CREDENTIALS:")
+        self.stdout.write("=" * 60)
+        self.stdout.write("\n🔑 Administrator:")
+        self.stdout.write("   Username: admin")
+        self.stdout.write("   Password: admin123")
+        self.stdout.write("   Role: ADMIN (Full system access)")
+        self.stdout.write("\n👥 Multi-Role Staff (Reception/Phlebotomy/Entry):")
+        self.stdout.write("   Username: staff")
+        self.stdout.write("   Password: staff123")
+        self.stdout.write("   Role: RECEPTION (Can perform registration, collection, entry)")
+        self.stdout.write("\n✅ Verification User:")
+        self.stdout.write("   Username: verifier")
+        self.stdout.write("   Password: verify123")
+        self.stdout.write("   Role: PATHOLOGIST (Result verification & publishing)")
+        self.stdout.write("\n" + "=" * 60)
+        self.stdout.write("Additional Individual Role Users:")
+        self.stdout.write("=" * 60)
+        self.stdout.write("   reception / reception123 (Reception only)")
+        self.stdout.write("   phlebotomy / phlebotomy123 (Phlebotomy only)")
+        self.stdout.write("   tech / tech123 (Technologist only)")
+        self.stdout.write("   pathologist / path123 (Pathologist only)")
+        self.stdout.write("=" * 60 + "\n")
