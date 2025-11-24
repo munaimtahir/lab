@@ -17,6 +17,26 @@ const navItems: NavItem[] = [
     label: 'Worklist',
     roles: ['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST', 'PATHOLOGIST'],
   },
+  {
+    path: ROUTES.PHLEBOTOMY,
+    label: 'Phlebotomy',
+    roles: ['ADMIN', 'PHLEBOTOMY', 'TECHNOLOGIST'],
+  },
+  {
+    path: ROUTES.RESULT_ENTRY,
+    label: 'Result Entry',
+    roles: ['ADMIN', 'TECHNOLOGIST'],
+  },
+  {
+    path: ROUTES.RESULT_VERIFICATION,
+    label: 'Verification',
+    roles: ['ADMIN', 'PATHOLOGIST'],
+  },
+  {
+    path: ROUTES.RESULT_PUBLISHING,
+    label: 'Publishing',
+    roles: ['ADMIN', 'PATHOLOGIST'],
+  },
   { path: ROUTES.ADMIN_DASHBOARD, label: 'Dashboard', roles: ['ADMIN'] },
   { path: ROUTES.SETTINGS, label: 'Settings', roles: ['ADMIN'] },
 ]

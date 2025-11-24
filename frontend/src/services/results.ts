@@ -42,19 +42,31 @@ export const resultService = {
   },
 
   /**
+   * Updates a result.
+   * @param {number} id - The ID of the result to update.
+   * @param {Partial<Result>} data - The data to update.
+   * @returns {Promise<Result>} A promise that resolves with the updated result.
+   */
+  async update(id: number, data: Partial<Result>): Promise<Result> {
+    return apiClient.patch<Result>(RESULT_ENDPOINTS.DETAIL(id), data)
+  },
+
+  /**
    * Enters a result.
    * @param {number} id - The ID of the result to enter.
-   * @param {EnterResultData} data - The data for the result.
+   * @param {EnterResultData} data - The data for the result (optional).
    * @returns {Promise<Result>} A promise that resolves with the entered result.
    */
-  async enter(id: number, data: EnterResultData): Promise<Result> {
-    await apiClient.patch<Result>(RESULT_ENDPOINTS.DETAIL(id), {
-      value: data.value,
-      unit: data.unit,
-      reference_range: data.reference_range,
-      flags: data.flag,
-      notes: data.notes,
-    })
+  async enter(id: number, data?: EnterResultData): Promise<Result> {
+    if (data) {
+      await apiClient.patch<Result>(RESULT_ENDPOINTS.DETAIL(id), {
+        value: data.value,
+        unit: data.unit,
+        reference_range: data.reference_range,
+        flags: data.flag,
+        notes: data.notes,
+      })
+    }
     return apiClient.post<Result>(RESULT_ENDPOINTS.ENTER(id))
   },
 
