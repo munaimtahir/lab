@@ -406,7 +406,9 @@ export function TestsPage() {
                     {test.department || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    Rs. {test.default_charge.toFixed(2)}
+                    Rs. {typeof test.default_charge === 'number' 
+                      ? test.default_charge.toFixed(2) 
+                      : parseFloat(test.default_charge || '0').toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
