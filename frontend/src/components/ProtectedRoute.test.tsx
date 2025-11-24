@@ -14,6 +14,10 @@ function TestComponent() {
   return <div>Protected Content</div>
 }
 
+// TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
+// This must match the constant in ProtectedRoute.tsx
+const TEMPORARY_FULL_ACCESS_MODE = true
+
 describe('ProtectedRoute', () => {
   it('shows loading state while checking authentication', () => {
     mockUseAuth.mockReturnValue({
@@ -76,26 +80,29 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Protected Content')).toBeInTheDocument()
   })
 
-  it('shows access denied when user lacks required role', () => {
-    mockUseAuth.mockReturnValue({
-      user: { id: 1, username: 'test', role: 'RECEPTION' } as User,
-      isAuthenticated: true,
-      isLoading: false,
-      login: vi.fn(),
-      logout: vi.fn(),
-    })
+  it.skipIf(TEMPORARY_FULL_ACCESS_MODE)(
+    'shows access denied when user lacks required role',
+    () => {
+      mockUseAuth.mockReturnValue({
+        user: { id: 1, username: 'test', role: 'RECEPTION' } as User,
+        isAuthenticated: true,
+        isLoading: false,
+        login: vi.fn(),
+        logout: vi.fn(),
+      })
 
-    render(
-      <BrowserRouter>
-        <ProtectedRoute allowedRoles={['ADMIN']}>
-          <TestComponent />
-        </ProtectedRoute>
-      </BrowserRouter>
-    )
+      render(
+        <BrowserRouter>
+          <ProtectedRoute allowedRoles={['ADMIN']}>
+            <TestComponent />
+          </ProtectedRoute>
+        </BrowserRouter>
+      )
 
-    expect(screen.getByText('Access Denied')).toBeInTheDocument()
-    expect(screen.queryByText('Protected Content')).not.toBeInTheDocument()
-  })
+      expect(screen.getByText('Access Denied')).toBeInTheDocument()
+      expect(screen.queryByText('Protected Content')).not.toBeInTheDocument()
+    }
+  )
 
   it('renders children when user has required role', () => {
     mockUseAuth.mockReturnValue({

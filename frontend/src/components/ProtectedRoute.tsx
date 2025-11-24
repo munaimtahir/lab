@@ -2,6 +2,10 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { ROUTES } from '../utils/constants'
 
+// TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
+// Set this to false to enable role-based route protection
+const TEMPORARY_FULL_ACCESS_MODE = true
+
 /**
  * Interface for the props of the ProtectedRoute component.
  */
@@ -34,6 +38,11 @@ export function ProtectedRoute({
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.LOGIN} replace />
+  }
+
+  // TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
+  if (TEMPORARY_FULL_ACCESS_MODE) {
+    return <>{children}</>
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {

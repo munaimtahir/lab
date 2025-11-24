@@ -5,10 +5,11 @@ from rest_framework import serializers
 
 from catalog.serializers import TestCatalogSerializer
 from patients.serializers import PatientSerializer
+from results.models import Result, ResultStatus
 from samples.models import Sample, SampleStatus
 from settings.utils import should_skip_sample_collection, should_skip_sample_receive
 
-from .models import Order, OrderItem
+from .models import Order, OrderItem, OrderStatus
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -63,7 +64,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
         This method also handles the automatic creation of samples and sets their
         status based on the current workflow settings (e.g., skipping sample
-        collection or reception).
+        collection or reception). When both collection and reception are skipped,
+        Result objects are also created to enable immediate result entry.
 
         Args:
             validated_data (dict): The validated data for the order.
@@ -72,15 +74,34 @@ class OrderSerializer(serializers.ModelSerializer):
             Order: The newly created order instance.
         """
         test_ids = validated_data.pop("test_ids")
-        order = Order.objects.create(**validated_data)
 
         # Get workflow settings
         skip_collection = should_skip_sample_collection()
         skip_receive = should_skip_sample_receive()
 
+        # Determine initial order status based on workflow settings
+        initial_order_status = OrderStatus.NEW
+        if skip_collection and skip_receive:
+            # If both are skipped, order is ready for result entry
+            initial_order_status = OrderStatus.IN_PROCESS
+        elif skip_collection:
+            # If only collection is skipped, order is in collected state
+            initial_order_status = OrderStatus.COLLECTED
+
+        order = Order.objects.create(**validated_data, status=initial_order_status)
+
         # Create order items and samples
         for test_id in test_ids:
-            order_item = OrderItem.objects.create(order=order, test_id=test_id)
+            # Determine order item status
+            item_status = OrderStatus.NEW
+            if skip_collection and skip_receive:
+                item_status = OrderStatus.IN_PROCESS
+            elif skip_collection:
+                item_status = OrderStatus.COLLECTED
+
+            order_item = OrderItem.objects.create(
+                order=order, test_id=test_id, status=item_status
+            )
 
             # Auto-create sample for this order item
             sample_status = SampleStatus.PENDING
@@ -104,5 +125,14 @@ class OrderSerializer(serializers.ModelSerializer):
                 collected_at=collected_at,
                 received_at=received_at,
             )
+
+            # If sample is marked as received (both steps skipped),
+            # create a Result object for immediate result entry
+            if skip_collection and skip_receive:
+                Result.objects.create(
+                    order_item=order_item,
+                    value="",
+                    status=ResultStatus.DRAFT,
+                )
 
         return order

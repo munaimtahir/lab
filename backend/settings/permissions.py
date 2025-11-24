@@ -2,6 +2,10 @@
 
 from .models import RolePermission
 
+# TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
+# Set this to False to enable role-based permission checking
+TEMPORARY_FULL_ACCESS_MODE = True
+
 
 def check_permission(user, permission_field: str) -> bool:
     """
@@ -17,6 +21,10 @@ def check_permission(user, permission_field: str) -> bool:
     """
     if not user or not user.is_authenticated:
         return False
+
+    # TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
+    if TEMPORARY_FULL_ACCESS_MODE:
+        return True
 
     # Admin always has all permissions
     if user.role == "ADMIN":

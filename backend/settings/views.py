@@ -102,6 +102,11 @@ class RolePermissionUpdateView(APIView):
         return Response(updated_permissions)
 
 
+# TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
+# Set this to False to enable role-based permission checking
+TEMPORARY_FULL_ACCESS_MODE = True
+
+
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_permissions(request):
@@ -128,7 +133,10 @@ def get_user_permissions(request):
         "can_edit_settings": False,
     }
 
-    if user.role == "ADMIN":
+    # TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
+    if TEMPORARY_FULL_ACCESS_MODE:
+        default_perms = dict.fromkeys(default_perms, True)
+    elif user.role == "ADMIN":
         default_perms = dict.fromkeys(default_perms, True)
     else:
         try:
