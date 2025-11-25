@@ -118,6 +118,18 @@ export function NewLabSlipPage() {
     return () => clearTimeout(debounce)
   }, [testSearch, selectedTests])
 
+  // Define addTest callback before it's used in handleTestSearchKeyDown
+  const addTest = useCallback((test: TestCatalog) => {
+    setSelectedTests(prev => [...prev, test])
+    setTestSearch('')
+    setTestSuggestions([])
+    setTestSearchIndex(-1)
+    // Focus back on the search input after selection
+    setTimeout(() => {
+      testSearchInputRef.current?.focus()
+    }, 50)
+  }, [])
+
   // Handle test search keyboard navigation
   const handleTestSearchKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (testSuggestions.length === 0) return
@@ -144,13 +156,44 @@ export function NewLabSlipPage() {
         setTestSearchIndex(-1)
         break
     }
-  }, [testSuggestions, testSearchIndex])
+  }, [testSuggestions, testSearchIndex, addTest])
+
+  // Define selectPatient callback before it's used in handlePatientSelect
+  const selectPatient = useCallback((patient: Patient) => {
+    setExistingPatient(patient)
+    
+    // Use age fields from patient if available, otherwise calculate from DOB
+    let ageYears = patient.age_years || 0
+    let ageMonths = patient.age_months || 0
+    let ageDays = patient.age_days || 0
+    
+    // If no age fields but DOB exists, calculate age
+    if (!patient.age_years && !patient.age_months && !patient.age_days && patient.dob && validateDOB(patient.dob)) {
+      const age = calculateAgeFromDOB(patient.dob)
+      ageYears = age.years
+      ageMonths = age.months
+      ageDays = age.days
+    }
+    
+    setPatientData({
+      cnic: patient.cnic || '',
+      phone: patient.phone,
+      full_name: patient.full_name,
+      patient_id: patient.mrn,
+      sex: patient.sex,
+      dob: patient.dob || '',
+      age_years: ageYears,
+      age_months: ageMonths,
+      age_days: ageDays,
+    })
+    setPatientSuggestions([])
+  }, [])
 
   // Handle patient selection from modal
   const handlePatientSelect = useCallback((patient: Patient) => {
     selectPatient(patient)
     setIsPatientSearchOpen(false)
-  }, [])
+  }, [selectPatient])
 
   const handlePatientChange = (
     field: keyof PatientFormData,
@@ -203,47 +246,6 @@ export function NewLabSlipPage() {
     setPatientData(prev => ({ ...prev, ...updates }))
     setExistingPatient(null)
     setErrors(prev => ({ ...prev, [field]: '' }))
-  }
-
-  const selectPatient = (patient: Patient) => {
-    setExistingPatient(patient)
-    
-    // Use age fields from patient if available, otherwise calculate from DOB
-    let ageYears = patient.age_years || 0
-    let ageMonths = patient.age_months || 0
-    let ageDays = patient.age_days || 0
-    
-    // If no age fields but DOB exists, calculate age
-    if (!patient.age_years && !patient.age_months && !patient.age_days && patient.dob && validateDOB(patient.dob)) {
-      const age = calculateAgeFromDOB(patient.dob)
-      ageYears = age.years
-      ageMonths = age.months
-      ageDays = age.days
-    }
-    
-    setPatientData({
-      cnic: patient.cnic || '',
-      phone: patient.phone,
-      full_name: patient.full_name,
-      patient_id: patient.mrn,
-      sex: patient.sex,
-      dob: patient.dob || '',
-      age_years: ageYears,
-      age_months: ageMonths,
-      age_days: ageDays,
-    })
-    setPatientSuggestions([])
-  }
-
-  const addTest = (test: TestCatalog) => {
-    setSelectedTests(prev => [...prev, test])
-    setTestSearch('')
-    setTestSuggestions([])
-    setTestSearchIndex(-1)
-    // Focus back on the search input after selection
-    setTimeout(() => {
-      testSearchInputRef.current?.focus()
-    }, 50)
   }
 
   const removeTest = (testId: number) => {

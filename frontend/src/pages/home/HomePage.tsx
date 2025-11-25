@@ -96,7 +96,7 @@ export function HomePage() {
   const pendingSamples =
     analytics?.sample_status.pending ?? 0
   const pendingCollection =
-    analytics?.sample_status.pending ?? 0
+    analytics?.sample_status.collected ?? 0
   const pendingResultEntry =
     (analytics?.sample_status.received ?? 0) -
     (analytics?.result_status.entered ?? 0) -
