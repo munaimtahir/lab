@@ -7,7 +7,9 @@ from .models import RolePermission
 # TEMPORARY FULL PERMISSION OVERRIDE — REMOVE LATER WHEN FINE-GRAINED PERMISSIONS ARE ACTIVATED.
 # Set this to False to enable role-based permission checking
 # Can also be controlled via TEMPORARY_FULL_ACCESS_MODE environment variable
-TEMPORARY_FULL_ACCESS_MODE = os.environ.get("TEMPORARY_FULL_ACCESS_MODE", "True").lower() == "true"
+TEMPORARY_FULL_ACCESS_MODE = (
+    os.environ.get("TEMPORARY_FULL_ACCESS_MODE", "True").lower() == "true"
+)
 
 
 def check_permission(user, permission_field: str) -> bool:
