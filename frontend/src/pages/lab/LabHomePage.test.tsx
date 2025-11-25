@@ -22,11 +22,11 @@ describe('LabHomePage', () => {
     )
 
     expect(screen.getByText('New Lab Slip')).toBeInTheDocument()
-    expect(screen.getByText('Due Lab Slip')).toBeInTheDocument()
-    expect(screen.getByText('Refund Lab Slip')).toBeInTheDocument()
-    expect(screen.getByText('Modify Lab Slip')).toBeInTheDocument()
-    expect(screen.getByText('Test Results Saving')).toBeInTheDocument()
-    expect(screen.getByText('Results Upload Bulk')).toBeInTheDocument()
+    expect(screen.getByText('Due Lab Slips')).toBeInTheDocument()
+    expect(screen.getByText('Sample Collection')).toBeInTheDocument()
+    expect(screen.getByText('Enter Results')).toBeInTheDocument()
+    expect(screen.getByText('Verify Results')).toBeInTheDocument()
+    expect(screen.getByText('Publish Results')).toBeInTheDocument()
     expect(screen.getByText('Manage Lab Tests')).toBeInTheDocument()
   })
 
@@ -37,10 +37,24 @@ describe('LabHomePage', () => {
       </BrowserRouter>
     )
 
-    expect(screen.getByText('Reports')).toBeInTheDocument()
-    expect(screen.getByText('Daily Reports')).toBeInTheDocument()
-    expect(screen.getByText('Monthly Summary')).toBeInTheDocument()
-    expect(screen.getByText('Department Wise')).toBeInTheDocument()
+    // Use getAllByText since "Reports" appears multiple times (section header and tile)
+    const reportsElements = screen.getAllByText('Reports')
+    expect(reportsElements.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('Patient Records')).toBeInTheDocument()
+    expect(screen.getByText('Dashboard Analytics')).toBeInTheDocument()
+  })
+
+  it('displays settings section', () => {
+    render(
+      <BrowserRouter>
+        <LabHomePage />
+      </BrowserRouter>
+    )
+
+    expect(screen.getByText('Settings & Admin')).toBeInTheDocument()
+    expect(screen.getByText('Workflow Settings')).toBeInTheDocument()
+    expect(screen.getByText('Role Permissions')).toBeInTheDocument()
+    expect(screen.getByText('User Management')).toBeInTheDocument()
   })
 
   it('new lab slip tile links to correct route', () => {

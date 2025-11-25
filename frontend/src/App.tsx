@@ -27,6 +27,7 @@ import { DashboardPage } from './pages/admin/DashboardPage'
 import { TestsPage } from './pages/admin/TestsPage'
 import { ParametersPage } from './pages/admin/ParametersPage'
 import { TestParametersPage } from './pages/admin/TestParametersPage'
+import { ReferenceRangesPage } from './pages/admin/ReferenceRangesPage'
 import { ROUTES } from './utils/constants'
 
 const queryClient = new QueryClient({
@@ -166,6 +167,14 @@ function AppRoutes() {
             element={
               <ProtectedRoute allowedRoles={['ADMIN']}>
                 <TestParametersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/reference-ranges"
+            element={
+              <ProtectedRoute allowedRoles={['ADMIN']}>
+                <ReferenceRangesPage />
               </ProtectedRoute>
             }
           />

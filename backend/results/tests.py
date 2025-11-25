@@ -10,6 +10,7 @@ from rest_framework.test import APIClient
 from catalog.models import TestCatalog
 from orders.models import Order, OrderItem
 from patients.models import Patient
+from settings.permissions import TEMPORARY_FULL_ACCESS_MODE
 
 from .models import Result
 
@@ -136,6 +137,10 @@ class TestResultAPI:
         assert response.data["status"] == "ENTERED"
         assert response.data["entered_by"] == self.tech_user.id
 
+    @pytest.mark.skipif(
+        TEMPORARY_FULL_ACCESS_MODE,
+        reason="Test skipped when TEMPORARY_FULL_ACCESS_MODE is enabled",
+    )
     def test_enter_result_as_reception_forbidden(self):
         """Test that reception cannot enter results."""
         self.client.force_authenticate(user=self.reception_user)
@@ -176,6 +181,10 @@ class TestResultAPI:
         response = self.client.post(f"/api/results/{result.id}/verify/")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    @pytest.mark.skipif(
+        TEMPORARY_FULL_ACCESS_MODE,
+        reason="Test skipped when TEMPORARY_FULL_ACCESS_MODE is enabled",
+    )
     def test_verify_result_as_tech_forbidden(self):
         """Test that tech cannot verify results."""
         self.client.force_authenticate(user=self.tech_user)
@@ -247,6 +256,10 @@ class TestResultAPI:
         response = self.client.post("/api/results/99999/publish/")
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    @pytest.mark.skipif(
+        TEMPORARY_FULL_ACCESS_MODE,
+        reason="Test skipped when TEMPORARY_FULL_ACCESS_MODE is enabled",
+    )
     def test_publish_result_as_tech_forbidden(self):
         """Test that tech cannot publish results."""
         self.client.force_authenticate(user=self.tech_user)

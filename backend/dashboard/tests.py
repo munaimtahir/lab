@@ -62,11 +62,12 @@ class DashboardAnalyticsTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_dashboard_requires_admin_role(self):
-        """Test that dashboard requires admin role."""
+    def test_dashboard_accessible_by_non_admin(self):
+        """Test that dashboard is accessible by non-admin authenticated users."""
         self.client.force_authenticate(user=self.regular_user)
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # Dashboard is now accessible to all authenticated users
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_dashboard_analytics_empty_state(self):
         """Test dashboard analytics with no data."""
