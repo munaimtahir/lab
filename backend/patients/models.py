@@ -1,7 +1,7 @@
 """Patient models."""
 
 from django.core.validators import RegexValidator
-from django.db import models
+from django.db import models, transaction
 
 from core.models import LabTerminal
 
@@ -113,22 +113,28 @@ class Patient(models.Model):
         Overrides the default save method to generate a Medical Record Number (MRN).
 
         The MRN is generated based on the current date and a sequential number.
+        This process is wrapped in a transaction with row-level locking to prevent race conditions.
         """
         if not self.mrn:
-            # Generate MRN: PAT-YYYYMMDD-NNNN
-            from django.utils import timezone
+            with transaction.atomic():
+                from django.utils import timezone
 
-            today = timezone.now().strftime("%Y%m%d")
-            # Get the last patient created today
-            last_patient = (
-                Patient.objects.filter(mrn__startswith=f"PAT-{today}")
-                .order_by("mrn")
-                .last()
-            )
-            if last_patient:
-                last_num = int(last_patient.mrn.split("-")[-1])
-                new_num = last_num + 1
-            else:
-                new_num = 1
-            self.mrn = f"PAT-{today}-{new_num:04d}"
+                today = timezone.now().strftime("%Y%m%d")
+
+                # Lock relevant rows to prevent race conditions
+                last_patient = (
+                    Patient.objects.select_for_update()
+                    .filter(mrn__startswith=f"PAT-{today}")
+                    .order_by("mrn")
+                    .last()
+                )
+
+                if last_patient:
+                    last_num = int(last_patient.mrn.split("-")[-1])
+                    new_num = last_num + 1
+                else:
+                    new_num = 1
+
+                self.mrn = f"PAT-{today}-{new_num:04d}"
+
         super().save(*args, **kwargs)
