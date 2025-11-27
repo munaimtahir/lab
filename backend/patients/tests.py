@@ -4,6 +4,7 @@ from datetime import date, timedelta
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.db import connection
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -412,3 +413,52 @@ class TestPatientSerializerValidation:
         serializer = PatientSerializer()
         result = serializer.validate_cnic("12345-1234567-1")
         assert result == "12345-1234567-1"
+
+@pytest.mark.django_db
+class TestPatientModelConcurrency:
+    """Tests for concurrency issues in Patient model."""
+
+    @pytest.mark.skipif(
+        connection.vendor == "sqlite",
+        reason="SQLite does not support concurrent writes and fails this test.",
+    )
+    def test_mrn_generation_race_condition(self):
+        """Test MRN generation under concurrent requests."""
+        import threading
+        from django.db import transaction
+
+        exceptions = []
+
+        def create_patient_thread(phone_suffix):
+            try:
+                # Each thread needs its own database connection
+                with transaction.atomic():
+                    Patient.objects.create(
+                        full_name="Race Condition Test",
+                        sex="M",
+                        phone=f"0300123456{phone_suffix:02d}",
+                    )
+            except Exception as e:
+                exceptions.append(e)
+            finally:
+                # Close the connection for this thread
+                connection.close()
+
+        threads = []
+        num_threads = 10
+        for i in range(num_threads):
+            thread = threading.Thread(target=create_patient_thread, args=(i,))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        if exceptions:
+            raise exceptions[0]
+
+        patients = Patient.objects.filter(full_name="Race Condition Test")
+        mrns = [p.mrn for p in patients]
+
+        assert len(patients) == num_threads
+        assert len(set(mrns)) == num_threads
