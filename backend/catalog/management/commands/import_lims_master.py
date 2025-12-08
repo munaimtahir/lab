@@ -58,7 +58,17 @@ class Command(BaseCommand):
             df_tests = pd.read_excel(xls, "Tests")
             df_tp = pd.read_excel(xls, "Test_Parameters")
             df_rr = pd.read_excel(xls, "Reference_Ranges")
-            df_qt = pd.read_excel(xls, "Parameter_Quick_Text")
+            
+            # Parameter_Quick_Text sheet is optional
+            if "Parameter_Quick_Text" in xls.sheet_names:
+                df_qt = pd.read_excel(xls, "Parameter_Quick_Text")
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        "Parameter_Quick_Text sheet not found - skipping quick text import"
+                    )
+                )
+                df_qt = pd.DataFrame()  # Empty DataFrame
 
             self.stdout.write(
                 self.style.SUCCESS(
